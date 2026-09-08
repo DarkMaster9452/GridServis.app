@@ -1,21 +1,26 @@
 # Mechanik — Custom Autoservis Manager
 
-Desktopová aplikácia na správu autoservisu pre Windows + prezentačný web k nej.
+Program na správu autoservisu pre Windows a prezentačný web k nemu.
 
-## Aplikácia
+## Program
 
-Inštalačku nájdete v [releases](https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest)
-(`MechanikSetup.exe`, Windows 10/11 64-bit).
+Inštalačku nájdete medzi [vydaniami](https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest)
+(`MechanikSetup.exe`, Windows 10 a 11, 64-bit).
 
 ## Web
 
-Statický web bez build kroku — čisté HTML, CSS a jeden JS súbor.
+Statické stránky, žiadny build krok, žiadne závislosti.
 
 ```
-index.html               # celá landing page
-assets/css/styles.css    # štýly
-assets/js/main.js        # navigácia, reveal animácie, načítanie info o poslednom release
-.github/workflows/pages.yml
+index.html       Domov
+funkcie.html     Popis obrazoviek programu
+cennik.html      Jednorazová licencia a kalkulačka podľa počtu PC
+stiahnut.html    Inštalačka, požiadavky, postup inštalácie
+faq.html         Časté otázky
+kontakt.html     Kontakt a objednávka
+assets/css/styles.css
+assets/js/main.js
+assets/img/      snímky obrazovky programu
 ```
 
 ### Lokálne spustenie
@@ -25,24 +30,26 @@ python3 -m http.server 8080
 # http://localhost:8080
 ```
 
+### Čo sa mení kde
+
+Na začiatku `assets/js/main.js` sú dve konštanty:
+
+```js
+var EMAIL = 'licencia@mechanik.sk';   // kontaktný e-mail na objednávky a podporu
+var PASMA = [ ... ];                  // cenové pásma licencie
+```
+
+`EMAIL` sa doplní do všetkých odkazov na písanie e-mailu vrátane
+predvyplnenej objednávky z kalkulačky. `PASMA` riadi kalkulačku v
+`cennik.html`; tabuľku pásiem pod kalkulačkou treba upraviť aj v HTML,
+aby sedela s hodnotami v skripte.
+
+Verzia programu, veľkosť inštalačky a odkaz na stiahnutie sa načítajú
+za behu z GitHub API (`/releases/latest`). Ak je API nedostupné, použijú
+sa hodnoty zapísané priamo v HTML. Po vydaní novej verzie teda na webe
+netreba nič meniť.
+
 ### Nasadenie
 
-- **GitHub Pages** — workflow `.github/workflows/pages.yml` nasadí web pri každom pushi do `main`.
-  V *Settings → Pages* stačí nastaviť **Source: GitHub Actions**.
-- **Vercel / Netlify** — importovať repo, build command nechať prázdny, output directory `.`.
-
-### Verzia a odkaz na stiahnutie
-
-Číslo verzie, veľkosť a odkaz na `MechanikSetup.exe` sa načítavajú za behu
-z GitHub API (`/releases/latest`). Ak API nie je dostupné, použijú sa statické
-hodnoty priamo v `index.html`. Po vydaní novej verzie teda netreba web meniť.
-
-### Čo si treba prejsť pred spustením
-
-Texty funkcií a FAQ sú napísané podľa bežného rozsahu autoservis softvéru —
-prispôsobte ich reálnym funkciám aplikácie. Rovnako:
-
-- systémové požiadavky v sekcii *Prečo Mechanik*
-- odpoveď o viacerých staniciach v FAQ
-- doplniť reálne screenshoty namiesto mockupu v hero sekcii
-- `canonical` URL v `<head>`, ak web pobeží na vlastnej doméne
+Vercel, projekt napojený na tento repozitár. Bez build príkazu, výstupný
+adresár je koreň repozitára. Každý push do produkčnej vetvy nasadí web.
