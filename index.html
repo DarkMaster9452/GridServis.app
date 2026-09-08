@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mechanik — program na správu autoservisu</title>
+<meta name="description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, jednorazová licencia, bez mesačných poplatkov.">
+<meta property="og:title" content="Mechanik — program na správu autoservisu">
+<meta property="og:description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, jednorazová licencia, bez mesačných poplatkov.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta name="theme-color" content="#101722">
+<link rel="icon" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a class="skip" href="#obsah">Preskočiť na obsah</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+    </a>
+    <nav class="hdr__nav" aria-label="Hlavná navigácia">
+      <a href="index.html" class="on">Domov</a>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník</a>
+      <a href="stiahnut.html">Demo</a>
+      <a href="faq.html">FAQ</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
+    <a href="index.html" class="on">Domov</a>
+    <a href="funkcie.html">Funkcie</a>
+    <a href="cennik.html">Cenník</a>
+    <a href="stiahnut.html">Demo</a>
+    <a href="faq.html">FAQ</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<main id="obsah">
+
+<section class="hero">
+  <div class="wrap hero__in">
+    <div class="hero__txt">
+      <h1>Celý servis v jednom programe.<br>Od príjmu auta po faktúru.</h1>
+      <p class="lead">Mechanik vedie zákazky, zákazníkov, sklad dielov aj cenník prác. Zo zákazky vytlačíte zákazkový list, faktúru aj štítok na kľúče. Program beží na počítači v dielni, dáta máte u seba.</p>
+      <div class="row">
+        <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu &mdash; od 359,99 €</a>
+        <a class="btn btn--gh btn--lg" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť demo</a>
+      </div>
+      <p class="fine">Demo si stiahnete zadarmo. Plnú verziu sprístupní zakúpená licencia &middot; Windows 10 a 11 &middot; verzia <span data-tag>1.5.1</span></p>
+    </div>
+  </div>
+  <div class="wrap hero__shot">
+    <figure class="shot shot--hero">
+  <img src="assets/img/prehlad.png" alt="Úvodná obrazovka programu Mechanik s prehľadom zákaziek a tržieb" fetchpriority="high" width="1600" height="1000">
+  <figcaption>Mechanik — Prehľad</figcaption>
+</figure>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="tri">
+      <div class="tri__i">
+        <h3>Zákazka drží všetko pokope</h3>
+        <p>Zákazník, auto, popis závady, vykonané úkony, vymenené diely, fotky a cena. Nič nehľadáte po zošitoch a esemeskách.</p>
+      </div>
+      <div class="tri__i">
+        <h3>História auta na jeden klik</h3>
+        <p>Pri každom vozidle vidíte, čo sa na ňom robilo minule. Podľa ŠPZ alebo VIN nájdete zákazku spred roka za pár sekúnd.</p>
+      </div>
+      <div class="tri__i">
+        <h3>Doklady sa vytlačia samé</h3>
+        <p>Zákazkový list a faktúra v PDF s rozpisom prác a dielov. Hodinovú sadzbu, DPH aj číslovanie si nastavíte raz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap">
+    <header class="shead">
+      <h2>Čo je v programe</h2>
+      <p>Sedem obrazoviek, ktoré pokrývajú bežný deň v dielni.</p>
+    </header>
+    <div class="mods">
+      <a class="mod" href="funkcie.html#zakazky"><b>Zákazky</b><span>Zoznam s filtrami podľa stavu, vyhľadávanie podľa mena, ŠPZ aj čísla zákazky, export do CSV.</span></a>
+      <a class="mod" href="funkcie.html#detail"><b>Detail zákazky</b><span>Údaje o aute vrátane VIN, termín objednania, fotky, história vozidla, tlač dokladov.</span></a>
+      <a class="mod" href="funkcie.html#zakaznici"><b>Zákazníci</b><span>Karty zákazníkov s autami, počtom zákaziek, útratou a označením pravidelných.</span></a>
+      <a class="mod" href="funkcie.html#sklad"><b>Sklad</b><span>Diely s katalógovým číslom, umiestnením v regáli, nákupnou a predajnou cenou aj maržou.</span></a>
+      <a class="mod" href="funkcie.html#cennik-prac"><b>Cenník prác</b><span>Úkony rozdelené do kategórií s normohodinami. Cena práce sa počíta zo sadzby dielne.</span></a>
+      <a class="mod" href="funkcie.html#statistiky"><b>Štatistiky</b><span>Tržby po mesiacoch, pomer práce a dielov, rozdelenie zákaziek podľa stavu, najčastejšie značky.</span></a>
+      <a class="mod" href="funkcie.html#nastavenia"><b>Nastavenia</b><span>Údaje dielne do hlavičky dokladov, hodinová sadzba, IBAN, splatnosť, DPH a číslovanie.</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="alt">
+      <div class="alt__txt">
+        <p class="tagline">Zákazky</p>
+        <h2>Vidíte, čo je rozrobené a čo čaká na diel</h2>
+        <p>Zoznam zákaziek sa dá filtrovať podľa stavu: prijaté, v riešení, čaká na diely, hotové, vydané. Vyhľadávanie berie meno zákazníka, značku, ŠPZ aj číslo zákazky.</p>
+        <ul class="ticks">
+          <li>Automatické číslovanie v tvare Z2026-0001</li>
+          <li>Farebné označenie stavu v zozname aj v prehľade</li>
+          <li>Export celého zoznamu do CSV</li>
+        </ul>
+        <a class="link" href="funkcie.html#zakazky">Podrobnosti o zákazkách</a>
+      </div>
+      <figure class="shot ">
+  <img src="assets/img/zakazky.png" alt="Zoznam zákaziek s filtrami podľa stavu" loading="lazy" width="1600" height="1000">
+  <figcaption>Zákazky</figcaption>
+</figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap">
+    <div class="alt alt--rev">
+      <div class="alt__txt">
+        <p class="tagline">Štatistiky</p>
+        <h2>Na konci mesiaca nič nedopočítavate</h2>
+        <p>Program ukáže tržby po mesiacoch, koľko z nich je za prácu a koľko za diely, čo je neuhradené, ktoré značky vozidiel chodia najčastejšie a ktorí zákazníci nechajú v dielni najviac.</p>
+        <ul class="ticks">
+          <li>Počet zákaziek a tržby po mesiacoch</li>
+          <li>Rozdelenie zákaziek podľa stavu</li>
+          <li>Najhodnotnejší zákazníci a najčastejšie diely</li>
+        </ul>
+        <a class="link" href="funkcie.html#statistiky">Podrobnosti o štatistikách</a>
+      </div>
+      <figure class="shot ">
+  <img src="assets/img/statistiky.png" alt="Štatistiky tržieb a zákaziek" loading="lazy" width="1600" height="1000">
+  <figcaption>Štatistiky</figcaption>
+</figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <header class="shead">
+      <h2>Zaplatíte raz</h2>
+      <p>Licencia je jednorazová a viaže sa na počet počítačov, na ktorých program používate. Žiadne predplatné, žiadne obnovovanie.</p>
+    </header>
+    <div class="teaser">
+      <div class="teaser__price"><b>od 359,99 €</b><span>jednorazovo za jeden počítač</span></div>
+      <p>Pri viacerých počítačoch v dielni cena za kus klesá. Presnú sumu spočíta kalkulačka v cenníku.</p>
+      <a class="btn btn--gh" href="cennik.html">Spočítať cenu</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap cta__in">
+    <h2>Najprv demo, potom rozhodnutie</h2>
+    <p>Demo si stiahnete hneď a vyskúšate na vlastných zákazkách. Licenciu kupujete až vtedy, keď viete, že vám program sadol.</p>
+    <div class="row row--c">
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+        <a class="btn btn--gh btn--lg btn--onDark" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť demo</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <a class="logo logo--foot" href="index.html">
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+        <span class="logo__txt">Mechanik</span>
+      </a>
+      <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
+    </div>
+    <div class="foot__col">
+      <h3>Program</h3>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník a licencia</a>
+      <a href="stiahnut.html">Demo na vyskúšanie</a>
+    </div>
+    <div class="foot__col">
+      <h3>Podpora</h3>
+      <a href="faq.html">Časté otázky</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/issues" target="_blank" rel="noopener">Nahlásiť chybu</a>
+    </div>
+    <div class="foot__col">
+      <h3>Súbory</h3>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases" target="_blank" rel="noopener">Všetky verzie</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>&copy; <span data-rok>2026</span> Mechanik</span>
+    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

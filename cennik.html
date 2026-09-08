@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cenník a licencia — Mechanik</title>
+<meta name="description" content="Jednorazová licencia na program Mechanik. Cena závisí od počtu počítačov, na ktorých program používate. Kalkulačka a postup objednávky.">
+<meta property="og:title" content="Cenník a licencia — Mechanik">
+<meta property="og:description" content="Jednorazová licencia na program Mechanik. Cena závisí od počtu počítačov, na ktorých program používate. Kalkulačka a postup objednávky.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta name="theme-color" content="#101722">
+<link rel="icon" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a class="skip" href="#obsah">Preskočiť na obsah</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+    </a>
+    <nav class="hdr__nav" aria-label="Hlavná navigácia">
+      <a href="index.html">Domov</a>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html" class="on">Cenník</a>
+      <a href="stiahnut.html">Demo</a>
+      <a href="faq.html">FAQ</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
+    <a href="index.html">Domov</a>
+    <a href="funkcie.html">Funkcie</a>
+    <a href="cennik.html" class="on">Cenník</a>
+    <a href="stiahnut.html">Demo</a>
+    <a href="faq.html">FAQ</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<main id="obsah">
+
+<section class="phead">
+  <div class="wrap">
+    <h1>Zaplatíte raz, používate natrvalo</h1>
+    <p class="lead">Licencia sa kupuje na počítač. Koľko počítačov v dielni Mechanika používa, toľko licencií potrebujete. Nič sa neobnovuje a nič sa neplatí mesačne. Plnú verziu programu sprístupní zakúpená licencia, demo je zadarmo.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <div class="calc">
+      <div class="calc__in">
+        <h2>Kalkulačka ceny</h2>
+        <p class="calc__q">Na koľkých počítačoch budete Mechanika používať?</p>
+        <output class="calc__val" id="hodnota" for="pocet">1 počítač</output>
+        <input class="slider" id="pocet" type="range" min="1" max="11" step="1" value="1"
+               aria-label="Počet počítačov, posledná poloha je cena na mieru">
+        <div class="scale"><span>1</span><span>5</span><span>10</span><span>na mieru</span></div>
+      </div>
+      <div class="calc__out">
+        <span class="calc__lbl" id="sumaLbl">Jednorazovo spolu</span>
+        <b class="calc__sum" id="suma">359,99 €</b>
+        <span class="calc__per" id="perks">359,99 € za počítač</span>
+        <span class="calc__save" id="uspora" hidden></span>
+        <a class="btn btn--pri btn--full" id="kupit" href="cennik.html" data-buy>Kúpiť licenciu</a>
+        <a class="calc__alt" id="objednat" href="kontakt.html">alebo objednať e-mailom</a>
+        <span class="calc__note" id="poznamka">Cena je konečná a platí sa raz. Po zaplatení dostanete odkaz na stiahnutie plnej verzie, licenčný kľúč a faktúru.</span>
+      </div>
+    </div>
+
+    <div class="tiers">
+      <h3>Ako sa cena počíta</h3>
+      <table class="tbl">
+        <thead><tr><th>Počet počítačov</th><th>Cena za počítač</th><th>Príklad</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>359,99 €</td><td>1 &times; 359,99 = <b>359,99 €</b></td></tr>
+          <tr><td>2 až 4</td><td>319,99 €</td><td>3 &times; 319,99 = <b>959,97 €</b></td></tr>
+          <tr><td>5 až 9</td><td>279,99 €</td><td>6 &times; 279,99 = <b>1 679,94 €</b></td></tr>
+          <tr><td>10 a viac</td><td>239,99 €</td><td>12 &times; 239,99 = <b>2 879,88 €</b></td></tr>
+        </tbody>
+      </table>
+      <p class="fine">Nižšia sadzba platí na všetky počítače v objednávke, nielen na tie nad hranicou.</p>
+    </div>
+
+    <div class="two">
+      <div class="box box--ok">
+        <h3>V cene je</h3>
+        <ul class="ticks">
+          <li>Stiahnutie plnej verzie programu</li>
+          <li>Používanie bez časového obmedzenia</li>
+          <li>Všetky moduly, žiadne platené doplnky</li>
+          <li>Opravy chýb a aktualizácie v rámci zakúpenej verzie</li>
+          <li>Prenos licencie na nový počítač pri výmene stroja</li>
+          <li>E-mailová podpora pri inštalácii a nastavení</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>V cene nie je</h3>
+        <ul class="crosses">
+          <li>Prechod na budúcu veľkú verziu programu</li>
+          <li>Úpravy programu na mieru</li>
+          <li>Prevádzka na serveri alebo zdieľaná databáza medzi počítačmi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap wrap--mid">
+    <header class="shead">
+      <h2>Ako to prebieha</h2>
+      <p>Najprv demo, potom platba. Plná verzia sa sťahuje až po zakúpení licencie.</p>
+    </header>
+    <ol class="steps">
+      <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo si stiahnete zadarmo a bez registrácie. Zadáte pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
+      <li><span>2</span><div><h3>Zvolíte počet počítačov</h3><p>V kalkulačke vyššie nastavíte, na koľkých staniciach budete program používať. Cena sa prepočíta hneď.</p></div></li>
+      <li><span>3</span><div><h3>Zaplatíte</h3><p>Cez platobnú bránu kartou, alebo prevodom na faktúru, ak vám to vyhovuje viac. Platí sa raz.</p></div></li>
+      <li><span>4</span><div><h3>Dostanete plnú verziu</h3><p>E-mailom príde odkaz na stiahnutie plnej verzie, licenčný kľúč pre každý počítač a faktúra.</p></div></li>
+      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Kľúč vložíte v Nastaveniach do poľa Licencia. Aktivácia je trvalá a funguje aj bez internetu.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--nar">
+    <header class="shead">
+      <h2>Otázky k licencii</h2>
+    </header>
+    <div class="faq">
+      <details><summary>Naozaj sa neplatí nič mesačne?</summary><p>Nie. Licencia je jednorazová platba. Po zaplatení program používate bez ďalších nákladov.</p></details>
+      <details><summary>Vymenil som počítač, čo s licenciou?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, počet licencií zostáva rovnaký.</p></details>
+      <details><summary>Potrebujem licenciu aj na počítač doma?</summary><p>Ak tam program spúšťate, áno. Licencia sa počíta na počítač, nie na človeka.</p></details>
+      <details><summary>Dostanem faktúru na firmu?</summary><p>Áno. V objednávke uveďte názov, adresu, IČO a prípadne IČ DPH a faktúra príde na tieto údaje.</p></details>
+      <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred kúpou, a ak vám nesadne, licenciu jednoducho nekúpite.</p></details>
+      <details><summary>Potrebujem viac ako desať licencií.</summary><p>Posuňte kalkulačku úplne doprava na možnosť na mieru a napíšte mi. Pri väčšom počte staníc dohodneme cenu individuálne.</p></details>
+      <details><summary>Ako je to s aktualizáciami?</summary><p>Opravy a vylepšenia v rámci zakúpenej verzie sú zdarma. Novú inštalačku stiahnete z rovnakého miesta a dáta zostanú zachované.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap cta__in">
+    <h2>Najprv skúsiť, potom platiť</h2>
+    <p>Stiahnite si demo a pozrite, či vám sadne. Kúpu vyriešime, keď budete vedieť.</p>
+    <div class="row row--c">
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+        <a class="btn btn--gh btn--lg btn--onDark" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť demo</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <a class="logo logo--foot" href="index.html">
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+        <span class="logo__txt">Mechanik</span>
+      </a>
+      <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
+    </div>
+    <div class="foot__col">
+      <h3>Program</h3>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník a licencia</a>
+      <a href="stiahnut.html">Demo na vyskúšanie</a>
+    </div>
+    <div class="foot__col">
+      <h3>Podpora</h3>
+      <a href="faq.html">Časté otázky</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/issues" target="_blank" rel="noopener">Nahlásiť chybu</a>
+    </div>
+    <div class="foot__col">
+      <h3>Súbory</h3>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases" target="_blank" rel="noopener">Všetky verzie</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>&copy; <span data-rok>2026</span> Mechanik</span>
+    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

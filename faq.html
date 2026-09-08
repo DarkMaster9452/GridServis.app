@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Časté otázky — Mechanik</title>
+<meta name="description" content="Odpovede na otázky o programe Mechanik: dáta, licencia, viac počítačov, faktúry, DPH, zálohovanie a podpora.">
+<meta property="og:title" content="Časté otázky — Mechanik">
+<meta property="og:description" content="Odpovede na otázky o programe Mechanik: dáta, licencia, viac počítačov, faktúry, DPH, zálohovanie a podpora.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta name="theme-color" content="#101722">
+<link rel="icon" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a class="skip" href="#obsah">Preskočiť na obsah</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+    </a>
+    <nav class="hdr__nav" aria-label="Hlavná navigácia">
+      <a href="index.html">Domov</a>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník</a>
+      <a href="stiahnut.html">Demo</a>
+      <a href="faq.html" class="on">FAQ</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
+    <a href="index.html">Domov</a>
+    <a href="funkcie.html">Funkcie</a>
+    <a href="cennik.html">Cenník</a>
+    <a href="stiahnut.html">Demo</a>
+    <a href="faq.html" class="on">FAQ</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<main id="obsah">
+
+<section class="phead">
+  <div class="wrap">
+    <h1>Časté otázky</h1>
+    <p class="lead">Ak tu odpoveď nenájdete, napíšte mi a doplním ju.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--nar">
+    <h2 class="gh">Program a dáta</h2>
+    <div class="faq">
+      <details><summary>Kde sú uložené moje zákazky?</summary><p>V databáze na počítači, kde je Mechanik nainštalovaný. Nič sa neposiela na cudzí server, takže údaje o zákazníkoch zostávajú v dielni.</p></details>
+      <details><summary>Funguje program bez internetu?</summary><p>Áno. Internet potrebujete na stiahnutie inštalačky a aktualizácií. Bežná práca so zákazkami funguje aj pri výpadku.</p></details>
+      <details><summary>Beží to na Macu alebo v mobile?</summary><p>Nie. Aktuálna verzia je program pre Windows 10 a 11.</p></details>
+      <details><summary>Môžu na dátach robiť dvaja ľudia naraz?</summary><p>Program je stavaný na jeden počítač s vlastnou databázou. Zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
+      <details><summary>Ako prenesiem dáta na iný počítač?</summary><p>Skopírujete súbor databázy zo starého počítača do nového a program ju načíta. Napíšte mi a pošlem presný postup pre vašu verziu.</p></details>
+    </div>
+
+    <h2 class="gh">Zákazky a doklady</h2>
+    <div class="faq">
+      <details><summary>Vystavuje program faktúry?</summary><p>Áno, priamo z detailu zákazky. Faktúra v PDF obsahuje rozpis vykonaných prác aj každého dielu zvlášť.</p></details>
+      <details><summary>Zvládne DPH?</summary><p>Áno. V nastaveniach zapnete, že ste platiteľ, zadáte IČ DPH a sadzbu. Faktúry sa potom počítajú s DPH.</p></details>
+      <details><summary>Čo je štítok na kľúče?</summary><p>Malý štítok s číslom zákazky, ŠPZ a menom zákazníka. Vytlačíte ho zo zákazky a zavesíte ku kľúčom, aby sa autá nepomiešali.</p></details>
+      <details><summary>Dá sa zákazka objednať na termín?</summary><p>Áno. Nastavíte dátum a čas a termín pridáte do Google kalendára alebo stiahnete ako súbor .ics do vlastného kalendára.</p></details>
+      <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže vidíte všetky predchádzajúce zákazky.</p></details>
+    </div>
+
+    <h2 class="gh">Licencia a platba</h2>
+    <div class="faq">
+      <details><summary>Koľko to stojí?</summary><p>Jednorazovo od 359,99 € za jeden počítač. Pri viacerých počítačoch cena za kus klesá, presnú sumu spočíta <a href="cennik.html">kalkulačka v cenníku</a>.</p></details>
+      <details><summary>Kde stiahnem plnú verziu?</summary><p>Odkaz na stiahnutie dostanete e-mailom po zaplatení licencie, spolu s licenčným kľúčom a faktúrou. Zo stránky sa sťahuje len demo.</p></details>
+      <details><summary>Je to predplatné?</summary><p>Nie. Platíte raz a program používate ďalej bez mesačných poplatkov.</p></details>
+      <details><summary>Musím platiť hneď?</summary><p>Nie. Najprv si stiahnete demo a vyskúšate ho. Licenciu kupujete až potom.</p></details>
+      <details><summary>Ako prebieha platba?</summary><p>Cez platobnú bránu kartou, prípadne prevodom na faktúru. Po zaplatení príde e-mailom odkaz na plnú verziu a licenčný kľúč.</p></details>
+      <details><summary>Čím sa demo líši od plnej verzie?</summary><p>Demo slúži na vyskúšanie ovládania a tlače dokladov. Plnú verziu bez obmedzení sprístupní zakúpená licencia.</p></details>
+    </div>
+
+    <h2 class="gh">Podpora</h2>
+    <div class="faq">
+      <details><summary>Našiel som chybu.</summary><p>Napíšte mi cez <a href="kontakt.html">kontakt</a> alebo založte hlásenie na <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/issues" target="_blank" rel="noopener">GitHube</a>. Uveďte, čo ste robili a čo program vypísal.</p></details>
+      <details><summary>Chýba mi funkcia, ktorú by som potreboval.</summary><p>Ozvite sa. Návrhy zo servisov, ktoré program reálne používajú, majú prednosť.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <a class="logo logo--foot" href="index.html">
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+        <span class="logo__txt">Mechanik</span>
+      </a>
+      <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
+    </div>
+    <div class="foot__col">
+      <h3>Program</h3>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník a licencia</a>
+      <a href="stiahnut.html">Demo na vyskúšanie</a>
+    </div>
+    <div class="foot__col">
+      <h3>Podpora</h3>
+      <a href="faq.html">Časté otázky</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/issues" target="_blank" rel="noopener">Nahlásiť chybu</a>
+    </div>
+    <div class="foot__col">
+      <h3>Súbory</h3>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases" target="_blank" rel="noopener">Všetky verzie</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>&copy; <span data-rok>2026</span> Mechanik</span>
+    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Mechanik pre Windows</title>
+<meta name="description" content="Demo programu Mechanik na vyskúšanie zadarmo, systémové požiadavky a postup inštalácie. Plná verzia sa sťahuje po zakúpení licencie.">
+<meta property="og:title" content="Demo Mechanik pre Windows">
+<meta property="og:description" content="Demo programu Mechanik na vyskúšanie zadarmo, systémové požiadavky a postup inštalácie. Plná verzia sa sťahuje po zakúpení licencie.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta name="theme-color" content="#101722">
+<link rel="icon" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a class="skip" href="#obsah">Preskočiť na obsah</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="index.html">
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+    </a>
+    <nav class="hdr__nav" aria-label="Hlavná navigácia">
+      <a href="index.html">Domov</a>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník</a>
+      <a href="stiahnut.html" class="on">Demo</a>
+      <a href="faq.html">FAQ</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
+    <a href="index.html">Domov</a>
+    <a href="funkcie.html">Funkcie</a>
+    <a href="cennik.html">Cenník</a>
+    <a href="stiahnut.html" class="on">Demo</a>
+    <a href="faq.html">FAQ</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<main id="obsah">
+
+<section class="phead">
+  <div class="wrap">
+    <h1>Demo na vyskúšanie</h1>
+    <p class="lead">Jeden inštalačný súbor, bez účtu a bez zadávania karty. Plnú verziu programu sprístupní zakúpená licencia.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <div class="dl">
+      <div class="dl__l">
+        <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+        <div>
+          <b>MechanikSetup.exe &mdash; demo</b>
+          <span>Verzia <span data-tag>1.5.1</span> &middot; <span data-size>~41 MB</span> &middot; Windows 10 a 11, 64-bit<span data-date></span></span>
+        </div>
+      </div>
+      <a class="btn btn--pri btn--lg" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť demo</a>
+    </div>
+    <p class="fine center">Demo je zadarmo, plnú verziu dostanete na stiahnutie po zakúpení licencie. <a href="cennik.html">Pozrieť cenník</a>. Staršie verzie sú v <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases" target="_blank" rel="noopener">zozname vydaní</a>.</p>
+
+    <div class="two two--top">
+      <div class="box">
+        <h3>Systémové požiadavky</h3>
+        <dl class="specs">
+          <div><dt>Systém</dt><dd>Windows 10 alebo 11, 64-bit</dd></div>
+          <div><dt>Pamäť</dt><dd>4 GB RAM a viac</dd></div>
+          <div><dt>Disk</dt><dd>približne 300 MB</dd></div>
+          <div><dt>Rozlíšenie</dt><dd>1366 &times; 768 a viac</dd></div>
+          <div><dt>Internet</dt><dd>len na stiahnutie a aktualizácie</dd></div>
+        </dl>
+      </div>
+      <div class="box">
+        <h3>Inštalácia krok za krokom</h3>
+        <ol class="ol">
+          <li>Stiahnite MechanikSetup.exe a spustite ho.</li>
+          <li>Ak Windows zobrazí modré okno SmartScreen, kliknite na <b>Ďalšie informácie</b> a potom na <b>Spustiť tak či tak</b>.</li>
+          <li>Potvrďte inštaláciu a počkajte, kým sa program nainštaluje.</li>
+          <li>Spustite Mechanik a v Nastaveniach vyplňte údaje dielne a hodinovú sadzbu.</li>
+          <li>Založte prvú zákazku tlačidlom Nová zákazka.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="warn">
+      <h3>Prečo Windows hlási neznámeho vydavateľa</h3>
+      <p>Inštalačka zatiaľ nemá zakúpený podpisový certifikát, preto ju SmartScreen označí ako neznámu. Súbor sťahujete priamo zo stránky vydaní tohto projektu na GitHube, takže viete, odkiaľ pochádza. Po kliknutí na Ďalšie informácie a Spustiť tak či tak inštalácia normálne pokračuje.</p>
+    </div>
+
+    <div class="two two--top">
+      <div class="box">
+        <h3>Prechod z dema na plnú verziu</h3>
+        <p>Po zakúpení licencie dostanete e-mailom odkaz na plnú verziu a licenčný kľúč. Inštalačku spustíte cez demo, zákazky zapísané v deme zostanú zachované a kľúč potom vložíte v Nastaveniach.</p>
+      </div>
+      <div class="box">
+        <h3>Zálohovanie dát</h3>
+        <p>Dáta sú v databáze na vašom počítači, nie v cloude. Odporúčam kopírovať ju raz za čas na USB kľúč alebo do cloudového disku, rovnako ako zálohujete účtovníctvo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap cta__in">
+    <h2>Demo vám sadlo?</h2>
+    <p>Licenciu kúpite v cenníku. Ak sa niečo zaseklo pri inštalácii, napíšte mi, čo hlási počítač.</p>
+    <div class="row row--c">
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+      <a class="btn btn--gh btn--lg btn--onDark" href="kontakt.html">Napísať</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <a class="logo logo--foot" href="index.html">
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
+        <span class="logo__txt">Mechanik</span>
+      </a>
+      <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
+    </div>
+    <div class="foot__col">
+      <h3>Program</h3>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník a licencia</a>
+      <a href="stiahnut.html">Demo na vyskúšanie</a>
+    </div>
+    <div class="foot__col">
+      <h3>Podpora</h3>
+      <a href="faq.html">Časté otázky</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/issues" target="_blank" rel="noopener">Nahlásiť chybu</a>
+    </div>
+    <div class="foot__col">
+      <h3>Súbory</h3>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases" target="_blank" rel="noopener">Všetky verzie</a>
+      <a href="https://github.com/DarkMaster9452/Custom-Autoservis-manager" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>&copy; <span data-rok>2026</span> Mechanik</span>
+    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
