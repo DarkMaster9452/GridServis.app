@@ -3,16 +3,23 @@
   'use strict';
 
   /* ------------------------------------------------------------------
-     NASTAVENIA — tu meňte kontaktný e-mail a ceny licencie.
+     NASTAVENIA — tu sa mení e-mail, adresa platobnej brány a ceny.
      ------------------------------------------------------------------ */
-  var EMAIL = 'licencia@mechanik.sk';   // TODO: doplniť skutočný e-mail
+  var EMAIL = 'strananek@gmail.com';     // kontakt na objednávky a podporu
+
+  var PLATBA = '';                       // TODO: adresa platobnej brány.
+                                         // Kým je prázdna, tlačidlá Kúpiť
+                                         // vedú do cenníka, respektíve na
+                                         // objednávku e-mailom.
 
   var PASMA = [                          // od koľkých počítačov platí cena za kus
-    { od: 10, cena: 89 },
-    { od: 5,  cena: 109 },
-    { od: 2,  cena: 129 },
-    { od: 1,  cena: 149 }
+    { od: 10, cena: 239.99 },
+    { od: 5,  cena: 279.99 },
+    { od: 2,  cena: 319.99 },
+    { od: 1,  cena: 359.99 }
   ];
+
+  var MAX = 10;                          // nad tento počet sa cena rieši dohodou
 
   var REPO = 'DarkMaster9452/Custom-Autoservis-manager';
   var ASSET = 'MechanikSetup.exe';
@@ -22,7 +29,9 @@
   }
 
   function eur(n) {
-    return n.toLocaleString('sk-SK') + ' €';
+    return n.toLocaleString('sk-SK', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }) + ' €';
   }
 
   function cenaZaKus(pocet) {
@@ -30,6 +39,17 @@
       if (pocet >= PASMA[i].od) return PASMA[i].cena;
     }
     return PASMA[PASMA.length - 1].cena;
+  }
+
+  function pocitace(n) {
+    if (n === 1) return '1 počítač';
+    if (n < 5) return n + ' počítače';
+    return n + ' počítačov';
+  }
+
+  function mailto(predmet, telo) {
+    return 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(predmet) +
+      (telo ? '&body=' + encodeURIComponent(telo) : '');
   }
 
   /* ---------------- hlavička ---------------- */
@@ -61,34 +81,64 @@
     podpora: 'Mechanik — podpora'
   };
   each('[data-mail]', function (el) {
-    el.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(PREDMET[el.getAttribute('data-mail')] || 'Mechanik');
+    el.href = mailto(PREDMET[el.getAttribute('data-mail')] || 'Mechanik');
   });
   each('[data-mail-txt]', function (el) {
     el.textContent = EMAIL;
     el.href = 'mailto:' + EMAIL;
   });
 
+  /* ---------------- tlačidlá Kúpiť ---------------- */
+  /* Kým nie je nastavená platobná brána, ostávajú odkazy z HTML. */
+  if (PLATBA) {
+    each('a[data-buy]', function (el) { el.href = PLATBA; });
+  }
+
   /* ---------------- kalkulačka licencie ---------------- */
-  var pocetEl = document.getElementById('pocet');
-  if (pocetEl) {
+  var slider = document.getElementById('pocet');
+  if (slider) {
+    var hodnotaEl = document.getElementById('hodnota');
+    var lblEl = document.getElementById('sumaLbl');
     var sumaEl = document.getElementById('suma');
     var perEl = document.getElementById('perks');
     var usporaEl = document.getElementById('uspora');
+    var kupitEl = document.getElementById('kupit');
     var objEl = document.getElementById('objednat');
+    var poznEl = document.getElementById('poznamka');
     var zaklad = cenaZaKus(1);
 
+    var TELO_NA_MIERU =
+      'Dobrý deň,\n\npotrebujem licenciu na program Mechanik pre viac ako ' +
+      MAX + ' počítačov.\n\nPočet počítačov: \n\nFakturačné údaje:\n' +
+      'Názov dielne: \nAdresa: \nIČO: \nIČ DPH: \n\nĎakujem.\n';
+
     var prepocitaj = function () {
-      var n = parseInt(pocetEl.value, 10);
-      if (isNaN(n) || n < 1) n = 1;
-      if (n > 50) n = 50;
-      pocetEl.value = n;
+      var n = parseInt(slider.value, 10) || 1;
+      var naMieru = n > MAX;
+
+      slider.setAttribute('aria-valuetext', naMieru ? 'cena na mieru' : pocitace(n));
+
+      if (naMieru) {
+        hodnotaEl.textContent = 'Viac ako ' + MAX + ' počítačov';
+        lblEl.textContent = 'Cena na mieru';
+        sumaEl.textContent = 'Dohodou';
+        perEl.textContent = 'Napíšte mi, koľko staníc potrebujete, a pošlem ponuku.';
+        usporaEl.hidden = true;
+        kupitEl.textContent = 'Napísať e-mail';
+        kupitEl.href = mailto('Licencia Mechanik — viac ako ' + MAX + ' PC', TELO_NA_MIERU);
+        objEl.hidden = true;
+        poznEl.textContent = 'Pri väčšom počte staníc dohodneme cenu aj spôsob nasadenia individuálne.';
+        return;
+      }
 
       var kus = cenaZaKus(n);
       var spolu = kus * n;
       var uspora = zaklad * n - spolu;
 
+      hodnotaEl.textContent = pocitace(n);
+      lblEl.textContent = 'Jednorazovo spolu';
       sumaEl.textContent = eur(spolu);
-      perEl.textContent = eur(kus) + ' za počítač' + (n > 1 ? ' × ' + n + ' počítačov' : '');
+      perEl.textContent = eur(kus) + ' za počítač' + (n > 1 ? ' × ' + n : '');
 
       if (uspora > 0) {
         usporaEl.textContent = 'Ušetríte ' + eur(uspora);
@@ -97,35 +147,19 @@
         usporaEl.hidden = true;
       }
 
-      objEl.href = 'mailto:' + EMAIL +
-        '?subject=' + encodeURIComponent('Objednávka licencie Mechanik — ' + n + ' PC') +
-        '&body=' + encodeURIComponent(
-          'Dobrý deň,\n\nmám záujem o licenciu na program Mechanik.\n\n' +
-          'Počet počítačov: ' + n + '\n' +
-          'Cena podľa kalkulačky: ' + eur(spolu) + ' jednorazovo\n\n' +
-          'Fakturačné údaje:\n' +
-          'Názov dielne: \nAdresa: \nIČO: \nIČ DPH: \n\n' +
-          'Ďakujem.\n');
-
-      each('.quick button', function (b) {
-        b.classList.toggle('on', parseInt(b.getAttribute('data-set'), 10) === n);
-      });
+      kupitEl.textContent = 'Kúpiť licenciu';
+      kupitEl.href = PLATBA || 'kontakt.html';
+      objEl.hidden = false;
+      objEl.href = mailto('Objednávka licencie Mechanik — ' + n + ' PC',
+        'Dobrý deň,\n\nmám záujem o licenciu na program Mechanik.\n\n' +
+        'Počet počítačov: ' + n + '\n' +
+        'Cena podľa kalkulačky: ' + eur(spolu) + ' jednorazovo\n\n' +
+        'Fakturačné údaje:\nNázov dielne: \nAdresa: \nIČO: \nIČ DPH: \n\nĎakujem.\n');
+      poznEl.textContent = 'Cena je konečná a platí sa raz. Po zaplatení dostanete odkaz na stiahnutie plnej verzie, licenčný kľúč a faktúru.';
     };
 
-    each('[data-step]', function (b) {
-      b.addEventListener('click', function () {
-        pocetEl.value = (parseInt(pocetEl.value, 10) || 1) + parseInt(b.getAttribute('data-step'), 10);
-        prepocitaj();
-      });
-    });
-    each('[data-set]', function (b) {
-      b.addEventListener('click', function () {
-        pocetEl.value = b.getAttribute('data-set');
-        prepocitaj();
-      });
-    });
-    pocetEl.addEventListener('input', prepocitaj);
-    pocetEl.addEventListener('change', prepocitaj);
+    slider.addEventListener('input', prepocitaj);
+    slider.addEventListener('change', prepocitaj);
     prepocitaj();
   }
 

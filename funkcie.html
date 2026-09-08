@@ -9,11 +9,11 @@
 <meta property="og:description" content="Prehľad obrazoviek programu Mechanik: zákazky, detail zákazky, zákazníci, sklad dielov, cenník prác, štatistiky a nastavenia dielne.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
-<meta name="theme-color" content="#1e2939">
+<meta name="theme-color" content="#101722">
 <link rel="icon" href="assets/img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -29,18 +29,18 @@
       <a href="index.html">Domov</a>
       <a href="funkcie.html" class="on">Funkcie</a>
       <a href="cennik.html">Cenník</a>
-      <a href="stiahnut.html">Stiahnuť</a>
+      <a href="stiahnut.html">Demo</a>
       <a href="faq.html">FAQ</a>
       <a href="kontakt.html">Kontakt</a>
     </nav>
-    <a class="btn btn--pri btn--sm hdr__cta" href="stiahnut.html">Stiahnuť</a>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
     <a href="index.html">Domov</a>
     <a href="funkcie.html" class="on">Funkcie</a>
     <a href="cennik.html">Cenník</a>
-    <a href="stiahnut.html">Stiahnuť</a>
+    <a href="stiahnut.html">Demo</a>
     <a href="faq.html">FAQ</a>
     <a href="kontakt.html">Kontakt</a>
   </nav>
@@ -50,7 +50,6 @@
 
 <section class="phead">
   <div class="wrap">
-    <p class="pill">Funkcie</p>
     <h1>Čo Mechanik vie</h1>
     <p class="lead">Obrazovky nižšie sú z bežiaceho programu. Ukážkové dáta patria vymyslenej dielni AutoServis Horák.</p>
   </div>
@@ -71,8 +70,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Zákazky</span></div>
   <img src="assets/img/zakazky.png" alt="Zoznam zákaziek s filtrami podľa stavu" loading="lazy" width="1600" height="1000">
+  <figcaption>Zákazky</figcaption>
 </figure>
     </div>
   </div>
@@ -93,8 +92,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Zákazka Z2026-0001 — Údaje</span></div>
   <img src="assets/img/zakazka-udaje.png" alt="Detail zákazky so záložkou Údaje" loading="lazy" width="1600" height="1000">
+  <figcaption>Zákazka Z2026-0001 — Údaje</figcaption>
 </figure>
     </div>
   </div>
@@ -114,8 +113,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Zákazka Z2026-0001 — Práce a cena</span></div>
   <img src="assets/img/zakazka-prace.png" alt="Záložka Práce a cena s úkonmi a dielmi" loading="lazy" width="1600" height="1000">
+  <figcaption>Zákazka Z2026-0001 — Práce a cena</figcaption>
 </figure>
     </div>
   </div>
@@ -135,8 +134,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Zákazníci</span></div>
   <img src="assets/img/zakaznici.png" alt="Karty zákazníkov s prehľadom zákaziek" loading="lazy" width="1600" height="1000">
+  <figcaption>Zákazníci</figcaption>
 </figure>
     </div>
   </div>
@@ -156,8 +155,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Sklad</span></div>
   <img src="assets/img/sklad.png" alt="Skladová evidencia dielov" loading="lazy" width="1600" height="1000">
+  <figcaption>Sklad</figcaption>
 </figure>
     </div>
   </div>
@@ -177,8 +176,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Cenník prác</span></div>
   <img src="assets/img/cennik-prac.png" alt="Cenník prác s kategóriami a normohodinami" loading="lazy" width="1600" height="1000">
+  <figcaption>Cenník prác</figcaption>
 </figure>
     </div>
   </div>
@@ -198,8 +197,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Štatistiky</span></div>
   <img src="assets/img/statistiky.png" alt="Štatistiky tržieb a zákaziek" loading="lazy" width="1600" height="1000">
+  <figcaption>Štatistiky</figcaption>
 </figure>
     </div>
   </div>
@@ -219,8 +218,8 @@
         </ul>
       </div>
       <figure class="shot ">
-  <div class="shot__bar"><i></i><i></i><i></i><span>Nastavenia</span></div>
   <img src="assets/img/nastavenia.png" alt="Nastavenia dielne, cien a faktúr" loading="lazy" width="1600" height="1000">
+  <figcaption>Nastavenia</figcaption>
 </figure>
     </div>
   </div>
@@ -228,10 +227,10 @@
 <section class="cta">
   <div class="wrap cta__in">
     <h2>Pozrite si to naživo</h2>
-    <p>Program si nainštalujete za pár minút a vyskúšate na vlastných zákazkách.</p>
+    <p>Demo sa nainštaluje za pár minút a vyskúšate ho na vlastných zákazkách.</p>
     <div class="row row--c">
-      <a class="btn btn--pri btn--lg" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť pre Windows</a>
-      <a class="btn btn--gh btn--lg btn--onDark" href="cennik.html">Cenník licencie</a>
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+        <a class="btn btn--gh btn--lg btn--onDark" href="https://github.com/DarkMaster9452/Custom-Autoservis-manager/releases/latest/download/MechanikSetup.exe" data-dl>Stiahnuť demo</a>
     </div>
   </div>
 </section>
@@ -250,7 +249,7 @@
       <h3>Program</h3>
       <a href="funkcie.html">Funkcie</a>
       <a href="cennik.html">Cenník a licencia</a>
-      <a href="stiahnut.html">Stiahnuť</a>
+      <a href="stiahnut.html">Demo na vyskúšanie</a>
     </div>
     <div class="foot__col">
       <h3>Podpora</h3>
