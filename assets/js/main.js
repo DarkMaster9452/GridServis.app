@@ -21,8 +21,6 @@
 
   var MAX = 10;                          // nad tento počet sa cena rieši dohodou
 
-  var REPO = 'DarkMaster9452/Custom-Autoservis-manager';
-  var ASSET = 'MechanikSetup.exe';
 
   function each(sel, fn) {
     Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
@@ -164,23 +162,23 @@
   }
 
   /* ---------------- údaje o poslednom vydaní ---------------- */
-  fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
-    headers: { Accept: 'application/vnd.github+json' }
-  })
+  /* Číslo verzie a veľkosť dodá vlastný endpoint. Kým neodpovie,
+     platia hodnoty zapísané priamo v HTML. */
+  fetch('/api/verzia', { headers: { Accept: 'application/json' } })
     .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
-    .then(function (rel) {
-      var tag = (rel.tag_name || '').replace(/^v/, '');
-      if (tag) each('[data-tag]', function (el) { el.textContent = tag; });
-
-      var a = (rel.assets || []).filter(function (x) { return x.name === ASSET; })[0] || (rel.assets || [])[0];
-      if (a) {
-        each('[data-size]', function (el) {
-          el.textContent = (a.size / 1048576).toFixed(0) + ' MB';
-        });
-        each('a[data-dl]', function (el) { el.href = a.browser_download_url; });
+    .then(function (v) {
+      if (v.verzia) {
+        each('[data-tag]', function (el) { el.textContent = v.verzia; });
       }
-      if (rel.published_at) {
-        var d = new Date(rel.published_at).toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' });
+      if (v.velkost) {
+        each('[data-size]', function (el) {
+          el.textContent = (v.velkost / 1048576).toFixed(0) + ' MB';
+        });
+      }
+      if (v.vydane) {
+        var d = new Date(v.vydane).toLocaleDateString('sk-SK', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
         each('[data-date]', function (el) { el.textContent = ' · vydané ' + d; });
       }
     })
