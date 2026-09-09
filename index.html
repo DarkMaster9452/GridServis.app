@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mechanik — program na správu autoservisu</title>
-<meta name="description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, jednorazová licencia, bez mesačných poplatkov.">
-<meta property="og:title" content="Mechanik — program na správu autoservisu">
-<meta property="og:description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, jednorazová licencia, bez mesačných poplatkov.">
+<title>AutoAgenda — program na správu autoservisu</title>
+<meta name="description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, predplatné 199,99 € ročne alebo 19,99 € mesačne.">
+<meta property="og:title" content="AutoAgenda — program na správu autoservisu">
+<meta property="og:description" content="Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, predplatné 199,99 € ročne alebo 19,99 € mesačne.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta name="theme-color" content="#101722">
 <link rel="icon" href="assets/img/favicon.svg">
+<link rel="mask-icon" href="assets/img/logo.svg" color="#0d1117">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -19,8 +20,8 @@
 <header class="hdr" id="hdr">
   <div class="wrap hdr__in">
     <a class="logo" href="index.html">
-      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
-      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4.5 57.5 13v18.6c0 13.4-10.4 22.6-25.5 27.4C16.9 54.2 6.5 45 6.5 31.6V13Z" stroke-width="4"/><path d="M15.5 37v-7.6c0-1.9 1.2-3.5 3-4.1l2.9-1 3.3-6.4c.8-1.5 2.3-2.4 4-2.4h7.6c1.7 0 3.2.9 4 2.4l3.3 6.4 2.9 1c1.8.6 3 2.2 3 4.1V37" stroke-width="3"/><path d="M15.5 37h10.5M49.5 37h-5" stroke-width="3"/><path d="M21.4 24.3h21.2" stroke-width="3"/><path d="M19.8 30.2l5 1.1M45.2 30.2l-5 1.1" stroke-width="2.6"/><path d="M28 31.6h9" stroke-width="2.6"/><path d="M14.2 27.8H19M49.8 27.8H45" stroke-width="3"/><path d="M41.8 38.8a5.2 5.2 0 1 0 0 7.4M31 42.5H21" stroke-width="4.8"/></svg></span>
+      <span class="logo__txt">AutoAgenda<em>správa autoservisu</em></span>
     </a>
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
       <a href="index.html" class="on">Domov</a>
@@ -30,7 +31,7 @@
       <a href="faq.html">FAQ</a>
       <a href="kontakt.html">Kontakt</a>
     </nav>
-    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
@@ -49,18 +50,17 @@
   <div class="wrap hero__in">
     <div class="hero__txt">
       <h1>Celý servis v jednom programe.<br>Od príjmu auta po faktúru.</h1>
-      <p class="lead">Mechanik vedie zákazky, zákazníkov, sklad dielov aj cenník prác. Zo zákazky vytlačíte zákazkový list, faktúru aj štítok na kľúče. Program beží na počítači v dielni, dáta máte u seba.</p>
+      <p class="lead">AutoAgenda vedie zákazky, zákazníkov, sklad dielov aj cenník prác. Zo zákazky vytlačíte zákazkový list, faktúru aj štítok na kľúče. Program beží na počítači v dielni, dáta máte u seba.</p>
       <div class="row">
-        <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu &mdash; od 359,99 €</a>
+        <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Predplatiť &mdash; 199,99 € za rok</a>
         <a class="btn btn--gh btn--lg" href="/api/stiahnut" data-dl>Stiahnuť demo</a>
       </div>
-      <p class="fine">Demo si stiahnete zadarmo. Plnú verziu sprístupní zakúpená licencia &middot; Windows 10 a 11 &middot; verzia <span data-tag>1.5.1</span></p>
+      <p class="fine">Demo si stiahnete zadarmo. Plnú verziu sprístupní predplatné &middot; Windows 10 a 11 &middot; <span data-rel-off>posledná vydaná verzia</span><span data-rel hidden>verzia <span data-tag></span></span></p>
     </div>
   </div>
   <div class="wrap hero__shot">
     <figure class="shot shot--hero">
-  <img src="assets/img/prehlad.png" alt="Úvodná obrazovka programu Mechanik s prehľadom zákaziek a tržieb" fetchpriority="high" width="1600" height="1000">
-  <figcaption>Mechanik — Prehľad</figcaption>
+  <img src="assets/img/prehlad.png" alt="Úvodná obrazovka programu AutoAgenda s prehľadom zákaziek a tržieb" fetchpriority="high" width="1600" height="1000">
 </figure>
   </div>
 </section>
@@ -118,7 +118,6 @@
       </div>
       <figure class="shot ">
   <img src="assets/img/zakazky.png" alt="Zoznam zákaziek s filtrami podľa stavu" loading="lazy" width="1600" height="1000">
-  <figcaption>Zákazky</figcaption>
 </figure>
     </div>
   </div>
@@ -140,22 +139,26 @@
       </div>
       <figure class="shot ">
   <img src="assets/img/statistiky.png" alt="Štatistiky tržieb a zákaziek" loading="lazy" width="1600" height="1000">
-  <figcaption>Štatistiky</figcaption>
 </figure>
     </div>
   </div>
 </section>
 
-<section class="sec">
+<section class="sec sec--alt">
   <div class="wrap wrap--mid">
     <header class="shead">
-      <h2>Zaplatíte raz</h2>
-      <p>Licencia je jednorazová a viaže sa na počet počítačov, na ktorých program používate. Žiadne predplatné, žiadne obnovovanie.</p>
+      <h2>Jedna cena za celý program</h2>
+      <p>Predplatné na jeden počítač. Ročné je najvýhodnejšie, mesačné si môžete kedykoľvek zrušiť.</p>
     </header>
-    <div class="teaser">
-      <div class="teaser__price"><b>od 359,99 €</b><span>jednorazovo za jeden počítač</span></div>
-      <p>Pri viacerých počítačoch v dielni cena za kus klesá. Presnú sumu spočíta kalkulačka v cenníku.</p>
-      <a class="btn btn--gh" href="cennik.html">Spočítať cenu</a>
+    <div class="pricebig">
+      <p class="pricebig__lbl">Ročné predplatné</p>
+      <p class="pricebig__sum"><b>199,99 €</b><span>/ rok</span></p>
+      <p class="pricebig__save">Ušetríte 39,89 € oproti mesačnému</p>
+      <p class="pricebig__note">To je 16,67 € na mesiac. Mesačne bez viazanosti vyjde na 19,99 €.</p>
+      <div class="row row--c">
+        <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Prejsť do cenníka</a>
+        <a class="btn btn--gh btn--lg" href="/api/stiahnut" data-dl>Najprv skúsiť demo</a>
+      </div>
     </div>
   </div>
 </section>
@@ -163,9 +166,9 @@
 <section class="cta">
   <div class="wrap cta__in">
     <h2>Najprv demo, potom rozhodnutie</h2>
-    <p>Demo si stiahnete hneď a vyskúšate na vlastných zákazkách. Licenciu kupujete až vtedy, keď viete, že vám program sadol.</p>
+    <p>Demo si stiahnete hneď a vyskúšate na vlastných zákazkách. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p>
     <div class="row row--c">
-      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Predplatiť</a>
         <a class="btn btn--gh btn--lg btn--onDark" href="/api/stiahnut" data-dl>Stiahnuť demo</a>
     </div>
   </div>
@@ -176,15 +179,15 @@
   <div class="wrap foot__in">
     <div class="foot__brand">
       <a class="logo logo--foot" href="index.html">
-        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
-        <span class="logo__txt">Mechanik</span>
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4.5 57.5 13v18.6c0 13.4-10.4 22.6-25.5 27.4C16.9 54.2 6.5 45 6.5 31.6V13Z" stroke-width="4"/><path d="M15.5 37v-7.6c0-1.9 1.2-3.5 3-4.1l2.9-1 3.3-6.4c.8-1.5 2.3-2.4 4-2.4h7.6c1.7 0 3.2.9 4 2.4l3.3 6.4 2.9 1c1.8.6 3 2.2 3 4.1V37" stroke-width="3"/><path d="M15.5 37h10.5M49.5 37h-5" stroke-width="3"/><path d="M21.4 24.3h21.2" stroke-width="3"/><path d="M19.8 30.2l5 1.1M45.2 30.2l-5 1.1" stroke-width="2.6"/><path d="M28 31.6h9" stroke-width="2.6"/><path d="M14.2 27.8H19M49.8 27.8H45" stroke-width="3"/><path d="M41.8 38.8a5.2 5.2 0 1 0 0 7.4M31 42.5H21" stroke-width="4.8"/></svg></span>
+        <span class="logo__txt">AutoAgenda</span>
       </a>
       <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
     </div>
     <div class="foot__col">
       <h3>Program</h3>
       <a href="funkcie.html">Funkcie</a>
-      <a href="cennik.html">Cenník a licencia</a>
+      <a href="cennik.html">Cenník a predplatné</a>
       <a href="stiahnut.html">Demo na vyskúšanie</a>
     </div>
     <div class="foot__col">
@@ -196,14 +199,14 @@
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="obchodne-podmienky.html#odstupenie">Vrátenie peňazí</a>
+      <a href="obchodne-podmienky.html#odstupenie">Zrušenie a vrátenie peňazí</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
   </div>
   <div class="wrap foot__bot">
-    <span>&copy; <span data-rok>2026</span> [doplniť obchodné meno]</span>
-    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+    <span>&copy; <span data-rok>2026</span> AutoAgenda</span>
+    <span><span data-rel hidden>Verzia <span data-tag></span> &middot; </span>pre Windows 10 a 11</span>
   </div>
 </footer>
 

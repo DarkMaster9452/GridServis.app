@@ -2,11 +2,11 @@
    Údaje o zdroji sú len na serveri, do prehliadača sa nedostanú. */
 
 var REPO  = process.env.RELEASE_REPO  || '';
-var ASSET = process.env.RELEASE_ASSET || 'MechanikSetup.exe';
+var ASSET = process.env.RELEASE_ASSET || '';
 var TOKEN = process.env.RELEASE_TOKEN || '';
 
 function hlavicky(accept) {
-  var h = { Accept: accept, 'User-Agent': 'mechanik-web' };
+  var h = { Accept: accept, 'User-Agent': 'autoagenda-web' };
   if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
   return h;
 }
@@ -22,9 +22,19 @@ async function posledneVydanie() {
   var rel = await r.json();
   var assets = rel.assets || [];
   var a = null;
+  var i;
 
-  for (var i = 0; i < assets.length; i++) {
-    if (assets[i].name === ASSET) { a = assets[i]; break; }
+  /* Presný názov z RELEASE_ASSET má prednosť. Bez neho sa vezme prvá
+     inštalačka .exe, aby premenovanie súboru vo vydaní nič nepokazilo. */
+  if (ASSET) {
+    for (i = 0; i < assets.length; i++) {
+      if (assets[i].name === ASSET) { a = assets[i]; break; }
+    }
+  }
+  if (!a) {
+    for (i = 0; i < assets.length; i++) {
+      if (/\.exe$/i.test(assets[i].name || '')) { a = assets[i]; break; }
+    }
   }
   if (!a && assets.length) a = assets[0];
 

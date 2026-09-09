@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cenník a licencia — Mechanik</title>
-<meta name="description" content="Jednorazová licencia na program Mechanik. Cena závisí od počtu počítačov, na ktorých program používate. Kalkulačka a postup objednávky.">
-<meta property="og:title" content="Cenník a licencia — Mechanik">
-<meta property="og:description" content="Jednorazová licencia na program Mechanik. Cena závisí od počtu počítačov, na ktorých program používate. Kalkulačka a postup objednávky.">
+<title>Cenník a predplatné — AutoAgenda</title>
+<meta name="description" content="Predplatné programu AutoAgenda: 199,99 € ročne alebo 19,99 € mesačne na jeden počítač. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
+<meta property="og:title" content="Cenník a predplatné — AutoAgenda">
+<meta property="og:description" content="Predplatné programu AutoAgenda: 199,99 € ročne alebo 19,99 € mesačne na jeden počítač. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta name="theme-color" content="#101722">
 <link rel="icon" href="assets/img/favicon.svg">
+<link rel="mask-icon" href="assets/img/logo.svg" color="#0d1117">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -19,8 +20,8 @@
 <header class="hdr" id="hdr">
   <div class="wrap hdr__in">
     <a class="logo" href="index.html">
-      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
-      <span class="logo__txt">Mechanik<em>správa autoservisu</em></span>
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4.5 57.5 13v18.6c0 13.4-10.4 22.6-25.5 27.4C16.9 54.2 6.5 45 6.5 31.6V13Z" stroke-width="4"/><path d="M15.5 37v-7.6c0-1.9 1.2-3.5 3-4.1l2.9-1 3.3-6.4c.8-1.5 2.3-2.4 4-2.4h7.6c1.7 0 3.2.9 4 2.4l3.3 6.4 2.9 1c1.8.6 3 2.2 3 4.1V37" stroke-width="3"/><path d="M15.5 37h10.5M49.5 37h-5" stroke-width="3"/><path d="M21.4 24.3h21.2" stroke-width="3"/><path d="M19.8 30.2l5 1.1M45.2 30.2l-5 1.1" stroke-width="2.6"/><path d="M28 31.6h9" stroke-width="2.6"/><path d="M14.2 27.8H19M49.8 27.8H45" stroke-width="3"/><path d="M41.8 38.8a5.2 5.2 0 1 0 0 7.4M31 42.5H21" stroke-width="4.8"/></svg></span>
+      <span class="logo__txt">AutoAgenda<em>správa autoservisu</em></span>
     </a>
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
       <a href="index.html">Domov</a>
@@ -30,7 +31,7 @@
       <a href="faq.html">FAQ</a>
       <a href="kontakt.html">Kontakt</a>
     </nav>
-    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Kúpiť licenciu</a>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
@@ -47,65 +48,76 @@
 
 <section class="phead">
   <div class="wrap">
-    <h1>Zaplatíte raz, používate natrvalo</h1>
-    <p class="lead">Licencia sa kupuje na počítač. Koľko počítačov v dielni Mechanika používa, toľko licencií potrebujete. Nič sa neobnovuje a nič sa neplatí mesačne. Plnú verziu programu sprístupní zakúpená licencia, demo je zadarmo.</p>
+    <h1>Ročne 199,99 €, mesačne 19,99 €</h1>
+    <p class="lead">Predplatné platí na jeden počítač a sprístupní celý program bez obmedzení. Ročné predplatné je o 39,89 € lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
-    <div class="calc">
-      <div class="calc__in">
-        <h2>Kalkulačka ceny</h2>
-        <p class="calc__q">Na koľkých počítačoch budete Mechanika používať?</p>
-        <output class="calc__val" id="hodnota" for="pocet">1 počítač</output>
-        <input class="slider" id="pocet" type="range" min="1" max="11" step="1" value="1"
-               aria-label="Počet počítačov, posledná poloha je cena na mieru">
-        <div class="scale"><span>1</span><span>5</span><span>10</span><span>na mieru</span></div>
-      </div>
-      <div class="calc__out">
-        <span class="calc__lbl" id="sumaLbl">Jednorazovo spolu</span>
-        <b class="calc__sum" id="suma">359,99 €</b>
-        <span class="calc__per" id="perks">359,99 € za počítač</span>
-        <span class="calc__save" id="uspora" hidden></span>
-        <a class="btn btn--pri btn--full" id="kupit" href="cennik.html" data-buy>Kúpiť licenciu</a>
-        <a class="calc__alt" id="objednat" href="kontakt.html">alebo objednať e-mailom</a>
-        <span class="calc__note" id="poznamka">Cena je konečná a platí sa raz. Po zaplatení dostanete odkaz na stiahnutie plnej verzie, licenčný kľúč a faktúru.</span>
-      </div>
-    </div>
-
-    <div class="tiers">
-      <h3>Ako sa cena počíta</h3>
-      <table class="tbl">
-        <thead><tr><th>Počet počítačov</th><th>Cena za počítač</th><th>Príklad</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>359,99 €</td><td>1 &times; 359,99 = <b>359,99 €</b></td></tr>
-          <tr><td>2 až 4</td><td>319,99 €</td><td>3 &times; 319,99 = <b>959,97 €</b></td></tr>
-          <tr><td>5 až 9</td><td>279,99 €</td><td>6 &times; 279,99 = <b>1 679,94 €</b></td></tr>
-          <tr><td>10 a viac</td><td>239,99 €</td><td>12 &times; 239,99 = <b>2 879,88 €</b></td></tr>
-        </tbody>
-      </table>
-      <p class="fine">Nižšia sadzba platí na všetky počítače v objednávke, nielen na tie nad hranicou.</p>
-    </div>
-
-    <div class="two">
-      <div class="box box--ok">
-        <h3>V cene je</h3>
+    <div class="plans">
+      <article class="plan plan--best">
+        <div class="plan__head">
+          <h2>Ročne</h2>
+          <span class="plan__badge">Ušetríte 39,89 €</span>
+        </div>
+        <p class="plan__price"><b>199,99 €</b><span>/ rok</span></p>
+        <p class="plan__per">Vychádza na 16,67 € mesačne. Dvanásť mesačných platieb by stálo 239,88 €.</p>
+        <a class="btn btn--pri btn--lg btn--full" href="#upozornenie" data-buy="rok">Predplatiť na rok</a>
         <ul class="ticks">
-          <li>Stiahnutie plnej verzie programu</li>
-          <li>Používanie bez časového obmedzenia</li>
+          <li>Celý program bez obmedzení na dvanásť mesiacov</li>
+          <li>Opravy chýb a nové verzie počas predplatného</li>
+          <li>Jedna platba za rok, žiadne mesačné strhávanie</li>
+          <li>E-mailová podpora pri inštalácii a nastavení</li>
+        </ul>
+      </article>
+      <article class="plan">
+        <div class="plan__head">
+          <h2>Mesačne</h2>
+          <span class="plan__badge plan__badge--mut">Bez viazanosti</span>
+        </div>
+        <p class="plan__price"><b>19,99 €</b><span>/ mesiac</span></p>
+        <p class="plan__per">Za rok to je 239,88 €, teda o 39,89 € viac ako ročné predplatné.</p>
+        <a class="btn btn--gh btn--lg btn--full" href="#upozornenie" data-buy="mesiac">Predplatiť na mesiac</a>
+        <ul class="ticks">
+          <li>Celý program bez obmedzení na jeden mesiac</li>
+          <li>Opravy chýb a nové verzie počas predplatného</li>
+          <li>Skončíte kedykoľvek, ďalší mesiac sa neplatí</li>
+          <li>E-mailová podpora pri inštalácii a nastavení</li>
+        </ul>
+      </article>
+    </div>
+    <p class="fine center">Ceny sú konečné, za jeden počítač. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+
+    <div class="warn" id="upozornenie">
+      <h3>Skôr než zaplatíte: Windows bude hlásiť, že súbor nie je bezpečný</h3>
+      <p>Inštalačka programu AutoAgenda nemá zakúpený podpisový certifikát. Windows ju preto pri spustení
+      označí modrým oknom SmartScreen s textom o neznámom vydavateľovi a o tom, že súbor môže
+      byť nebezpečný. Nejde o vírus ani o chybu programu, iba o to, že certifikát stojí peniaze
+      a zatiaľ ho nemám kúpený.</p>
+      <p>Inštalácia normálne pokračuje po kliknutí na <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>.
+      Rovnaké hlásenie uvidíte aj pri plnej verzii po zaplatení, preto to píšem ešte pred platbou.
+      Ak vám to prekáža, vyskúšajte najprv <a href="stiahnut.html">demo</a> — je zadarmo a hlási to isté.</p>
+    </div>
+
+    <div class="two two--top">
+      <div class="box box--ok">
+        <h3>V predplatnom je</h3>
+        <ul class="ticks">
+          <li>Plná verzia programu bez obmedzení</li>
           <li>Všetky moduly, žiadne platené doplnky</li>
-          <li>Opravy chýb a aktualizácie v rámci zakúpenej verzie</li>
-          <li>Prenos licencie na nový počítač po dohode</li>
+          <li>Opravy chýb a nové verzie počas predplatného</li>
+          <li>Prenos na nový počítač po dohode</li>
           <li>E-mailová podpora pri inštalácii a nastavení</li>
         </ul>
       </div>
       <div class="box">
-        <h3>V cene nie je</h3>
+        <h3>V predplatnom nie je</h3>
         <ul class="crosses">
-          <li>Prechod na budúcu veľkú verziu programu</li>
+          <li>Používanie programu po skončení predplatného</li>
           <li>Úpravy programu na mieru</li>
           <li>Prevádzka na serveri alebo zdieľaná databáza medzi počítačmi</li>
+          <li>Podpisový certifikát inštalačky, preto Windows hlási neznámeho vydavateľa</li>
         </ul>
       </div>
     </div>
@@ -116,14 +128,14 @@
   <div class="wrap wrap--mid">
     <header class="shead">
       <h2>Ako to prebieha</h2>
-      <p>Najprv demo, potom platba. Plná verzia sa sťahuje až po zakúpení licencie.</p>
+      <p>Najprv demo, potom platba. Plná verzia sa sťahuje až po zaplatení predplatného.</p>
     </header>
     <ol class="steps">
       <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo si stiahnete zadarmo a bez registrácie. Zadáte pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
-      <li><span>2</span><div><h3>Zvolíte počet počítačov</h3><p>V kalkulačke vyššie nastavíte, na koľkých staniciach budete program používať. Cena sa prepočíta hneď.</p></div></li>
-      <li><span>3</span><div><h3>Zaplatíte</h3><p>Cez platobnú bránu kartou, alebo prevodom na faktúru, ak vám to vyhovuje viac. Platí sa raz.</p></div></li>
-      <li><span>4</span><div><h3>Dostanete plnú verziu</h3><p>E-mailom príde odkaz na stiahnutie plnej verzie, licenčný kľúč pre každý počítač a faktúra.</p></div></li>
-      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Kľúč vložíte v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
+      <li><span>2</span><div><h3>Zvolíte obdobie</h3><p>Ročné predplatné za 199,99 €, alebo mesačné za 19,99 € bez viazanosti. Ročné je o 39,89 € lacnejšie.</p></div></li>
+      <li><span>3</span><div><h3>Prečítate si upozornenie</h3><p>Inštalačka nie je podpísaná certifikátom, takže Windows ju označí za nebezpečnú. <a href="#upozornenie">Vysvetlenie je vyššie</a>, ešte pred platbou.</p></div></li>
+      <li><span>4</span><div><h3>Zaplatíte</h3><p>Cez platobnú bránu kartou, alebo prevodom, ak vám to vyhovuje viac.</p></div></li>
+      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>E-mailom príde odkaz na plnú verziu a licenčný kľúč. Kľúč vložíte v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
     </ol>
   </div>
 </section>
@@ -131,16 +143,16 @@
 <section class="sec">
   <div class="wrap wrap--nar">
     <header class="shead">
-      <h2>Otázky k licencii</h2>
+      <h2>Otázky k predplatnému</h2>
     </header>
     <div class="faq">
-      <details><summary>Naozaj sa neplatí nič mesačne?</summary><p>Nie. Licencia je jednorazová platba. Po zaplatení program používate bez ďalších nákladov.</p></details>
-      <details><summary>Vymenil som počítač, čo s licenciou?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, počet licencií zostáva rovnaký.</p></details>
-      <details><summary>Potrebujem licenciu aj na počítač doma?</summary><p>Ak tam program spúšťate, áno. Licencia sa počíta na počítač, nie na človeka.</p></details>
-      <details><summary>Dostanem faktúru na firmu?</summary><p>Áno. V objednávke uveďte názov, adresu, IČO a prípadne IČ DPH a faktúra príde na tieto údaje.</p></details>
-      <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred kúpou, a ak vám nesadne, licenciu jednoducho nekúpite.</p></details>
-      <details><summary>Potrebujem viac ako desať licencií.</summary><p>Posuňte kalkulačku úplne doprava na možnosť na mieru a napíšte mi. Pri väčšom počte staníc dohodneme cenu individuálne.</p></details>
-      <details><summary>Ako je to s aktualizáciami?</summary><p>Opravy a vylepšenia v rámci zakúpenej verzie sú zdarma. Novú inštalačku stiahnete z rovnakého miesta a dáta zostanú zachované.</p></details>
+      <details><summary>Prečo je ročné predplatné výhodnejšie?</summary><p>Ročné stojí 199,99 €, dvanásť mesačných platieb 239,88 €. Rozdiel je 39,89 €, ktoré pri ročnej platbe neplatíte.</p></details>
+      <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne a bez obnovenia sa v ňom nedá ďalej pracovať. Vaše dáta zostávajú v databáze na počítači, o nič neprídete.</p></details>
+      <details><summary>Musím predplatné obnovovať sám?</summary><p>Áno. Nič sa nestrháva automaticky, pred koncom obdobia sa ozvem a obnovíte ho, len ak chcete.</p></details>
+      <details><summary>Vymenil som počítač, čo s predplatným?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, obdobie zostáva rovnaké.</p></details>
+      <details><summary>Potrebujem program aj na počítač doma?</summary><p>Ak tam program spúšťate, potrebujete druhé predplatné. Ozvite sa, pri viacerých staniciach dohodneme cenu.</p></details>
+      <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite.</p></details>
+      <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát. <a href="#upozornenie">Podrobne to vysvetľujem vyššie</a> a to isté platí pre demo aj pre plnú verziu.</p></details>
     </div>
   </div>
 </section>
@@ -148,9 +160,9 @@
 <section class="cta">
   <div class="wrap cta__in">
     <h2>Najprv skúsiť, potom platiť</h2>
-    <p>Stiahnite si demo a pozrite, či vám sadne. Kúpu vyriešime, keď budete vedieť.</p>
+    <p>Stiahnite si demo a pozrite, či vám sadne. Predplatné vyriešime, keď budete vedieť.</p>
     <div class="row row--c">
-      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Kúpiť licenciu</a>
+      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Predplatiť</a>
         <a class="btn btn--gh btn--lg btn--onDark" href="/api/stiahnut" data-dl>Stiahnuť demo</a>
     </div>
   </div>
@@ -161,15 +173,15 @@
   <div class="wrap foot__in">
     <div class="foot__brand">
       <a class="logo logo--foot" href="index.html">
-        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.3 5.3l-8 8a2.8 2.8 0 0 1-4-4l8-8a4 4 0 0 0-1.3-1.3z"/></svg></span>
-        <span class="logo__txt">Mechanik</span>
+        <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M32 4.5 57.5 13v18.6c0 13.4-10.4 22.6-25.5 27.4C16.9 54.2 6.5 45 6.5 31.6V13Z" stroke-width="4"/><path d="M15.5 37v-7.6c0-1.9 1.2-3.5 3-4.1l2.9-1 3.3-6.4c.8-1.5 2.3-2.4 4-2.4h7.6c1.7 0 3.2.9 4 2.4l3.3 6.4 2.9 1c1.8.6 3 2.2 3 4.1V37" stroke-width="3"/><path d="M15.5 37h10.5M49.5 37h-5" stroke-width="3"/><path d="M21.4 24.3h21.2" stroke-width="3"/><path d="M19.8 30.2l5 1.1M45.2 30.2l-5 1.1" stroke-width="2.6"/><path d="M28 31.6h9" stroke-width="2.6"/><path d="M14.2 27.8H19M49.8 27.8H45" stroke-width="3"/><path d="M41.8 38.8a5.2 5.2 0 1 0 0 7.4M31 42.5H21" stroke-width="4.8"/></svg></span>
+        <span class="logo__txt">AutoAgenda</span>
       </a>
       <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
     </div>
     <div class="foot__col">
       <h3>Program</h3>
       <a href="funkcie.html">Funkcie</a>
-      <a href="cennik.html">Cenník a licencia</a>
+      <a href="cennik.html">Cenník a predplatné</a>
       <a href="stiahnut.html">Demo na vyskúšanie</a>
     </div>
     <div class="foot__col">
@@ -181,14 +193,14 @@
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="obchodne-podmienky.html#odstupenie">Vrátenie peňazí</a>
+      <a href="obchodne-podmienky.html#odstupenie">Zrušenie a vrátenie peňazí</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
   </div>
   <div class="wrap foot__bot">
-    <span>&copy; <span data-rok>2026</span> [doplniť obchodné meno]</span>
-    <span>Verzia <span data-tag>1.5.1</span> pre Windows 10 a 11</span>
+    <span>&copy; <span data-rok>2026</span> AutoAgenda</span>
+    <span><span data-rel hidden>Verzia <span data-tag></span> &middot; </span>pre Windows 10 a 11</span>
   </div>
 </footer>
 
