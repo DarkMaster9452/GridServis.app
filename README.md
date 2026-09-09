@@ -1,6 +1,6 @@
-# AutoAgenda — web
+# GridServis — web
 
-Prezentačný web a predaj predplatného na program AutoAgenda (správa
+Prezentačný web a predaj predplatného na program GridServis (správa
 autoservisu, Windows).
 
 ## Štruktúra
@@ -89,7 +89,7 @@ e-mailom.
 | `STIAHNUT_BEZ_PLATBY` | nie | `1` vypne zámok sťahovania, len na testovanie |
 | `DATABASE_URL` | áno | pripojenie do licenčnej databázy rolou `web_klient` |
 | `RESEND_API_KEY` | nie | kľúč na odosielanie e-mailov s licenčným kódom |
-| `RESEND_FROM` | nie | odosielateľ, napr. `AutoAgenda <licencie@vasa-domena.sk>` |
+| `RESEND_FROM` | nie | odosielateľ, napr. `GridServis <licencie@vasa-domena.sk>` |
 | `RESEND_REPLY_TO` | nie | adresa na odpoveď, predvolene `strananekm@gmail.com` |
 | `RELEASE_ASSET_DEMO` | nie | názov demo inštalačky vo vydaní |
 | `GITHUB_API` | nie | iná adresa GitHub API, len na testovanie |

@@ -31,7 +31,7 @@ async function sql(dotaz, parametre) {
     headers: {
       'Content-Type': 'application/json',
       'Neon-Connection-String': URL_DB,
-      'User-Agent': 'autoagenda-web'
+      'User-Agent': 'gridservis-web'
     },
     body: JSON.stringify({
       query: dotaz,
