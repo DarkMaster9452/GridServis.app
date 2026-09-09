@@ -20,9 +20,13 @@ assets/js/main.js
 assets/img/favicon.svg     ikona do záložky prehliadača
 assets/img/logo.svg        značka (štít s autom a kľúčom)
 assets/img/                snímky obrazovky programu
+hotovo.html                stránka po platbe, odtiaľ sa sťahuje
+api/checkout.js            založí platbu v Stripe a presmeruje na pokladňu
+api/pristup.js             overí, či je objednávka dokončená
+api/stiahnut.js            presmerovanie na inštalačku, až po objednávke
 api/verzia.js              JSON s číslom verzie, veľkosťou a dátumom
-api/stiahnut.js            presmerovanie na inštalačku
-api/_release.js            spoločný pomocník k obom
+api/_release.js            spoločný pomocník k vydaniam
+api/_stripe.js             spoločný pomocník k Stripe (plány a ceny)
 tools/gen.py               generátor HTML stránok
 ```
 
@@ -44,10 +48,58 @@ Predplatné na jeden počítač:
 
 Ceny sú na dvoch miestach a musia sedieť:
 
-* `CENY` v `tools/gen.py` — texty na stránkach,
-* `CENY` v `assets/js/main.js` — sumy v predvyplnenom objednávkovom e-maile.
+* `CENY` v `tools/gen.py` — texty na stránkach (po zmene spustiť generátor),
+* `PLANY` v `api/_stripe.js` — sumy v centoch, ktoré sa účtujú v Stripe.
 
-Po zmene treba spustiť generátor.
+## Platby cez Stripe
+
+Sťahovať sa dá až po dokončenej objednávke, a to aj demo. Demo je
+objednávka s nulovou sumou: Stripe pri nej nepýta kartu, iba e-mail.
+
+```
+tlačidlo na stránke  ->  POST /api/checkout  ->  pokladňa Stripe
+       -> hotovo.html?relacia=cs_...  ->  /api/pristup (overenie)
+       -> /api/stiahnut?relacia=cs_...  ->  inštalačka
+```
+
+`/api/stiahnut` si reláciu overuje priamo v Stripe pri každom stiahnutí,
+takže odkaz sa nedá podvrhnúť. Inštalačka je pre demo aj pre platené
+predplatné tá istá, plnú verziu odomkne až licenčný kľúč, ktorý posielam
+e-mailom.
+
+### Premenné prostredia pre Stripe
+
+| Premenná | Povinná | Význam |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | áno | tajný kľúč, v sandboxe začína `sk_test_` |
+| `STRIPE_PRICE_DEMO` | nie | ID ceny za demo, ak ju chcete spravovať v Stripe |
+| `STRIPE_PRICE_MESIAC` | nie | ID ceny mesačného predplatného |
+| `STRIPE_PRICE_ROK` | nie | ID ceny ročného predplatného |
+| `SITE_URL` | nie | adresa webu pre návrat z pokladne; inak sa berie z požiadavky |
+| `STIAHNUT_BEZ_PLATBY` | nie | `1` vypne zámok sťahovania, len na testovanie |
+
+Bez `STRIPE_PRICE_*` sa cena posiela priamo z `PLANY` v `api/_stripe.js`,
+takže v Stripe netreba nič zakladať.
+
+### Kde kľúč nájsť
+
+1. [dashboard.stripe.com](https://dashboard.stripe.com) → vľavo hore
+   prepnúť na **Sandbox** (alebo zapnúť **Test mode**).
+2. **Developers → API keys → Secret key** → *Reveal*. Kľúč začína
+   `sk_test_`. Publishable key (`pk_test_`) tento web nepotrebuje, platba
+   beží celá na serveri.
+3. Vo Vercel projekte **Settings → Environment Variables** pridať
+   `STRIPE_SECRET_KEY`, hodnotu vložiť a nasadiť znova.
+
+Kľúč nikdy nedávajte do repozitára ani do súborov v `assets/`. Keby sa
+niekam dostal, v Stripe ho zrušte tlačidlom *Roll key*.
+
+Testovacia karta v sandboxe: `4242 4242 4242 4242`, ľubovoľný budúci
+dátum, ľubovoľné CVC a PSČ. Demo kartu nepýta vôbec.
+
+Po prechode na ostrú prevádzku stačí vymeniť `sk_test_` za `sk_live_`
+a v Stripe si zapnúť potvrdenia o platbe e-mailom
+(*Settings → Customer emails → Successful payments*).
 
 ## Verzia programu
 
@@ -73,9 +125,9 @@ prípade zobrazia bez čísla verzie a odkaz na stiahnutie nefunguje.
 
 ## Čo treba doplniť pred spustením
 
-1. **Platobná brána** — `PLATBA.rok` a `PLATBA.mesiac` v `assets/js/main.js`.
-   Kým sú prázdne, tlačidlá *Predplatiť* v cenníku vedú na objednávku
-   e-mailom s predvyplnenou správou.
+1. **Stripe kľúč** — `STRIPE_SECRET_KEY` podľa kapitoly vyššie. Kým nie je
+   nastavený, tlačidlá *Predplatiť* aj *Získať demo* sa vrátia späť na
+   stránku s oznamom a ponúknu objednávku e-mailom; stiahnuť sa nedá nič.
 2. **Údaje predávajúceho** — web uvádza len e-mail, pretože program predáva
    fyzická osoba bez firmy. Ak by pri predaji vznikla povinnosť uvádzať
    identifikačné údaje (napríklad pri živnosti), doplňte ich do `PREDAJCA`
@@ -96,10 +148,11 @@ Ak certifikát pribudne, tieto štyri miesta treba upraviť v `tools/gen.py`.
 Na začiatku `assets/js/main.js`:
 
 ```js
-var EMAIL  = 'strananekm@gmail.com';   // objednávky a podpora
-var PLATBA = { rok: '', mesiac: '' };  // adresy platobnej brány
-var CENY   = { rok: 199.99, mesiac: 19.99 };
+var EMAIL = 'strananekm@gmail.com';   // objednávky a podpora
 ```
+
+Ceny a plány sú na serveri v `api/_stripe.js`, texty s cenami
+v `tools/gen.py`.
 
 ## Lokálne spustenie
 

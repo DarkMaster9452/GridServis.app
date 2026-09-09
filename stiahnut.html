@@ -49,12 +49,13 @@
 <section class="phead">
   <div class="wrap">
     <h1>Demo na vyskúšanie</h1>
-    <p class="lead">Jeden inštalačný súbor, bez účtu a bez zadávania karty. Plnú verziu programu sprístupní predplatné.</p>
+    <p class="lead">Demo nič nestojí, sťahuje sa však cez objednávku za 0 €: v pokladni zadáte e-mail, kartu Stripe nepýta. Plnú verziu programu sprístupní predplatné.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    <p class="oznam" id="oznam" hidden></p>
     <div class="dl">
       <div class="dl__l">
         <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
@@ -63,9 +64,12 @@
           <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span><span data-date-wrap> &middot; vydané <span data-date></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
         </div>
       </div>
-      <a class="btn btn--pri btn--lg" href="/api/stiahnut" data-dl>Stiahnuť demo</a>
+      <form class="pay" method="post" action="/api/checkout">
+  <input type="hidden" name="plan" value="demo">
+  <button class="btn btn--pri btn--lg" type="submit">Získať demo zadarmo</button>
+</form>
     </div>
-    <p class="fine center">Sťahujete vždy poslednú vydanú verziu. Demo je zadarmo, plnú verziu dostanete po zaplatení predplatného &mdash; <a href="cennik.html">pozrieť cenník</a>.</p>
+    <p class="fine center">Tlačidlo otvorí pokladňu Stripe. Za demo sa neplatí, suma je 0 € a karta sa nezadáva &mdash; potrebný je len e-mail. Po potvrdení objednávky sa hneď dostanete na stiahnutie poslednej vydanej verzie. Plnú verziu sprístupní predplatné, <a href="cennik.html">pozrieť cenník</a>.</p>
 
     <div class="warn">
       <h3>Windows bude hlásiť, že súbor nie je bezpečný</h3>
@@ -113,7 +117,7 @@
     <h2>Demo vám sadlo?</h2>
     <p>Predplatné vybavíte v cenníku. Ak sa niečo zaseklo pri inštalácii, napíšte mi, čo hlási počítač.</p>
     <div class="row row--c">
-      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Predplatiť</a>
+      <a class="btn btn--pri btn--lg" href="cennik.html">Predplatiť</a>
       <a class="btn btn--gh btn--lg btn--onDark" href="kontakt.html">Napísať</a>
     </div>
   </div>

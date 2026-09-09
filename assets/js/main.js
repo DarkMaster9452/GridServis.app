@@ -3,29 +3,17 @@
   'use strict';
 
   /* ------------------------------------------------------------------
-     NASTAVENIA — tu sa mení e-mail, adresy platobnej brány a ceny.
-     Ceny musia sedieť s hodnotami v tools/gen.py (premenná CENY).
+     NASTAVENIA — tu sa mení e-mail na objednávky a podporu.
+
+     Ceny a plány sú na serveri v api/_stripe.js (premenná PLANY), lebo
+     platbu zakladá Stripe. Texty s cenami na stránkach vychádzajú
+     z premennej CENY v tools/gen.py; obe musia sedieť.
      ------------------------------------------------------------------ */
   var EMAIL = 'strananekm@gmail.com';    // kontakt na objednávky a podporu
-
-  var PLATBA = {                         // TODO: adresy platobnej brány.
-    rok: '',                             // Kým sú prázdne, tlačidlá
-    mesiac: ''                           // Predplatiť vedú na objednávku
-  };                                     // e-mailom.
-
-  var CENY = { rok: 199.99, mesiac: 19.99 };
-
-  var NAZOV = { rok: 'ročné predplatné', mesiac: 'mesačné predplatné' };
 
 
   function each(sel, fn) {
     Array.prototype.forEach.call(document.querySelectorAll(sel), fn);
-  }
-
-  function eur(n) {
-    return n.toLocaleString('sk-SK', {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    }) + ' €';
   }
 
   function mailto(predmet, telo) {
@@ -70,22 +58,84 @@
     el.href = 'mailto:' + EMAIL;
   });
 
-  /* ---------------- tlačidlá predplatného ----------------
-     Odkazy bez hodnoty (data-buy="") vedú z HTML do cenníka.
-     Karty v cenníku majú data-buy="rok" alebo "mesiac": ak je
-     nastavená platobná brána, idú na ňu, inak na objednávku e-mailom. */
-  each('a[data-buy]', function (el) {
-    var plan = el.getAttribute('data-buy');
-    if (!plan || !CENY[plan]) return;
-    if (PLATBA[plan]) { el.href = PLATBA[plan]; return; }
-    el.href = mailto(
-      'Objednávka predplatného AutoAgenda — ' + NAZOV[plan],
-      'Dobrý deň,\n\nmám záujem o ' + NAZOV[plan] + ' programu AutoAgenda' +
-      ' za ' + eur(CENY[plan]) + (plan === 'rok' ? ' na rok' : ' na mesiac') + '.\n\n' +
-      'Počet počítačov: 1\nMeno alebo názov dielne: \nAdresa: \n\n' +
-      'Beriem na vedomie, že inštalačka nie je podpísaná certifikátom' +
-      ' a Windows pri jej spustení zobrazí varovanie.\n\nĎakujem.\n');
-  });
+  /* ---------------- odkaz na pokladňu ----------------
+     Tlačidlá Predplatiť a Získať demo sú formuláre na /api/checkout,
+     ktorý založí platbu v Stripe a presmeruje na jeho pokladňu.
+     Sem sa vraciame len s oznamom, keď sa niečo nepodarilo. */
+  var oznam = document.getElementById('oznam');
+  if (oznam) {
+    var dovod = new URLSearchParams(location.search);
+    var text = '';
+    if (dovod.get('zrusene')) {
+      text = 'Platba bola zrušená a nič sa nestrhlo. Skúsiť znova môžete kedykoľvek.';
+    } else if (dovod.get('chyba') === 'brana') {
+      text = 'Platobná brána zatiaľ nie je nastavená. Napíšte mi a objednávku vybavíme e-mailom.';
+    } else if (dovod.get('chyba') === 'platba') {
+      text = 'Platbu sa nepodarilo založiť. Skúste to prosím znova, alebo mi napíšte.';
+    }
+    if (text) {
+      oznam.textContent = text + ' ';
+      if (dovod.get('chyba')) {
+        var odkaz = document.createElement('a');
+        odkaz.textContent = 'Napísať e-mail';
+        odkaz.href = mailto(PREDMET.objednavka);
+        oznam.appendChild(odkaz);
+      }
+      oznam.hidden = false;
+    }
+  }
+
+  /* ---------------- stránka po platbe ----------------
+     Stripe sem vráti kupujúceho s číslom relácie. Server ju overí
+     a až potom sa ukáže odkaz na stiahnutie. */
+  var hlava = document.getElementById('hlava');
+  if (hlava) {
+    var podnadpis = document.getElementById('podnadpis');
+    var problem = document.getElementById('problem');
+    var problemtext = document.getElementById('problemtext');
+    var relacia = new URLSearchParams(location.search).get('relacia') || '';
+
+    var zle = function (sprava) {
+      hlava.textContent = 'Objednávku sa nepodarilo overiť';
+      podnadpis.textContent = 'Bez potvrdenej objednávky sa inštalačka nesťahuje.';
+      if (sprava) problemtext.textContent = sprava;
+      problem.hidden = false;
+    };
+
+    var dobre = function (v) {
+      var platene = v.plan === 'rok' || v.plan === 'mesiac';
+      hlava.textContent = platene ? 'Predplatné je zaplatené' : 'Demo je pripravené';
+      podnadpis.textContent = platene
+        ? 'Ďakujem. Inštalačku stiahnete hneď tu, licenčný kľúč pošlem e-mailom' +
+          (v.email ? ' na ' + v.email : '') + ', zvyčajne do 24 hodín.'
+        : 'Objednávka za 0 € prešla, platiť sa nič nemuselo. Inštalačku stiahnete tlačidlom nižšie.';
+
+      var poznamka = document.getElementById('poznamka');
+      poznamka.textContent = platene
+        ? 'Potvrdenie o platbe pošle Stripe e-mailom. Kľúč vložíte v programe v Nastaveniach do poľa Licencia.'
+        : 'Demo slúži na vyskúšanie. Plnú verziu bez obmedzení sprístupní predplatné.';
+      poznamka.hidden = false;
+
+      document.getElementById('odkaz').href =
+        '/api/stiahnut?relacia=' + encodeURIComponent(relacia);
+      document.getElementById('stiahnutie').hidden = false;
+      document.getElementById('varovanie').hidden = false;
+      document.getElementById('dalej').hidden = false;
+    };
+
+    if (!relacia) {
+      zle('Adresa neobsahuje číslo objednávky. Stiahnutie začnite na stránke s demom alebo v cenníku.');
+    } else {
+      fetch('/api/pristup?relacia=' + encodeURIComponent(relacia),
+        { headers: { Accept: 'application/json' } })
+        .then(function (r) { return r.json().then(function (v) { return { r: r, v: v }; }); })
+        .then(function (o) {
+          if (o.r.ok && o.v.ok) dobre(o.v);
+          else zle(o.v && o.v.chyba ? o.v.chyba : '');
+        })
+        .catch(function () { zle('Server neodpovedal. Skúste stránku obnoviť.'); });
+    }
+  }
 
   /* ---------------- údaje o poslednom vydaní ----------------
      Číslo verzie, veľkosť aj názov súboru berie /api/verzia priamo
