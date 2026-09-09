@@ -17,24 +17,24 @@ var PLANY = {
   demo: {
     suma: 0,
     obdobie: '',                 // jednorazová objednávka, nie predplatné
-    nazov: 'AutoAgenda — demo',
-    popis: 'Bezplatné stiahnutie dema programu AutoAgenda.',
+    nazov: 'GridServis — demo',
+    popis: 'Bezplatné stiahnutie dema programu GridServis.',
     cena: process.env.STRIPE_PRICE_DEMO || '',
     spat: '/stiahnut.html'
   },
   mesiac: {
     suma: 1999,
     obdobie: 'month',
-    nazov: 'AutoAgenda — mesačné predplatné',
-    popis: 'Predplatné programu AutoAgenda na jeden počítač, obnovuje sa každý mesiac.',
+    nazov: 'GridServis — mesačné predplatné',
+    popis: 'Predplatné programu GridServis na jeden počítač, obnovuje sa každý mesiac.',
     cena: process.env.STRIPE_PRICE_MESIAC || '',
     spat: '/cennik.html'
   },
   rok: {
     suma: 19999,
     obdobie: 'year',
-    nazov: 'AutoAgenda — ročné predplatné',
-    popis: 'Predplatné programu AutoAgenda na jeden počítač, obnovuje sa každý rok.',
+    nazov: 'GridServis — ročné predplatné',
+    popis: 'Predplatné programu GridServis na jeden počítač, obnovuje sa každý rok.',
     cena: process.env.STRIPE_PRICE_ROK || '',
     spat: '/cennik.html'
   }
@@ -72,7 +72,7 @@ async function stripe(cesta, telo) {
     headers: {
       Authorization: 'Bearer ' + KLUC,
       'Stripe-Version': VERZIA,
-      'User-Agent': 'autoagenda-web'
+      'User-Agent': 'gridservis-web'
     }
   };
   if (telo) {

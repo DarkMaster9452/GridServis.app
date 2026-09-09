@@ -63,7 +63,7 @@ async function vydaj(platba) {
     `INSERT INTO licencie (kod, dielna, kontakt, max_zariadeni, platna_do, stav, poznamka)
      VALUES ($1, $2, $3, 1, $4::date, 'aktivna', $5)`,
     [kod, dielna, platba.email || '', dokedy,
-     'AutoAgenda web · ' + (platba.plan === 'rok' ? 'ročné' : 'mesačné') +
+     'GridServis web · ' + (platba.plan === 'rok' ? 'ročné' : 'mesačné') +
      ' predplatné · ' + platba.stripe_id]
   );
 

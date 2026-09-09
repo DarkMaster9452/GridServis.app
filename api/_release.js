@@ -8,7 +8,7 @@ var TOKEN = process.env.RELEASE_TOKEN || '';
 var API = process.env.GITHUB_API || 'https://api.github.com';   // prepínateľné pri testovaní
 
 function hlavicky(accept) {
-  var h = { Accept: accept, 'User-Agent': 'autoagenda-web' };
+  var h = { Accept: accept, 'User-Agent': 'gridservis-web' };
   if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
   return h;
 }

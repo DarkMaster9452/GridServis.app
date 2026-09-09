@@ -1,4 +1,4 @@
-/* AutoAgenda — web. Menu, predplatné, údaje o poslednom vydaní. */
+/* GridServis — web. Menu, predplatné, údaje o poslednom vydaní. */
 (function () {
   'use strict';
 
@@ -46,12 +46,12 @@
 
   /* ---------------- e-mailové odkazy ---------------- */
   var PREDMET = {
-    objednavka: 'Objednávka predplatného AutoAgenda',
-    podpora: 'AutoAgenda — podpora',
-    viac: 'AutoAgenda — predplatné pre viac počítačov'
+    objednavka: 'Objednávka predplatného GridServis',
+    podpora: 'GridServis — podpora',
+    viac: 'GridServis — predplatné pre viac počítačov'
   };
   each('[data-mail]', function (el) {
-    el.href = mailto(PREDMET[el.getAttribute('data-mail')] || 'AutoAgenda');
+    el.href = mailto(PREDMET[el.getAttribute('data-mail')] || 'GridServis');
   });
   each('[data-mail-txt]', function (el) {
     el.textContent = EMAIL;

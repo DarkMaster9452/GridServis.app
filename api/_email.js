@@ -13,7 +13,7 @@ function text(kod, plan, platnaDo, adresaWebu) {
   return [
     'Dobrý deň,',
     '',
-    'ďakujem za ' + obdobie + ' predplatné programu AutoAgenda.',
+    'ďakujem za ' + obdobie + ' predplatné programu GridServis.',
     '',
     'Licenčný kód: ' + kod,
     'Predplatné platí do: ' + platnaDo,
@@ -44,7 +44,7 @@ async function posli(email, kod, plan, platnaDo, adresaWebu) {
         from: ODOSIELATEL,
         to: [email],
         reply_to: ODPOVED,
-        subject: 'AutoAgenda — licenčný kód ' + kod,
+        subject: 'GridServis — licenčný kód ' + kod,
         text: text(kod, plan, platnaDo, adresaWebu)
       })
     });

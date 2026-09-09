@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Vygeneruje statické HTML stránky webu AutoAgenda (bez build kroku v repe)."""
+"""Vygeneruje statické HTML stránky webu GridServis (bez build kroku v repe)."""
 import os, io
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ZNACKA = 'AutoAgenda'
+ZNACKA = 'GridServis'
 
 # Predávajúci. Program predáva fyzická osoba, nie firma, preto tu nie sú
 # IČO, DIČ ani zápis v registri — kontakt prebieha e-mailom.
@@ -33,17 +33,7 @@ def eur(n):
 ROK = eur(CENY['rok'])
 MESIAC = eur(CENY['mesiac'])
 
-LOGO = ('<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" '
-        'stroke-linecap="round" stroke-linejoin="round">'
-        '<path d="M32 4.5 57.5 13v18.6c0 13.4-10.4 22.6-25.5 27.4C16.9 54.2 6.5 45 6.5 31.6V13Z" stroke-width="4"/>'
-        '<path d="M15.5 37v-7.6c0-1.9 1.2-3.5 3-4.1l2.9-1 3.3-6.4c.8-1.5 2.3-2.4 4-2.4h7.6c1.7 0 3.2.9 4 2.4l3.3 6.4 2.9 1c1.8.6 3 2.2 3 4.1V37" stroke-width="3"/>'
-        '<path d="M15.5 37h10.5M49.5 37h-5" stroke-width="3"/>'
-        '<path d="M21.4 24.3h21.2" stroke-width="3"/>'
-        '<path d="M19.8 30.2l5 1.1M45.2 30.2l-5 1.1" stroke-width="2.6"/>'
-        '<path d="M28 31.6h9" stroke-width="2.6"/>'
-        '<path d="M14.2 27.8H19M49.8 27.8H45" stroke-width="3"/>'
-        '<path d="M41.8 38.8a5.2 5.2 0 1 0 0 7.4M31 42.5H21" stroke-width="4.8"/>'
-        '</svg>')
+LOGO = ('<img src="assets/img/logo-256.png" width="256" height="256" alt="">')
 
 # Verzia programu sa nikde nepíše natvrdo. Doplní ju /api/verzia z posledného
 # vydania na GitHube; kým neodpovie, ostane zobrazená náhrada v [data-rel-off].
@@ -79,8 +69,8 @@ def head(active, title, desc):
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta name="theme-color" content="#101722">
-<link rel="icon" href="assets/img/favicon.svg">
-<link rel="mask-icon" href="assets/img/logo.svg" color="#0d1117">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -90,7 +80,7 @@ def head(active, title, desc):
   <div class="wrap hdr__in">
     <a class="logo" href="index.html">
       <span class="logo__mark" aria-hidden="true">LOGO</span>
-      <span class="logo__txt">ZNACKA<em>správa autoservisu</em></span>
+      <span class="logo__txt">ZNACKA</span>
     </a>
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
 %s
@@ -195,7 +185,7 @@ VAROVANIE = '''<div class="warn" id="upozornenie">
 # ============================================================ DOMOV
 index = head('index.html', 'ZNACKA — program na správu autoservisu',
              'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, predplatné ROK ročne alebo MESIAC mesačne.') + '''
-<section class="hero">
+<section class="hero mriezka">
   <div class="wrap hero__in">
     <div class="hero__txt">
       <h1>Celý servis v jednom programe.<br>Od príjmu auta po faktúru.</h1>
@@ -305,7 +295,7 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
   </div>
 </section>
 
-<section class="cta">
+<section class="cta mriezka">
   <div class="wrap cta__in">
     <h2>Najprv demo, potom rozhodnutie</h2>
     <p>Demo si stiahnete hneď a vyskúšate na vlastných zákazkách. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p>
@@ -341,7 +331,7 @@ def blok(anchor, tag, h2, p, body_ul, img, alt, rev=False):
 
 funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
                'Prehľad obrazoviek programu ZNACKA: zákazky, detail zákazky, zákazníci, sklad dielov, cenník prác, štatistiky a nastavenia dielne.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap">
     <h1>Čo program vie</h1>
     <p class="lead">Obrazovky nižšie sú z bežiaceho programu. Ukážkové dáta patria vymyslenej dielni AutoServis Horák.</p>
@@ -405,7 +395,7 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
      'IBAN, splatnosť faktúr, predpona čísla faktúry',
      'IČ DPH a sadzba DPH pre platiteľov'],
     'nastavenia.png', 'Nastavenia dielne, cien a faktúr', rev=True) + '''
-<section class="cta">
+<section class="cta mriezka">
   <div class="wrap cta__in">
     <h2>Pozrite si to naživo</h2>
     <p>Demo sa nainštaluje za pár minút a vyskúšate ho na vlastných zákazkách.</p>
@@ -420,7 +410,7 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 # ============================================================ CENNÍK
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
               'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap">
     <h1>Ročne ROK, mesačne MESIAC</h1>
     <p class="lead">Predplatné platí na jeden počítač a sprístupní celý program bez obmedzení. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
@@ -526,7 +516,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
   </div>
 </section>
 
-<section class="cta">
+<section class="cta mriezka">
   <div class="wrap cta__in">
     <h2>Najprv skúsiť, potom platiť</h2>
     <p>Stiahnite si demo a pozrite, či vám sadne. Predplatné vyriešime, keď budete vedieť.</p>
@@ -541,7 +531,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
 # ============================================================ STIAHNUŤ
 stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
                 'Demo programu ZNACKA na vyskúšanie zadarmo, systémové požiadavky a postup inštalácie. Plná verzia sa sťahuje po zaplatení predplatného.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap">
     <h1>Demo na vyskúšanie</h1>
     <p class="lead">Demo nič nestojí, sťahuje sa však cez objednávku za 0 €: v pokladni zadáte e-mail, kartu Stripe nepýta. Plnú verziu programu sprístupní predplatné.</p>
@@ -604,7 +594,7 @@ stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
   </div>
 </section>
 
-<section class="cta">
+<section class="cta mriezka">
   <div class="wrap cta__in">
     <h2>Demo vám sadlo?</h2>
     <p>Predplatné vybavíte v cenníku. Ak sa niečo zaseklo pri inštalácii, napíšte mi, čo hlási počítač.</p>
@@ -620,7 +610,7 @@ stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
 # ============================================================ FAQ
 faq = head('faq.html', 'Časté otázky — ZNACKA',
            'Odpovede na otázky o programe ZNACKA: dáta, predplatné, viac počítačov, faktúry, DPH, zálohovanie a podpora.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap">
     <h1>Časté otázky</h1>
     <p class="lead">Ak tu odpoveď nenájdete, napíšte mi a doplním ju.</p>
@@ -675,7 +665,7 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
 # ============================================================ KONTAKT
 kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
                'Kontakt na objednávku predplatného, podporu pri inštalácii a hlásenie chýb v programe ZNACKA.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap">
     <h1>Napíšte mi</h1>
     <p class="lead">Objednávka predplatného, pomoc s inštaláciou alebo hlásenie chyby. Ozvem sa hneď, ako to bude možné.</p>
@@ -729,7 +719,7 @@ kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
 
 hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
               'Potvrdenie objednávky a stiahnutie programu ZNACKA.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1 id="hlava">Overujem objednávku</h1>
     <p class="lead" id="podnadpis">Chvíľu to potrvá, stránku zatiaľ nezatvárajte.</p>
@@ -791,7 +781,7 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
 
 obnova = head('obnova.html', 'Obnovenie licencie — ZNACKA',
               'Obnovenie zastavenej licencie programu ZNACKA. Po zaplatení sa licencia predĺži a dáta zostávajú.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Obnovenie licencie</h1>
     <p class="lead">Zaplatením sa tá istá licencia predĺži. Kód sa nemení, program sa odomkne a zákazky, sklad ani nastavenia sa nikam nestratia.</p>
@@ -865,7 +855,7 @@ PREDAVAJUCI = '''
 
 sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
                 'Aké osobné údaje spracúvam pri predaji predplatného programu ZNACKA, na aký účel, ako dlho a aké práva máte.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Ochrana súkromia</h1>
     <p class="lead">Tento web nepoužíva analytiku, reklamné nástroje ani profilovanie. Nižšie je popísané, čo sa deje s údajmi, ktoré mi pošlete pri objednávke alebo v e-maili.</p>
@@ -924,7 +914,7 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
 
 cookies = head('cookies.html', 'Cookies — ZNACKA',
                'Tento web nepoužíva sledovacie ani analytické cookies. Vysvetlenie, čo sa v prehliadači ukladá a prečo nie je zobrazovaná lišta so súhlasom.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Cookies</h1>
     <p class="lead">Krátka odpoveď: tento web nepoužíva sledovacie ani analytické cookies a nezobrazuje lištu so súhlasom, pretože nie je čo odsúhlasovať.</p>
@@ -962,7 +952,7 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
 
 vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
            'Všeobecné obchodné podmienky predplatného programu ZNACKA vrátane ceny, dodania, trvania predplatného, odstúpenia od zmluvy a reklamácií.') + '''
-<section class="phead">
+<section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Obchodné podmienky</h1>
     <p class="lead">Podmienky predaja predplatného programu ZNACKA. Vzťahujú sa na každú objednávku uskutočnenú cez tento web alebo e-mailom.</p>
