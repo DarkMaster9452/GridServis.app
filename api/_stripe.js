@@ -16,6 +16,7 @@ var VERZIA = '2023-08-16';
 var PLANY = {
   demo: {
     suma: 0,
+    obdobie: '',                 // jednorazová objednávka, nie predplatné
     nazov: 'AutoAgenda — demo',
     popis: 'Bezplatné stiahnutie dema programu AutoAgenda.',
     cena: process.env.STRIPE_PRICE_DEMO || '',
@@ -23,15 +24,17 @@ var PLANY = {
   },
   mesiac: {
     suma: 1999,
+    obdobie: 'month',
     nazov: 'AutoAgenda — mesačné predplatné',
-    popis: 'Predplatné programu AutoAgenda na jeden mesiac, jeden počítač.',
+    popis: 'Predplatné programu AutoAgenda na jeden počítač, obnovuje sa každý mesiac.',
     cena: process.env.STRIPE_PRICE_MESIAC || '',
     spat: '/cennik.html'
   },
   rok: {
     suma: 19999,
+    obdobie: 'year',
     nazov: 'AutoAgenda — ročné predplatné',
-    popis: 'Predplatné programu AutoAgenda na dvanásť mesiacov, jeden počítač.',
+    popis: 'Predplatné programu AutoAgenda na jeden počítač, obnovuje sa každý rok.',
     cena: process.env.STRIPE_PRICE_ROK || '',
     spat: '/cennik.html'
   }

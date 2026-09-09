@@ -197,6 +197,14 @@ b,strong{font-weight:640;color:var(--ink)}
 .oznam a{color:var(--warn-ink);text-decoration:underline;text-underline-offset:3px}
 .oznam__detail{display:block;margin-top:8px;font-size:.86rem;opacity:.85}
 
+/* ---------- licenčný kód ---------- */
+.kod{display:grid;gap:6px;justify-items:center;text-align:center;margin:0 0 26px;padding:clamp(24px,3.2vw,34px);border:2px solid var(--ink);border-radius:var(--r-l);background:var(--bg)}
+.kod__lbl{color:var(--mut);font-size:.76rem;font-weight:620;letter-spacing:.11em;text-transform:uppercase}
+.kod__val{font-size:clamp(1.5rem,4.4vw,2.3rem);font-weight:680;letter-spacing:.06em;line-height:1.15;font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+.kod .btn{margin-top:6px}
+.kod + .dl{margin-top:20px}
+.kod__note{margin-top:6px;max-width:52ch;color:var(--mut);font-size:.88rem;line-height:1.6}
+
 /* ---------- boxy ---------- */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:34px}
 .two--top{align-items:start}

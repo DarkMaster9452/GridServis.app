@@ -20,13 +20,22 @@ assets/js/main.js
 assets/img/favicon.svg     ikona do záložky prehliadača
 assets/img/logo.svg        značka (štít s autom a kľúčom)
 assets/img/                snímky obrazovky programu
-hotovo.html                stránka po platbe, odtiaľ sa sťahuje
-api/checkout.js            založí platbu v Stripe a presmeruje na pokladňu
-api/pristup.js             overí, či je objednávka dokončená
+hotovo.html                stránka po platbe: licenčný kód a stiahnutie
+obnova.html                obnovenie zastavenej licencie (odkaz z programu)
+api/checkout.js            založí predplatné v Stripe a presmeruje na pokladňu
+api/obnova.js              nové predplatné na existujúci licenčný kód
+api/stripe-hook.js         webhook: obnovy, neúspešné platby, koniec predplatného
+api/pristup.js             overí objednávku a vydá licenčný kód
+api/portal.js              odkaz do Stripe portálu (zrušenie obnovy z programu)
+api/udalost.js             anonymné počítadlo návštevnosti
 api/stiahnut.js            presmerovanie na inštalačku, až po objednávke
 api/verzia.js              JSON s číslom verzie, veľkosťou a dátumom
 api/_release.js            spoločný pomocník k vydaniam
 api/_stripe.js             spoločný pomocník k Stripe (plány a ceny)
+api/_db.js                 spojenie na licenčnú databázu (Neon)
+api/_licencia.js           generovanie a predlžovanie licencií
+api/_objednavka.js         čo sa deje po zaplatení
+api/_email.js              odoslanie licenčného kódu
 tools/gen.py               generátor HTML stránok
 ```
 
@@ -76,10 +85,37 @@ e-mailom.
 | `STRIPE_PRICE_MESIAC` | nie | ID ceny mesačného predplatného |
 | `STRIPE_PRICE_ROK` | nie | ID ceny ročného predplatného |
 | `SITE_URL` | nie | adresa webu pre návrat z pokladne; inak sa berie z požiadavky |
+| `STRIPE_WEBHOOK_SECRET` | áno | podpis webhooku, `whsec_...` |
 | `STIAHNUT_BEZ_PLATBY` | nie | `1` vypne zámok sťahovania, len na testovanie |
+| `DATABASE_URL` | áno | pripojenie do licenčnej databázy rolou `web_klient` |
+| `RESEND_API_KEY` | nie | kľúč na odosielanie e-mailov s licenčným kódom |
+| `RESEND_FROM` | nie | odosielateľ, napr. `AutoAgenda <licencie@vasa-domena.sk>` |
+| `RESEND_REPLY_TO` | nie | adresa na odpoveď, predvolene `strananekm@gmail.com` |
+| `RELEASE_ASSET_DEMO` | nie | názov demo inštalačky vo vydaní |
+| `GITHUB_API` | nie | iná adresa GitHub API, len na testovanie |
 
 Bez `STRIPE_PRICE_*` sa cena posiela priamo z `PLANY` v `api/_stripe.js`,
 takže v Stripe netreba nič zakladať.
+
+### Webhook
+
+V Stripe (**Developers → Webhooks → Add endpoint**) treba pridať adresu
+`https://<vas-web>/api/stripe-hook` a zapnúť tieto udalosti:
+
+| Udalosť | Čo spraví |
+|---|---|
+| `checkout.session.completed` | vydá licenciu a pošle kód e-mailom |
+| `invoice.paid` | obnova prešla → predĺži platnosť licencie |
+| `invoice.payment_failed` | zapíše neúspešnú platbu a poznámku k licencii |
+| `customer.subscription.deleted` | predplatné skončilo → licencia sa zastaví |
+
+Podpisové tajomstvo z tej istej obrazovky (`whsec_...`) patrí do
+`STRIPE_WEBHOOK_SECRET`. Bez neho webhook beží tiež, ale prijme aj správu,
+ktorá neprišla zo Stripe — nastavte ho.
+
+Aj bez webhooku sa licencia vydá, len neskôr: stránka `hotovo.html` si ju
+vypýta cez `/api/pristup` hneď po návrate z pokladne. Obnovy predplatného
+však bez webhooku fungovať nebudú.
 
 ### Kde kľúč nájsť
 
@@ -138,6 +174,37 @@ verejný repozitár a v adrese sťahovania bude vidieť.
 
 Lokálne `/api/*` nebeží pod `python3 -m http.server`; stránky sa v tom
 prípade zobrazia bez čísla verzie a odkaz na stiahnutie nefunguje.
+
+## Licencie, predplatné a databáza
+
+Licenčný systém je spoločný s programom — beží v Neon databáze
+`mechanik-licencie`, do ktorej sa hlási aj admin aplikácia. Web do nej
+pristupuje rolou `web_klient`, ktorá vidí len licencie, platby, návštevnosť
+a zariadenia; k zákazníckym dátam dielní (`zaznamy`) ani k podpisovému
+tajomstvu (`tajomstva`) sa nedostane.
+
+Tabuľky, ktoré pridal web:
+
+| Tabuľka | Čo je v nej |
+|---|---|
+| `platby` | každá platba zo Stripe: prvá aj obnovy, e-mail kupujúceho, suma, stav a vydaný licenčný kód |
+| `udalosti_web` | anonymné počítadlo: zobrazenia stránok, kliky na predplatné, dokončené platby |
+
+### Ako to ide za sebou
+
+1. Kupujúci zaplatí v pokladni Stripe (predplatné, nie jednorazová platba).
+2. Vytvorí sa licencia v tabuľke `licencie`: kód v tvare `MECH-XXXX-XXXX-XXXX`,
+   `max_zariadeni = 1`, `platna_do` na koniec zaplateného obdobia plus tri dni
+   odkladu, `kontakt` je e-mail z objednávky.
+3. Kód sa ukáže na stránke a odošle e-mailom.
+4. Po skončení obdobia Stripe strhne ďalšiu platbu; `invoice.paid` predĺži
+   `platna_do` a dielňa si ničoho nevšimne.
+5. Keď platba neprejde a predplatné skončí, `platna_do` sa nastaví na dnešok —
+   program sa uzamkne, dáta v ňom zostanú a ponúkne odkaz na `obnova.html`.
+   Po zaplatení sa predĺži tá istá licencia, nový kód sa nevydáva.
+
+Licencia sa pri aktivácii naviaže na jeden počítač. Preloženie inde rieši
+predávajúci ručne v admin aplikácii a podľa obchodných podmienok stojí 10 €.
 
 ## Čo treba doplniť pred spustením
 

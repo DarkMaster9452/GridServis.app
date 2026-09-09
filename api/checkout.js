@@ -47,13 +47,15 @@ module.exports = async function (req, res) {
       unit_amount: p.suma,
       product_data: { name: p.nazov, description: p.popis }
     };
+    /* Predplatné potrebuje opakovanie; demo za 0 € je jednorazová objednávka. */
+    if (p.obdobie) polozka.price_data.recurring = { interval: p.obdobie };
   }
 
   var web = adresaWebu(req);
 
   try {
-    var relacia = await stripe('/checkout/sessions', {
-      mode: 'payment',
+    var poziadavka = {
+      mode: p.obdobie ? 'subscription' : 'payment',
       locale: 'sk',
       /* Pri nulovej sume Checkout kartu nepýta sám, od verzie API
          2023-08-16 je to predvolené správanie jednorazovej platby.
@@ -68,7 +70,11 @@ module.exports = async function (req, res) {
       cancel_url: web + p.spat + '?zrusene=1',
       metadata: { plan: plan },
       line_items: [polozka]
-    });
+    };
+    /* nech je plán vidieť aj na predplatnom, nielen na objednávke */
+    if (p.obdobie) poziadavka.subscription_data = { metadata: { plan: plan } };
+
+    var relacia = await stripe('/checkout/sessions', poziadavka);
 
     if (chceJson(req)) { res.status(200).json({ url: relacia.url }); return; }
     res.redirect(303, relacia.url);
