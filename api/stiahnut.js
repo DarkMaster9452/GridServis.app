@@ -2,6 +2,10 @@
    vydania, ale až po dokončenej objednávke v Stripe. Platí to pre demo
    (objednávka za 0 €) aj pre zaplatené predplatné.
 
+   Verzia inštalačky sa vždy určuje podľa objednávky: k plánu rok/mesiac
+   patrí plná verzia, k demo objednávke demo inštalačka. Zámerne nejde
+   voliť inak — kto si kúpil predplatné, nedostane demo, a naopak.
+
    Pri súkromnom zdroji sa použije podpísaná adresa, ktorú vráti server,
    takže sa v prehliadači neobjaví adresa repozitára. */
 

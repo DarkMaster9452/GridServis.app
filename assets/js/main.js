@@ -188,33 +188,100 @@
       problem.hidden = false;
     };
 
+    /* ---- licenčný kód: skrytý blurom, odhalí sa kliknutím na emoji,
+       kliknutím na odhalený kód sa skopíruje ---- */
     var ukazKod = function (v) {
       var box = document.getElementById('licencia');
       if (!box) return;
+      var hodnota = document.getElementById('kodhodnota');
+      var odhal = document.getElementById('odhalit');
+      var kopiruj = document.getElementById('kopiruj');
+
       if (!v.kod) {
         document.getElementById('kodpozn').textContent =
           'Kód sa práve vydáva. Príde vám e-mailom o pár sekúnd; ak nie, napíšte mi.';
+        if (odhal) odhal.hidden = true;
         box.hidden = false;
         return;
       }
-      document.getElementById('kodhodnota').textContent = v.kod;
+
+      hodnota.textContent = v.kod;
       document.getElementById('kodpozn').textContent =
-        'Zadajte ho pri prvom spustení programu. Licencia platí na jeden počítač' +
+        'Kliknutím na oko kód odhalíte, kliknutím na kód ho skopírujete. Zadajte ho pri prvom spustení programu. Licencia platí na jeden počítač' +
         (v.platna_do ? ' do ' + v.platna_do : '') + '.' +
         (v.poslany && v.email ? ' Poslal som ho aj na ' + v.email + '.'
                               : ' Odložte si ho, budete ho potrebovať pri inštalácii.');
       box.hidden = false;
 
-      var tlacidlo = document.getElementById('kopiruj');
-      if (tlacidlo && navigator.clipboard) {
-        tlacidlo.hidden = false;
-        tlacidlo.addEventListener('click', function () {
-          navigator.clipboard.writeText(v.kod).then(function () {
-            tlacidlo.textContent = 'Skopírované';
-            setTimeout(function () { tlacidlo.textContent = 'Kopírovať'; }, 2000);
-          });
+      var kopirovat = function () {
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(v.kod).then(function () {
+          hodnota.classList.add('je-skopirovany');
+          if (kopiruj) {
+            kopiruj.textContent = 'Skopírované';
+            setTimeout(function () {
+              kopiruj.textContent = '📋 Kopírovať';
+              hodnota.classList.remove('je-skopirovany');
+            }, 2000);
+          } else {
+            setTimeout(function () { hodnota.classList.remove('je-skopirovany'); }, 2000);
+          }
+        });
+      };
+
+      if (odhal) {
+        odhal.addEventListener('click', function () {
+          hodnota.classList.add('je-odhaleny');
+          odhal.hidden = true;
+          if (kopiruj && navigator.clipboard) kopiruj.hidden = false;
         });
       }
+      hodnota.addEventListener('click', function () {
+        if (hodnota.classList.contains('je-odhaleny')) kopirovat();
+      });
+      if (kopiruj) kopiruj.addEventListener('click', kopirovat);
+    };
+
+    /* ---- stiahnutie: ukáže sa len tá inštalačka, ktorá zodpovedá
+       objednávke — platená dostane plnú verziu, demo objednávka demo ---- */
+    var naplnStiahnutie = function (demo, elInfo, elOdkaz) {
+      elOdkaz.href = '/api/stiahnut?relacia=' + encodeURIComponent(relacia);
+      fetch('/api/verzia' + (demo ? '?demo=1' : ''), { headers: { Accept: 'application/json' } })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (v) {
+          if (!v.verzia) return Promise.reject(0);
+          var casti = ['Verzia ' + v.verzia];
+          if (v.velkost) casti.push((v.velkost / 1048576).toFixed(0) + ' MB');
+          casti.push('Windows 10 a 11, 64-bit');
+          elInfo.textContent = casti.join(' · ');
+        })
+        .catch(function () {
+          elInfo.textContent = 'Posledná vydaná verzia · Windows 10 a 11, 64-bit';
+        });
+    };
+
+    /* ---- konfety pri kúpe: pár vĺn zo spodných rohov nahor ---- */
+    var oslavKupu = function () {
+      if (typeof window.confetti !== 'function') return;
+      var trvanie = 5000;
+      var koniec = Date.now() + trvanie;
+      var vychodzie = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      function nahodne(min, max) { return Math.random() * (max - min) + min; }
+
+      var interval = setInterval(function () {
+        var zostava = koniec - Date.now();
+        if (zostava <= 0) { clearInterval(interval); return; }
+        var pocet = 50 * (zostava / trvanie);
+        window.confetti(Object.assign({}, vychodzie, {
+          particleCount: pocet,
+          origin: { x: nahodne(0.1, 0.3), y: Math.random() - 0.2 }
+        }));
+        window.confetti(Object.assign({}, vychodzie, {
+          particleCount: pocet,
+          origin: { x: nahodne(0.7, 0.9), y: Math.random() - 0.2 }
+        }));
+      }, 250);
     };
 
     var dobre = function (v) {
@@ -227,16 +294,30 @@
       var poznamka = document.getElementById('poznamka');
       poznamka.textContent = platene
         ? 'Potvrdenie o platbe pošle Stripe e-mailom. Predplatné sa obnovuje automaticky, zrušiť sa dá v programe v Nastaveniach.'
-        : 'Demo slúži na vyskúšanie. Plnú verziu bez obmedzení sprístupní predplatné.';
+        : 'Demo slúži na vyskúšanie a nič nevyžaduje. Plnú verziu bez obmedzení odomkne licenčný kód po zaplatení predplatného.';
       poznamka.hidden = false;
 
-      if (platene) ukazKod(v);
+      /* platená objednávka dostane len plnú verziu a licenciu, demo
+         objednávka len demo — nič z toho druhého sa tu neukáže */
+      if (platene) {
+        ukazKod(v);
+        naplnStiahnutie(false, document.getElementById('info-plna'), document.getElementById('odkaz-plna'));
+        document.getElementById('dl-plna').hidden = false;
+        oslavKupu();
+      } else {
+        naplnStiahnutie(true, document.getElementById('info-demo'), document.getElementById('odkaz-demo'));
+        document.getElementById('dl-demo').hidden = false;
+      }
       zapis('platba_hotova', v.plan);
 
-      document.getElementById('odkaz').href =
-        '/api/stiahnut?relacia=' + encodeURIComponent(relacia);
       document.getElementById('stiahnutie').hidden = false;
       document.getElementById('varovanie').hidden = false;
+
+      var navod = document.getElementById('navod');
+      var krokKod = document.getElementById('krok-kod');
+      if (krokKod) krokKod.hidden = !platene;
+      if (navod) navod.hidden = false;
+
       document.getElementById('dalej').hidden = false;
     };
 

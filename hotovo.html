@@ -54,22 +54,37 @@
 
 <section class="sec">
   <div class="wrap wrap--mid">
-    <div class="kod" id="licencia" hidden>
+    <div class="kod kod--skryty" id="licencia" hidden>
       <span class="kod__lbl">Licenčný kód</span>
-      <b class="kod__val" id="kodhodnota">&mdash;</b>
-      <button class="btn btn--gh btn--sm" type="button" id="kopiruj" hidden>Kopírovať</button>
+      <span class="kod__box">
+        <b class="kod__val" id="kodhodnota">&mdash;</b>
+        <button class="kod__odhal" type="button" id="odhalit">&#128065;&#65039; Zobraziť kód</button>
+      </span>
+      <button class="btn btn--gh btn--sm" type="button" id="kopiruj" hidden>&#128203; Kopírovať</button>
       <span class="kod__note" id="kodpozn"></span>
     </div>
 
-    <div class="dl" id="stiahnutie" hidden>
-      <div class="dl__l">
-        <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        <div>
-          <b><span data-file>Inštalačný súbor</span></b>
-          <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
+    <div class="dl-list" id="stiahnutie" hidden>
+      <div class="dl" id="dl-plna" hidden>
+        <div class="dl__l">
+          <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+          <div>
+            <b>GridServis</b>
+            <span id="info-plna">načítavam údaje o vydaní&hellip;</span>
+          </div>
         </div>
+        <a class="btn btn--pri btn--lg" id="odkaz-plna" href="#">Stiahnuť</a>
       </div>
-      <a class="btn btn--pri btn--lg" id="odkaz" href="#">Stiahnuť</a>
+      <div class="dl" id="dl-demo" hidden>
+        <div class="dl__l">
+          <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+          <div>
+            <b>GridServis &mdash; demo</b>
+            <span id="info-demo">načítavam údaje o vydaní&hellip;</span>
+          </div>
+        </div>
+        <a class="btn btn--pri btn--lg" id="odkaz-demo" href="#">Stiahnuť</a>
+      </div>
     </div>
 
     <p class="fine center" id="poznamka" hidden></p>
@@ -86,6 +101,29 @@
       <p>Inštalačka nemá zakúpený podpisový certifikát, preto ju SmartScreen označí ako súbor od neznámeho vydavateľa. Nie je to vírus. Po kliknutí na <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b> inštalácia normálne pokračuje.</p>
     </div>
 
+    <div class="two two--top" id="navod" hidden>
+      <div class="box">
+        <h3>Systémové požiadavky</h3>
+        <dl class="specs">
+          <div><dt>Systém</dt><dd>Windows 10 alebo 11, 64-bit</dd></div>
+          <div><dt>Pamäť</dt><dd>4 GB RAM a viac</dd></div>
+          <div><dt>Disk</dt><dd>približne 300 MB</dd></div>
+          <div><dt>Rozlíšenie</dt><dd>1366 &times; 768 a viac</dd></div>
+          <div><dt>Internet</dt><dd>len na stiahnutie a aktualizácie</dd></div>
+        </dl>
+      </div>
+      <div class="box">
+        <h3>Inštalácia a spustenie</h3>
+        <ol class="ol">
+          <li>Stiahnite si inštalačku vyššie a spustite ju.</li>
+          <li>Keď Windows zobrazí modré okno SmartScreen, kliknite na <b>Ďalšie informácie</b> a potom na <b>Spustiť tak či tak</b>.</li>
+          <li>Potvrďte inštaláciu a počkajte, kým sa program nainštaluje.</li>
+          <li id="krok-kod">Pri prvom spustení zadajte licenčný kód z tejto stránky (odhaľte ho vyššie) &mdash; program sa tým odomkne pre tento počítač.</li>
+          <li>V Nastaveniach vyplňte údaje dielne a hodinovú sadzbu a založte prvú zákazku tlačidlom Nová zákazka.</li>
+        </ol>
+      </div>
+    </div>
+
     <div class="two two--top" id="dalej" hidden>
       <div class="box">
         <h3>Odkaz si odložte</h3>
@@ -98,7 +136,7 @@
     </div>
   </div>
 </section>
-</main>
+<script src="assets/js/confetti.js"></script></main>
 
 <footer class="foot">
   <div class="wrap foot__in">
