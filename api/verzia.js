@@ -15,6 +15,7 @@ module.exports = async function (req, res) {
       vydane: v.rel.published_at || null
     });
   } catch (e) {
+    console.error('verzia:', e.message);
     res.setHeader('Cache-Control', 'no-store');
     res.status(503).json({ chyba: 'Údaje o verzii sa nepodarilo načítať.' });
   }

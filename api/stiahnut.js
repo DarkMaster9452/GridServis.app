@@ -43,6 +43,7 @@ module.exports = async function (req, res) {
       var objednavka = await overRelaciu(id);
       /* demo objednávka dostane demo inštalačku, predplatné plnú verziu */
       demo = objednavka.plan !== 'rok' && objednavka.plan !== 'mesiac';
+      console.log('stiahnut: relacia=' + id + ' plan=' + JSON.stringify(objednavka.plan) + ' demo=' + demo);
     } catch (e) {
       odmietni(res, e.stav === 402 ? 402 : 403,
         'Inštalačka sa sťahuje až po dokončení objednávky. Demo je zadarmo,' +
@@ -54,6 +55,7 @@ module.exports = async function (req, res) {
   try {
     var v = await posledneVydanie(demo);
     if (!v.asset) throw new Error('vydanie neobsahuje inštalačku');
+    console.log('stiahnut: demo=' + demo + ' vybrany asset=' + v.asset.name);
 
     if (process.env.RELEASE_TOKEN) {
       var r = await fetch(v.asset.url, {
@@ -71,6 +73,7 @@ module.exports = async function (req, res) {
     res.setHeader('Cache-Control', 'no-store');
     res.redirect(302, v.asset.browser_download_url);
   } catch (e) {
+    console.error('stiahnut:', e.message);
     res.setHeader('Cache-Control', 'no-store');
     res.status(503).send('Inštalačka je momentálne nedostupná. Skúste to prosím neskôr.');
   }
