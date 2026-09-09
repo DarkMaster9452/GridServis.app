@@ -60,6 +60,10 @@ module.exports = async function (req, res) {
          Parameter payment_method_collection sa sem neposiela, v tomto
          režime ho Stripe neberie. */
       billing_address_collection: 'auto',
+      /* Predávajúci daň neúčtuje a ceny sú konečné, takže automatický
+         výpočet dane sa vypína. Keby zostal zapnutý (Stripe Tax na účte),
+         Checkout by pri položke pýtal daňový kód a reláciu by odmietol. */
+      automatic_tax: { enabled: false },
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + p.spat + '?zrusene=1',
       metadata: { plan: plan },

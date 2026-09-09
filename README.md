@@ -91,6 +91,18 @@ takže v Stripe netreba nič zakladať.
 3. Vo Vercel projekte **Settings → Environment Variables** pridať
    `STRIPE_SECRET_KEY`, hodnotu vložiť a nasadiť znova.
 
+### Daň
+
+Relácia sa zakladá s `automatic_tax[enabled]=false`, pretože predávajúci
+daň neúčtuje a ceny na webe sú konečné. Ak máte na účte zapnutý Stripe
+Tax, bez tohto vypnutia by Checkout pri každej položke pýtal daňový kód
+a reláciu by odmietol.
+
+Keby ste sa niekedy stali platiteľom DPH a chceli daň počítať cez Stripe,
+založte si produkty a ceny priamo v Stripe (tam sa nastavuje aj daňový
+kód), vyplňte `STRIPE_PRICE_*` a v `api/checkout.js` prepnite
+`automatic_tax` na `true`.
+
 Keď sa platba nezaloží, hláška zo Stripe sa vypíše pod oznamom na
 stránke a rovnaká ide do logu funkcie (Vercel → projekt → **Logs**,
 riadok začína `checkout:`). Podľa nej sa dá zistiť, čo Stripe vadí.
