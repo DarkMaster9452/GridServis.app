@@ -55,8 +55,10 @@ module.exports = async function (req, res) {
     var relacia = await stripe('/checkout/sessions', {
       mode: 'payment',
       locale: 'sk',
-      /* Pri nulovej sume Checkout kartu nepýta. */
-      payment_method_collection: 'if_required',
+      /* Pri nulovej sume Checkout kartu nepýta sám, od verzie API
+         2023-08-16 je to predvolené správanie jednorazovej platby.
+         Parameter payment_method_collection sa sem neposiela, v tomto
+         režime ho Stripe neberie. */
       billing_address_collection: 'auto',
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + p.spat + '?zrusene=1',
@@ -67,11 +69,14 @@ module.exports = async function (req, res) {
     if (chceJson(req)) { res.status(200).json({ url: relacia.url }); return; }
     res.redirect(303, relacia.url);
   } catch (e) {
-    console.error('checkout:', e.message);
+    /* Hláška zo Stripe ide do logu funkcie (Vercel → Logs) a skrátená
+       aj na stránku, aby bolo pri nastavovaní vidieť, čo mu vadí. */
+    console.error('checkout:', plan, e.message);
     if (chceJson(req)) {
-      res.status(e.stav || 502).json({ chyba: 'Platbu sa nepodarilo založiť.' });
+      res.status(e.stav || 502).json({ chyba: 'Platbu sa nepodarilo založiť.', dovod: e.message });
       return;
     }
-    res.redirect(303, p.spat + '?chyba=platba');
+    res.redirect(303, p.spat + '?chyba=platba&dovod=' +
+      encodeURIComponent(String(e.message || '').slice(0, 150)));
   }
 };

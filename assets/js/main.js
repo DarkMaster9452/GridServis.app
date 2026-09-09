@@ -81,6 +81,14 @@
         odkaz.href = mailto(PREDMET.objednavka);
         oznam.appendChild(odkaz);
       }
+      /* Hláška z platobnej brány, nech je pri nastavovaní vidieť,
+         prečo sa platba nezaložila. */
+      if (dovod.get('dovod')) {
+        var detail = document.createElement('span');
+        detail.className = 'oznam__detail';
+        detail.textContent = dovod.get('dovod');
+        oznam.appendChild(detail);
+      }
       oznam.hidden = false;
     }
   }

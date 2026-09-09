@@ -91,6 +91,10 @@ takže v Stripe netreba nič zakladať.
 3. Vo Vercel projekte **Settings → Environment Variables** pridať
    `STRIPE_SECRET_KEY`, hodnotu vložiť a nasadiť znova.
 
+Keď sa platba nezaloží, hláška zo Stripe sa vypíše pod oznamom na
+stránke a rovnaká ide do logu funkcie (Vercel → projekt → **Logs**,
+riadok začína `checkout:`). Podľa nej sa dá zistiť, čo Stripe vadí.
+
 Kľúč nikdy nedávajte do repozitára ani do súborov v `assets/`. Keby sa
 niekam dostal, v Stripe ho zrušte tlačidlom *Roll key*.
 
