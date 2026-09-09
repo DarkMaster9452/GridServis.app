@@ -260,6 +260,30 @@
         });
     };
 
+    /* ---- konfety pri kúpe: pár vĺn zo spodných rohov nahor ---- */
+    var oslavKupu = function () {
+      if (typeof window.confetti !== 'function') return;
+      var trvanie = 5000;
+      var koniec = Date.now() + trvanie;
+      var vychodzie = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      function nahodne(min, max) { return Math.random() * (max - min) + min; }
+
+      var interval = setInterval(function () {
+        var zostava = koniec - Date.now();
+        if (zostava <= 0) { clearInterval(interval); return; }
+        var pocet = 50 * (zostava / trvanie);
+        window.confetti(Object.assign({}, vychodzie, {
+          particleCount: pocet,
+          origin: { x: nahodne(0.1, 0.3), y: Math.random() - 0.2 }
+        }));
+        window.confetti(Object.assign({}, vychodzie, {
+          particleCount: pocet,
+          origin: { x: nahodne(0.7, 0.9), y: Math.random() - 0.2 }
+        }));
+      }, 250);
+    };
+
     var dobre = function (v) {
       var platene = v.plan === 'rok' || v.plan === 'mesiac';
       hlava.textContent = platene ? 'Predplatné je zaplatené' : 'Demo je pripravené';
@@ -279,6 +303,7 @@
         ukazKod(v);
         naplnStiahnutie(false, document.getElementById('info-plna'), document.getElementById('odkaz-plna'));
         document.getElementById('dl-plna').hidden = false;
+        oslavKupu();
       } else {
         naplnStiahnutie(true, document.getElementById('info-demo'), document.getElementById('odkaz-demo'));
         document.getElementById('dl-demo').hidden = false;

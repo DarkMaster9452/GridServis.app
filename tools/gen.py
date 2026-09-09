@@ -808,7 +808,7 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
     </div>
   </div>
 </section>
-''' + FOOT
+''' + '<script src="assets/js/confetti.js"></script>' + FOOT
 
 
 # ============================================================ OBNOVENIE
