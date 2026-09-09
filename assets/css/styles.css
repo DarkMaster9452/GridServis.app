@@ -213,9 +213,26 @@ b,strong{font-weight:640;color:var(--ink)}
 /* ---------- licenčný kód ---------- */
 .kod{display:grid;gap:6px;justify-items:center;text-align:center;margin:0 0 26px;padding:clamp(24px,3.2vw,34px);border:2px solid var(--ink);border-radius:var(--r-l);background:var(--bg)}
 .kod__lbl{color:var(--mut);font-size:.76rem;font-weight:620;letter-spacing:.11em;text-transform:uppercase}
-.kod__val{font-size:clamp(1.5rem,4.4vw,2.3rem);font-weight:680;letter-spacing:.06em;line-height:1.15;font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+.kod__box{position:relative;display:inline-block;isolation:isolate}
+.kod__val{display:inline-block;margin:0;padding:.15em .5em;border-radius:10px;background:var(--bg-2);
+  font-size:clamp(1.5rem,4.4vw,2.3rem);font-weight:680;letter-spacing:.06em;line-height:1.4;
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;word-break:break-all}
+/* na stránke po platbe je kód najprv skrytý za rozmazaním — kod--skryty
+   je len na hotovo.html, kde je aj tlačidlo na odhalenie; inde (napr.
+   obnova.html) sa kód zobrazuje rovno, nemá sa čím odhaliť */
+.kod--skryty .kod__val{filter:blur(11px);transition:filter .3s ease;user-select:none}
+.kod--skryty .kod__val.je-odhaleny{filter:none;user-select:text;cursor:pointer}
+.kod__val.je-odhaleny:hover{background:var(--bg-3)}
+.kod__val.je-skopirovany{background:var(--acc-soft)}
+.kod__odhal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:inline-flex;align-items:center;gap:.5em;white-space:nowrap;
+  padding:.6em 1.15em;border-radius:999px;border:none;
+  background:var(--ink);color:#fff;font:inherit;font-weight:640;font-size:.92rem;
+  cursor:pointer;box-shadow:0 8px 22px -8px rgba(13,17,23,.5)}
+.kod__odhal:hover{background:#000}
+.kod__odhal span{font-size:1.1em}
 .kod .btn{margin-top:6px}
-.kod + .dl{margin-top:20px}
+.kod + .dl,.kod + .dl-list{margin-top:20px}
 .kod__note{margin-top:6px;max-width:52ch;color:var(--mut);font-size:.88rem;line-height:1.6}
 
 /* ---------- boxy ---------- */
@@ -246,6 +263,7 @@ b,strong{font-weight:640;color:var(--ink)}
 .steps p{margin:0;color:var(--mut);font-size:.93rem;line-height:1.6}
 
 /* ---------- stiahnutie ---------- */
+.dl-list{display:grid;gap:14px}
 .dl{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r-l);padding:26px 30px}
 .dl__l{display:flex;align-items:center;gap:18px;min-width:0}
 .dl__l b{display:block;font-size:1.08rem;letter-spacing:-.02em}
