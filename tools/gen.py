@@ -290,7 +290,7 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
   <div class="wrap wrap--mid">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
-      <p>Predplatné na jeden počítač. Ročné je najvýhodnejšie, mesačné si môžete kedykoľvek zrušiť.</p>
+      <p>Predplatné na jeden počítač. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
     <div class="pricebig">
       <p class="pricebig__lbl">Ročné predplatné</p>
@@ -442,14 +442,14 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         <ul class="ticks">
           <li>Celý program bez obmedzení na dvanásť mesiacov</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
-          <li>Jedna platba za rok, žiadne mesačné strhávanie</li>
+          <li>Jedna platba za rok, obnovuje sa sama</li>
           <li>E-mailová podpora pri inštalácii a nastavení</li>
         </ul>
       </article>
       <article class="plan">
         <div class="plan__head">
           <h2>Mesačne</h2>
-          <span class="plan__badge plan__badge--mut">Bez viazanosti</span>
+          <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
         </div>
         <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
         <p class="plan__per">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
@@ -457,12 +457,12 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         <ul class="ticks">
           <li>Celý program bez obmedzení na jeden mesiac</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
-          <li>Skončíte kedykoľvek, ďalší mesiac sa neplatí</li>
+          <li>Obnovu vypnete v programe, ďalší mesiac sa neplatí</li>
           <li>E-mailová podpora pri inštalácii a nastavení</li>
         </ul>
       </article>
     </div>
-    <p class="fine center">Ceny sú konečné, za jeden počítač. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
 
     ''' + VAROVANIE + '''
 
@@ -481,6 +481,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         <h3>V predplatnom nie je</h3>
         <ul class="crosses">
           <li>Používanie programu po skončení predplatného</li>
+          <li>Preloženie licencie na iný počítač zadarmo — stojí 10 € a rieši sa e-mailom</li>
           <li>Úpravy programu na mieru</li>
           <li>Prevádzka na serveri alebo zdieľaná databáza medzi počítačmi</li>
           <li>Podpisový certifikát inštalačky, preto Windows hlási neznámeho vydavateľa</li>
@@ -500,8 +501,8 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
       <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo je zadarmo, stiahne sa cez objednávku za 0 €, kde zadáte len e-mail. Zapíšete pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
       <li><span>2</span><div><h3>Zvolíte obdobie</h3><p>Ročné predplatné za ROK, alebo mesačné za MESIAC bez viazanosti. Ročné je o USPORA lacnejšie.</p></div></li>
       <li><span>3</span><div><h3>Prečítate si upozornenie</h3><p>Inštalačka nie je podpísaná certifikátom, takže Windows ju označí za nebezpečnú. <a href="#upozornenie">Vysvetlenie je vyššie</a>, ešte pred platbou.</p></div></li>
-      <li><span>4</span><div><h3>Zaplatíte</h3><p>Tlačidlo otvorí pokladňu Stripe, kde zaplatíte kartou. Platí sa raz za zvolené obdobie, nič sa nestrháva automaticky.</p></div></li>
-      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Po zaplatení sa rovno dostanete na stiahnutie. Licenčný kľúč pošlem e-mailom, vložíte ho v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
+      <li><span>4</span><div><h3>Zaplatíte</h3><p>Tlačidlo otvorí pokladňu Stripe, kde zaplatíte kartou. Po skončení obdobia sa predplatné obnoví samo; vypnúť sa dá v programe.</p></div></li>
+      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Licenčný kód sa ukáže hneď po zaplatení a príde aj e-mailom. Zadáte ho pri prvom spustení a program sa odomkne na tomto počítači.</p></div></li>
     </ol>
   </div>
 </section>
@@ -513,9 +514,9 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
     </header>
     <div class="faq">
       <details><summary>Prečo je ročné predplatné výhodnejšie?</summary><p>Ročné stojí ROK, dvanásť mesačných platieb ROCNE_MESACNE. Rozdiel je USPORA, ktoré pri ročnej platbe neplatíte.</p></details>
-      <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne a bez obnovenia sa v ňom nedá ďalej pracovať. Vaše dáta zostávajú v databáze na počítači, o nič neprídete.</p></details>
-      <details><summary>Musím predplatné obnovovať sám?</summary><p>Áno. Nič sa nestrháva automaticky, pred koncom obdobia sa ozvem a obnovíte ho, len ak chcete.</p></details>
-      <details><summary>Vymenil som počítač, čo s predplatným?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, obdobie zostáva rovnaké.</p></details>
+      <details><summary>Obnovuje sa predplatné samo?</summary><p>Áno. Po skončení obdobia sa z karty strhne ďalšia platba a licencia sa predĺži — v programe si ničoho nevšimnete. Obnovu vypnete v programe v Nastaveniach alebo mi napíšte.</p></details>
+      <details><summary>Čo sa stane, keď platba neprejde?</summary><p>Licencia sa zastaví a program sa uzamkne. Dáta zostávajú na vašom počítači a viete si ich vyexportovať aj v tomto stave. Program ukáže odkaz na obnovenie; po zaplatení sa tá istá licencia predĺži a pokračujete tam, kde ste skončili.</p></details>
+      <details><summary>Vymenil som počítač, čo s licenciou?</summary><p>Licencia sa pri aktivácii naviaže na jeden počítač a sama sa z neho neuvoľní. Napíšte mi a preložím ju na nový — za preloženie účtujem 10 €.</p></details>
       <details><summary>Potrebujem program aj na počítač doma?</summary><p>Ak tam program spúšťate, potrebujete druhé predplatné. Ozvite sa, pri viacerých staniciach dohodneme cenu.</p></details>
       <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite.</p></details>
       <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe. Kliknete na Predplatiť, na stránke Stripe zaplatíte kartou a vrátite sa späť na stiahnutie. Údaje o karte idú priamo Stripe, ja sa k nim nedostanem.</p></details>
@@ -649,8 +650,10 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
     <h2 class="gh">Predplatné a platba</h2>
     <div class="faq">
       <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti. Ročné predplatné je o USPORA lacnejšie, podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
-      <details><summary>Je to predplatné, alebo sa platí raz?</summary><p>Je to predplatné. Platí sa za obdobie, ktoré si zvolíte — rok alebo mesiac — a po jeho skončení sa obnovuje.</p></details>
-      <details><summary>Strháva sa platba automaticky?</summary><p>Nie. Pred koncom obdobia sa ozvem a predplatné obnovíte, len ak chcete.</p></details>
+      <details><summary>Je to predplatné, alebo sa platí raz?</summary><p>Je to predplatné. Platí sa za obdobie, ktoré si zvolíte — rok alebo mesiac — a po jeho skončení sa obnovuje samo, kým obnovu nevypnete.</p></details>
+      <details><summary>Strháva sa platba automaticky?</summary><p>Áno, po skončení obdobia sa predplatné obnoví z tej istej karty. Obnovu vypnete v programe v Nastaveniach — licencia potom dobehne do konca zaplateného obdobia a ďalej sa neúčtuje.</p></details>
+      <details><summary>Čo ak platba neprejde?</summary><p>Licencia sa zastaví a program sa uzamkne, dáta vám zostanú. Program ukáže odkaz na obnovenie; po zaplatení pokračuje tá istá licencia. Exportovať dáta sa dá aj v zastavenom stave.</p></details>
+      <details><summary>Dá sa licencia preložiť na iný počítač?</summary><p>Sama sa neuvoľní — po aktivácii je naviazaná na ten počítač. Napíšte mi a preložím ju; za preloženie účtujem 10 €.</p></details>
       <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe, kartou. Po zaplatení sa vrátite na stránku, odkiaľ sa dá hneď stiahnuť inštalačka. Údaje o karte spracúva Stripe, ja ich nevidím.</p></details>
       <details><summary>Kde stiahnem plnú verziu?</summary><p>Hneď po zaplatení na stránke, na ktorú vás Stripe vráti. Licenčný kľúč k nej pošlem e-mailom.</p></details>
       <details><summary>Prečo sa demo sťahuje cez pokladňu, keď je zadarmo?</summary><p>Aby som vedel, kto si program skúša, a mal kam poslať kľúč, keby ste si predplatné kúpili. Suma je 0 €, karta sa nezadáva, stačí e-mail.</p></details>
@@ -735,6 +738,13 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    <div class="kod" id="licencia" hidden>
+      <span class="kod__lbl">Licenčný kód</span>
+      <b class="kod__val" id="kodhodnota">&mdash;</b>
+      <button class="btn btn--gh btn--sm" type="button" id="kopiruj" hidden>Kopírovať</button>
+      <span class="kod__note" id="kodpozn"></span>
+    </div>
+
     <div class="dl" id="stiahnutie" hidden>
       <div class="dl__l">
         <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
@@ -768,6 +778,73 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
       <div class="box">
         <h3>Niečo nesedí?</h3>
         <p>Napíšte mi na e-mail v <a href="kontakt.html">kontakte</a> a pošlite číslo objednávky z adresy tejto stránky. Ozvem sa hneď, ako to bude možné.</p>
+      </div>
+    </div>
+  </div>
+</section>
+''' + FOOT
+
+
+# ============================================================ OBNOVENIE
+# Sem vedie odkaz, ktorý program ukáže, keď sa licencia zastaví. Kód si
+# stránka prečíta z adresy a po zaplatení sa tá istá licencia predĺži.
+
+obnova = head('obnova.html', 'Obnovenie licencie — ZNACKA',
+              'Obnovenie zastavenej licencie programu ZNACKA. Po zaplatení sa licencia predĺži a dáta zostávajú.') + '''
+<section class="phead">
+  <div class="wrap wrap--nar">
+    <h1>Obnovenie licencie</h1>
+    <p class="lead">Zaplatením sa tá istá licencia predĺži. Kód sa nemení, program sa odomkne a zákazky, sklad ani nastavenia sa nikam nestratia.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    ''' + OZNAM + '''
+
+    <div class="kod" id="licencia">
+      <span class="kod__lbl">Licencia na obnovenie</span>
+      <b class="kod__val" id="kodhodnota">&mdash;</b>
+      <span class="kod__note" id="kodpozn">Kód si stránka prečíta z odkazu, ktorý ukázal program. Ak je prázdny, otvorte odkaz znova z programu alebo mi napíšte.</span>
+    </div>
+
+    <div class="plans">
+      <article class="plan plan--best">
+        <div class="plan__head">
+          <h2>Ročne</h2>
+          <span class="plan__badge">Ušetríte USPORA</span>
+        </div>
+        <p class="plan__price"><b>ROK</b><span>/ rok</span></p>
+        <p class="plan__per">Obnoví licenciu na ďalších dvanásť mesiacov a ďalej sa obnovuje sama.</p>
+        <form class="pay" method="post" action="/api/obnova">
+          <input type="hidden" name="kod" value="" data-kod>
+          <input type="hidden" name="plan" value="rok">
+          <button class="btn btn--pri btn--lg btn--full" type="submit">Obnoviť na rok</button>
+        </form>
+      </article>
+      <article class="plan">
+        <div class="plan__head">
+          <h2>Mesačne</h2>
+          <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
+        </div>
+        <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
+        <p class="plan__per">Obnoví licenciu na jeden mesiac a ďalej sa obnovuje sama.</p>
+        <form class="pay" method="post" action="/api/obnova">
+          <input type="hidden" name="kod" value="" data-kod>
+          <input type="hidden" name="plan" value="mesiac">
+          <button class="btn btn--gh btn--lg btn--full" type="submit">Obnoviť na mesiac</button>
+        </form>
+      </article>
+    </div>
+
+    <div class="two two--top">
+      <div class="box">
+        <h3>O dáta neprídete</h3>
+        <p>Zákazky, zákazníci aj sklad sú v databáze na vašom počítači. Kým je licencia zastavená, program ich nezahodí — po zaplatení sa všetko otvorí tam, kde ste skončili. Aj v zastavenom stave si viete dáta vyexportovať.</p>
+      </div>
+      <div class="box">
+        <h3>Niečo nesedí?</h3>
+        <p>Ak vám platba neprešla alebo potrebujete licenciu preložiť na iný počítač, napíšte mi na <a data-mail-txt href="#">&nbsp;</a> a dohodneme sa.</p>
       </div>
     </div>
   </div>
@@ -809,6 +886,7 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
       <li><b>Pri stiahnutí dema:</b> e-mail, ktorý zadáte v objednávke za 0 €. Slúži na sprístupnenie stiahnutia a na to, aby som vedel, komu poslať licenčný kľúč, ak si predplatné kúpite.</li>
       <li><b>Pri e-mailovej komunikácii:</b> e-mailová adresa, meno a obsah správy, ktorý mi pošlete.</li>
       <li><b>Pri prevádzke webu:</b> technické záznamy hostingu, napríklad IP adresa a čas požiadavky, ktoré vznikajú automaticky a slúžia na prevádzku a bezpečnosť.</li>
+      <li><b>Pri pohybe po webe:</b> anonymné počítadlo návštevnosti — typ udalosti (zobrazenie stránky, kliknutie na predplatné, dokončená platba), názov stránky a doména, z ktorej ste prišli. Nezapisuje sa IP adresa ani nič, podľa čoho by sa dal človek identifikovať, a nepoužívajú sa na to cookies. Slúži mi to len na to, aby som vedel, ktoré časti webu ľuďom nesadli.</li>
     </ul>
     <p>Nezbieram nič, čo na vybavenie objednávky alebo odpoveď nepotrebujem. Web neobsahuje formuláre, ktoré by údaje odosielali na server — kontakt prebieha e-mailom.</p>
 
@@ -827,10 +905,13 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
     </ul>
 
     <h2>Komu sa údaje dostanú</h2>
-    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, platobnej bráne Stripe Payments Europe, Ltd. a poskytovateľovi e-mailovej schránky. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
+    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, platobnej bráne Stripe Payments Europe, Ltd., službe na odosielanie e-mailov s licenčným kódom a poskytovateľovi e-mailovej schránky. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
 
     <h2>Vaše práva</h2>
     <p>Máte právo na prístup k svojim údajom, na ich opravu, výmaz, obmedzenie spracúvania, na prenosnosť a právo namietať proti spracúvaniu založenému na oprávnenom záujme. Stačí napísať na e-mail uvedený vyššie. Ak si myslíte, že s údajmi nakladám nesprávne, môžete podať sťažnosť Úradu na ochranu osobných údajov Slovenskej republiky, Hraničná 12, 820 07 Bratislava.</p>
+
+    <h2>Údaje o licencii</h2>
+    <p>K vydanej licencii si vediem licenčný kód, e-mail z objednávky, obdobie platnosti a záznam o počítači, na ktorom je licencia aktivovaná (názov počítača, verzia systému a programu, odtlačok počítača). Slúži to na overovanie licencie, riešenie problémov a na to, aby sa jeden kód nepoužíval na viacerých počítačoch, než koľko je zaplatených. Program tieto údaje posiela pri aktivácii a potom pri občasnej kontrole licencie.</p>
 
     <h2>Automatizované rozhodovanie</h2>
     <p>Žiadne nerobím. Údaje sa nepoužívajú na profilovanie ani na automatizované rozhodnutia s právnym účinkom.</p>
@@ -854,7 +935,7 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
   <div class="wrap wrap--nar doc">
     <h2>Čo web nepoužíva</h2>
     <ul>
-      <li>Žiadnu analytiku návštevnosti.</li>
+      <li>Žiadnu cudziu analytiku typu Google Analytics.</li>
       <li>Žiadne reklamné ani remarketingové skripty.</li>
       <li>Žiadne tlačidlá ani vložený obsah zo sociálnych sietí.</li>
       <li>Žiadne externé písma ani knižnice načítavané z cudzích serverov.</li>
@@ -863,6 +944,9 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
 
     <h2>Čo sa môže uložiť</h2>
     <p>Poskytovateľ hostingu môže nastaviť technické cookies nutné na prevádzku a bezpečnosť, napríklad na rozloženie záťaže alebo ochranu pred zneužitím. Takéto cookies neslúžia na sledovanie a podľa zákona o elektronických komunikáciách nevyžadujú súhlas.</p>
+
+    <h2>Vlastné počítadlo návštevnosti</h2>
+    <p>Web si počíta, koľkokrát sa zobrazila ktorá stránka a koľkokrát niekto klikol na predplatné alebo demo. Zapisuje sa len typ udalosti, názov stránky a doména, z ktorej ste prišli — žiadna IP adresa a nič, podľa čoho by sa dal človek identifikovať. Nepoužívajú sa na to cookies; jednotlivé zobrazenia spája náhodné číslo uložené v pamäti karty prehliadača (sessionStorage), ktoré sa po jej zavretí zmaže a nikam sa neposiela.</p>
 
     <h2>Ako si cookies zmazať</h2>
     <p>V nastaveniach prehliadača v časti Súkromie alebo Ochrana osobných údajov nájdete zoznam uložených údajov pre jednotlivé stránky a možnosť ich vymazať. Blokovanie cookies fungovanie tohto webu neobmedzí.</p>
@@ -900,11 +984,13 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
 
     <h2 id="cena">4. Cena a platba</h2>
-    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné a platia za jeden počítač. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
+    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné, platia za jeden počítač a v rovnakej výške sa účtujú aj pri automatickej obnove. Preloženie licencie na iný počítač stojí jednorazovo 10 €. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
 
-    <h2 id="trvanie">5. Trvanie, obnovenie a ukončenie</h2>
+    <h2 id="trvanie">5. Trvanie, automatická obnova a ukončenie</h2>
     <p>Predplatné začína plynúť dňom sprístupnenia plnej verzie a trvá zvolené obdobie, teda dvanásť mesiacov pri ročnom a jeden mesiac pri mesačnom predplatnom.</p>
-    <p>Platba sa nestrháva automaticky. Pred koncom obdobia predávajúci kupujúceho upozorní a predplatné pokračuje len vtedy, ak si ho kupujúci obnoví. Ak sa neobnoví, program sa po skončení obdobia uzamkne. Dáta zapísané v programe zostávajú v databáze na počítači kupujúceho.</p>
+    <p>Predplatné sa po skončení obdobia automaticky obnovuje a z platobného prostriedku kupujúceho sa strhne cena ďalšieho obdobia v rovnakej výške, akú kupujúci pri objednávke odsúhlasil. Po každej úspešnej platbe sa licencia predĺži bez zásahu kupujúceho.</p>
+    <p>Kupujúci môže automatickú obnovu kedykoľvek vypnúť — priamo v programe v Nastaveniach alebo e-mailom predávajúcemu. Predplatné potom dobehne do konca zaplateného obdobia a ďalšia platba sa nestrhne.</p>
+    <p>Ak platba neprejde, licencia sa po uplynutí zaplateného obdobia zastaví a program sa uzamkne. Dáta zapísané v programe zostávajú v databáze na počítači kupujúceho a kupujúci si ich vie vyexportovať aj v tomto stave. Program zároveň ponúkne odkaz na obnovenie; po zaplatení sa tá istá licencia predĺži.</p>
 
     <h2 id="dodanie">6. Dodanie</h2>
     <p>Po pripísaní platby posiela predávajúci na e-mail kupujúceho odkaz na stiahnutie plnej verzie programu a licenčný kľúč. Dodanie prebieha bez zbytočného odkladu. Ak by dodanie meškalo, kupujúci má právo od zmluvy odstúpiť.</p>
@@ -916,7 +1002,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <h2 id="licencia">8. Licenčné podmienky</h2>
     <p>Kupujúci získava nevýhradné právo používať program na jednom počítači počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
     <p>Kupujúci nesmie program ani licenčný kľúč ďalej predávať, prenajímať, sprístupňovať tretím osobám ani rozmnožovať nad rámec zaplateného počtu počítačov. Nesmie program spätne prekladať, dekompilovať ani inak zisťovať jeho zdrojový kód, s výnimkou prípadov, ktoré výslovne pripúšťa zákon.</p>
-    <p>Prenos predplatného na iný počítač kupujúceho je možný po dohode s predávajúcim.</p>
+    <p>Licencia sa pri aktivácii naviaže na konkrétny počítač a sama sa z neho neuvoľní. Preloženie na iný počítač vybaví predávajúci po e-mailovej žiadosti; za preloženie si účtuje jednorazový poplatok 10 €.</p>
 
     <h2 id="odstupenie">9. Odstúpenie od zmluvy a vrátenie peňazí</h2>
     <p>Kupujúci, ktorý je spotrebiteľom, má právo odstúpiť od zmluvy do štrnástich dní od jej uzavretia bez uvedenia dôvodu.</p>
@@ -956,7 +1042,7 @@ NAHRADY = [
 for name, content in [('index.html', index), ('funkcie.html', funkcie),
                       ('cennik.html', cennik), ('stiahnut.html', stiahnut),
                       ('faq.html', faq), ('kontakt.html', kontakt),
-                      ('hotovo.html', hotovo),
+                      ('hotovo.html', hotovo), ('obnova.html', obnova),
                       ('ochrana-sukromia.html', sukromie), ('cookies.html', cookies),
                       ('obchodne-podmienky.html', vop)]:
     content = content.replace('</a><a class="btn', '</a>\n        <a class="btn')

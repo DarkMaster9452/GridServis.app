@@ -32,10 +32,13 @@ function odmietni(res, stav, sprava) {
 
 module.exports = async function (req, res) {
   var id = (req.query && req.query.relacia) || '';
+  var demo = true;
 
   if (!BEZ_PLATBY) {
     try {
-      await overRelaciu(id);
+      var objednavka = await overRelaciu(id);
+      /* demo objednávka dostane demo inštalačku, predplatné plnú verziu */
+      demo = objednavka.plan !== 'rok' && objednavka.plan !== 'mesiac';
     } catch (e) {
       odmietni(res, e.stav === 402 ? 402 : 403,
         'Inštalačka sa sťahuje až po dokončení objednávky. Demo je zadarmo,' +
@@ -45,7 +48,7 @@ module.exports = async function (req, res) {
   }
 
   try {
-    var v = await posledneVydanie();
+    var v = await posledneVydanie(demo);
     if (!v.asset) throw new Error('vydanie neobsahuje inštalačku');
 
     if (process.env.RELEASE_TOKEN) {

@@ -58,6 +58,69 @@
     el.href = 'mailto:' + EMAIL;
   });
 
+  /* ---------------- meranie návštevnosti ----------------
+     Anonymné: žiadne cookies, žiadna IP. Identifikátor návštevy je náhodné
+     číslo, ktoré žije len v jednej karte prehliadača. Keď sa nedá uložiť
+     (súkromné okno), pošle sa udalosť bez neho. */
+  function navsteva() {
+    try {
+      var id = sessionStorage.getItem('aa_navsteva');
+      if (!id) {
+        id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        sessionStorage.setItem('aa_navsteva', id);
+      }
+      return id;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function zdroj() {
+    try {
+      return document.referrer ? new URL(document.referrer).hostname : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function zapis(typ, plan) {
+    var udaje = JSON.stringify({
+      typ: typ,
+      plan: plan || '',
+      stranka: location.pathname.replace(/^.*\//, '') || 'index.html',
+      relacia: navsteva(),
+      zdroj: zdroj()
+    });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/udalost', new Blob([udaje], { type: 'application/json' }));
+        return;
+      }
+    } catch (e) { /* skúsime to cez fetch */ }
+    try {
+      fetch('/api/udalost', {
+        method: 'POST', keepalive: true,
+        headers: { 'Content-Type': 'application/json' }, body: udaje
+      }).catch(function () {});
+    } catch (e) { /* meranie nikdy nesmie prekážať stránke */ }
+  }
+
+  zapis('zobrazenie');
+
+  /* kliky na tlačidlá — vidno, kde ľudia odpadnú */
+  each('form.pay', function (f) {
+    f.addEventListener('submit', function () {
+      var plan = (f.querySelector('input[name="plan"]') || {}).value || '';
+      zapis('pokladna', plan);
+    });
+  });
+  each('a[href$="cennik.html"]', function (a) {
+    a.addEventListener('click', function () { zapis('klik_predplatit'); });
+  });
+  each('a[href$="stiahnut.html"]', function (a) {
+    a.addEventListener('click', function () { zapis('klik_demo'); });
+  });
+
   /* ---------------- odkaz na pokladňu ----------------
      Tlačidlá Predplatiť a Získať demo sú formuláre na /api/checkout,
      ktorý založí platbu v Stripe a presmeruje na jeho pokladňu.
@@ -93,6 +156,21 @@
     }
   }
 
+  /* ---------------- stránka na obnovenie licencie ----------------
+     Kód príde v adrese z programu; doplní sa do formulárov aj na obrazovku. */
+  var kodZAdresy = (new URLSearchParams(location.search).get('kod') || '')
+    .trim().toUpperCase();
+  if (document.querySelector('form.pay [data-kod]')) {
+    each('form.pay [data-kod]', function (pole) { pole.value = kodZAdresy; });
+    var zobrazenie = document.getElementById('kodhodnota');
+    if (zobrazenie && kodZAdresy) {
+      zobrazenie.textContent = kodZAdresy;
+      document.getElementById('kodpozn').textContent =
+        'Po zaplatení sa predĺži práve táto licencia. Kód zostáva rovnaký, ' +
+        'v programe ho nemusíte zadávať znova.';
+    }
+  }
+
   /* ---------------- stránka po platbe ----------------
      Stripe sem vráti kupujúceho s číslom relácie. Server ju overí
      a až potom sa ukáže odkaz na stiahnutie. */
@@ -110,19 +188,50 @@
       problem.hidden = false;
     };
 
+    var ukazKod = function (v) {
+      var box = document.getElementById('licencia');
+      if (!box) return;
+      if (!v.kod) {
+        document.getElementById('kodpozn').textContent =
+          'Kód sa práve vydáva. Príde vám e-mailom o pár sekúnd; ak nie, napíšte mi.';
+        box.hidden = false;
+        return;
+      }
+      document.getElementById('kodhodnota').textContent = v.kod;
+      document.getElementById('kodpozn').textContent =
+        'Zadajte ho pri prvom spustení programu. Licencia platí na jeden počítač' +
+        (v.platna_do ? ' do ' + v.platna_do : '') + '.' +
+        (v.poslany && v.email ? ' Poslal som ho aj na ' + v.email + '.'
+                              : ' Odložte si ho, budete ho potrebovať pri inštalácii.');
+      box.hidden = false;
+
+      var tlacidlo = document.getElementById('kopiruj');
+      if (tlacidlo && navigator.clipboard) {
+        tlacidlo.hidden = false;
+        tlacidlo.addEventListener('click', function () {
+          navigator.clipboard.writeText(v.kod).then(function () {
+            tlacidlo.textContent = 'Skopírované';
+            setTimeout(function () { tlacidlo.textContent = 'Kopírovať'; }, 2000);
+          });
+        });
+      }
+    };
+
     var dobre = function (v) {
       var platene = v.plan === 'rok' || v.plan === 'mesiac';
       hlava.textContent = platene ? 'Predplatné je zaplatené' : 'Demo je pripravené';
       podnadpis.textContent = platene
-        ? 'Ďakujem. Inštalačku stiahnete hneď tu, licenčný kľúč pošlem e-mailom' +
-          (v.email ? ' na ' + v.email : '') + ', zvyčajne do 24 hodín.'
+        ? 'Ďakujem. Licenčný kód aj inštalačku máte nižšie.'
         : 'Objednávka za 0 € prešla, platiť sa nič nemuselo. Inštalačku stiahnete tlačidlom nižšie.';
 
       var poznamka = document.getElementById('poznamka');
       poznamka.textContent = platene
-        ? 'Potvrdenie o platbe pošle Stripe e-mailom. Kľúč vložíte v programe v Nastaveniach do poľa Licencia.'
+        ? 'Potvrdenie o platbe pošle Stripe e-mailom. Predplatné sa obnovuje automaticky, zrušiť sa dá v programe v Nastaveniach.'
         : 'Demo slúži na vyskúšanie. Plnú verziu bez obmedzení sprístupní predplatné.';
       poznamka.hidden = false;
+
+      if (platene) ukazKod(v);
+      zapis('platba_hotova', v.plan);
 
       document.getElementById('odkaz').href =
         '/api/stiahnut?relacia=' + encodeURIComponent(relacia);

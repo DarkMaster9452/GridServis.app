@@ -3,7 +3,9 @@
 
 var REPO  = process.env.RELEASE_REPO  || '';
 var ASSET = process.env.RELEASE_ASSET || '';
+var ASSET_DEMO = process.env.RELEASE_ASSET_DEMO || '';
 var TOKEN = process.env.RELEASE_TOKEN || '';
+var API = process.env.GITHUB_API || 'https://api.github.com';   // prepínateľné pri testovaní
 
 function hlavicky(accept) {
   var h = { Accept: accept, 'User-Agent': 'autoagenda-web' };
@@ -11,34 +13,41 @@ function hlavicky(accept) {
   return h;
 }
 
-async function posledneVydanie() {
+/* Vo vydaní sú dve inštalačky: plná verzia a demo s limitmi. Rozlišujú sa
+   podľa názvu súboru — demo ho má v mene. Presné názvy sa dajú určiť
+   premennými RELEASE_ASSET a RELEASE_ASSET_DEMO. */
+function vyber(assets, demo) {
+  var i;
+  var chceny = demo ? ASSET_DEMO : ASSET;
+
+  if (chceny) {
+    for (i = 0; i < assets.length; i++) {
+      if (assets[i].name === chceny) return assets[i];
+    }
+  }
+  for (i = 0; i < assets.length; i++) {
+    var meno = assets[i].name || '';
+    if (!/\.exe$/i.test(meno)) continue;
+    if (demo === /demo/i.test(meno)) return assets[i];
+  }
+  /* keď vydanie demo inštalačku ešte nemá, radšej dáme tú, ktorá tam je */
+  for (i = 0; i < assets.length; i++) {
+    if (/\.exe$/i.test(assets[i].name || '')) return assets[i];
+  }
+  return assets.length ? assets[0] : null;
+}
+
+
+async function posledneVydanie(demo) {
   if (!REPO) throw new Error('RELEASE_REPO nie je nastavené');
 
-  var r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest',
+  var r = await fetch(API + '/repos/' + REPO + '/releases/latest',
     { headers: hlavicky('application/vnd.github+json') });
 
   if (!r.ok) throw new Error('vydanie sa nepodarilo načítať (' + r.status + ')');
 
   var rel = await r.json();
-  var assets = rel.assets || [];
-  var a = null;
-  var i;
-
-  /* Presný názov z RELEASE_ASSET má prednosť. Bez neho sa vezme prvá
-     inštalačka .exe, aby premenovanie súboru vo vydaní nič nepokazilo. */
-  if (ASSET) {
-    for (i = 0; i < assets.length; i++) {
-      if (assets[i].name === ASSET) { a = assets[i]; break; }
-    }
-  }
-  if (!a) {
-    for (i = 0; i < assets.length; i++) {
-      if (/\.exe$/i.test(assets[i].name || '')) { a = assets[i]; break; }
-    }
-  }
-  if (!a && assets.length) a = assets[0];
-
-  return { rel: rel, asset: a };
+  return { rel: rel, asset: vyber(rel.assets || [], demo) };
 }
 
 module.exports = { posledneVydanie: posledneVydanie, hlavicky: hlavicky };
