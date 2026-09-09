@@ -71,6 +71,7 @@ module.exports = async function (req, res) {
     res.setHeader('Cache-Control', 'no-store');
     res.redirect(302, v.asset.browser_download_url);
   } catch (e) {
+    console.error('stiahnut:', e.message);
     res.setHeader('Cache-Control', 'no-store');
     res.status(503).send('Inštalačka je momentálne nedostupná. Skúste to prosím neskôr.');
   }
