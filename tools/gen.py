@@ -33,7 +33,7 @@ def eur(n):
 ROK = eur(CENY['rok'])
 MESIAC = eur(CENY['mesiac'])
 
-LOGO = ('<img src="assets/img/logo-256.png" width="256" height="256" alt="">')
+LOGO = ('<img src="assets/img/gridservis-logo.png" width="838" height="168" alt="GridServis">')
 
 # Verzia programu sa nikde nepíše natvrdo. Doplní ju /api/verzia z posledného
 # vydania na GitHube; kým neodpovie, ostane zobrazená náhrada v [data-rel-off].
@@ -79,8 +79,7 @@ def head(active, title, desc):
 <header class="hdr" id="hdr">
   <div class="wrap hdr__in">
     <a class="logo" href="index.html">
-      <span class="logo__mark" aria-hidden="true">LOGO</span>
-      <span class="logo__txt">ZNACKA</span>
+      LOGO
     </a>
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
 %s
@@ -103,8 +102,7 @@ FOOT = '''</main>
   <div class="wrap foot__in">
     <div class="foot__brand">
       <a class="logo logo--foot" href="index.html">
-        <span class="logo__mark" aria-hidden="true">LOGO</span>
-        <span class="logo__txt">ZNACKA</span>
+        LOGO
       </a>
       <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
     </div>

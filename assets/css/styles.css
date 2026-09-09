@@ -86,11 +86,10 @@ b,strong{font-weight:640;color:var(--ink)}
 .hdr{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.82);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
 .hdr.on{border-bottom-color:var(--line)}
 .hdr__in{display:flex;align-items:center;gap:22px;height:74px}
-.logo{display:inline-flex;align-items:center;gap:11px;color:var(--ink)}
+.logo{display:inline-flex;align-items:center;color:var(--ink)}
 .logo:hover{text-decoration:none}
-.logo__mark{width:34px;height:34px;flex:none;display:grid;place-items:center;color:var(--ink)}
-.logo__mark img,.logo__mark svg{width:34px;height:34px;display:block}
-.logo__txt{font-weight:760;letter-spacing:.01em;line-height:1;font-size:1.12rem;text-transform:uppercase}
+.logo img{display:block;height:34px;width:auto}
+.logo--foot img{height:30px}
 .hdr__nav{display:flex;gap:26px;margin-left:auto}
 .hdr__nav a{position:relative;padding:2px 0;color:var(--mut);font-size:.955rem;font-weight:480;transition:color .15s}
 .hdr__nav a:hover{color:var(--ink);text-decoration:none}
