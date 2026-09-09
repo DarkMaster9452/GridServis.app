@@ -55,6 +55,7 @@
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    <p class="oznam" id="oznam" hidden></p>
     <div class="plans">
       <article class="plan plan--best">
         <div class="plan__head">
@@ -63,7 +64,10 @@
         </div>
         <p class="plan__price"><b>199,99 €</b><span>/ rok</span></p>
         <p class="plan__per">Vychádza na 16,67 € mesačne. Dvanásť mesačných platieb by stálo 239,88 €.</p>
-        <a class="btn btn--pri btn--lg btn--full" href="#upozornenie" data-buy="rok">Predplatiť na rok</a>
+<form class="pay" method="post" action="/api/checkout">
+  <input type="hidden" name="plan" value="rok">
+  <button class="btn btn--pri btn--lg btn--full" type="submit">Predplatiť na rok</button>
+</form>
         <ul class="ticks">
           <li>Celý program bez obmedzení na dvanásť mesiacov</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
@@ -78,7 +82,10 @@
         </div>
         <p class="plan__price"><b>19,99 €</b><span>/ mesiac</span></p>
         <p class="plan__per">Za rok to je 239,88 €, teda o 39,89 € viac ako ročné predplatné.</p>
-        <a class="btn btn--gh btn--lg btn--full" href="#upozornenie" data-buy="mesiac">Predplatiť na mesiac</a>
+<form class="pay" method="post" action="/api/checkout">
+  <input type="hidden" name="plan" value="mesiac">
+  <button class="btn btn--gh btn--lg btn--full" type="submit">Predplatiť na mesiac</button>
+</form>
         <ul class="ticks">
           <li>Celý program bez obmedzení na jeden mesiac</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
@@ -131,11 +138,11 @@
       <p>Najprv demo, potom platba. Plná verzia sa sťahuje až po zaplatení predplatného.</p>
     </header>
     <ol class="steps">
-      <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo si stiahnete zadarmo a bez registrácie. Zadáte pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
+      <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo je zadarmo, stiahne sa cez objednávku za 0 €, kde zadáte len e-mail. Zapíšete pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
       <li><span>2</span><div><h3>Zvolíte obdobie</h3><p>Ročné predplatné za 199,99 €, alebo mesačné za 19,99 € bez viazanosti. Ročné je o 39,89 € lacnejšie.</p></div></li>
       <li><span>3</span><div><h3>Prečítate si upozornenie</h3><p>Inštalačka nie je podpísaná certifikátom, takže Windows ju označí za nebezpečnú. <a href="#upozornenie">Vysvetlenie je vyššie</a>, ešte pred platbou.</p></div></li>
-      <li><span>4</span><div><h3>Zaplatíte</h3><p>Cez platobnú bránu kartou, alebo prevodom, ak vám to vyhovuje viac.</p></div></li>
-      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>E-mailom príde odkaz na plnú verziu a licenčný kľúč. Kľúč vložíte v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
+      <li><span>4</span><div><h3>Zaplatíte</h3><p>Tlačidlo otvorí pokladňu Stripe, kde zaplatíte kartou. Platí sa raz za zvolené obdobie, nič sa nestrháva automaticky.</p></div></li>
+      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Po zaplatení sa rovno dostanete na stiahnutie. Licenčný kľúč pošlem e-mailom, vložíte ho v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
     </ol>
   </div>
 </section>
@@ -152,6 +159,8 @@
       <details><summary>Vymenil som počítač, čo s predplatným?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, obdobie zostáva rovnaké.</p></details>
       <details><summary>Potrebujem program aj na počítač doma?</summary><p>Ak tam program spúšťate, potrebujete druhé predplatné. Ozvite sa, pri viacerých staniciach dohodneme cenu.</p></details>
       <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite.</p></details>
+      <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe. Kliknete na Predplatiť, na stránke Stripe zaplatíte kartou a vrátite sa späť na stiahnutie. Údaje o karte idú priamo Stripe, ja sa k nim nedostanem.</p></details>
+      <details><summary>Prečo aj pri deme zadávam e-mail?</summary><p>Demo sa sťahuje cez objednávku za 0 €. Karta sa nezadáva, e-mail potrebujem na to, aby som vedel, komu poslať licenčný kľúč, keby ste sa neskôr rozhodli pre predplatné.</p></details>
       <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát. <a href="#upozornenie">Podrobne to vysvetľujem vyššie</a> a to isté platí pre demo aj pre plnú verziu.</p></details>
     </div>
   </div>
@@ -162,8 +171,8 @@
     <h2>Najprv skúsiť, potom platiť</h2>
     <p>Stiahnite si demo a pozrite, či vám sadne. Predplatné vyriešime, keď budete vedieť.</p>
     <div class="row row--c">
-      <a class="btn btn--pri btn--lg" href="cennik.html" data-buy>Predplatiť</a>
-        <a class="btn btn--gh btn--lg btn--onDark" href="/api/stiahnut" data-dl>Stiahnuť demo</a>
+      <a class="btn btn--pri btn--lg" href="cennik.html">Predplatiť</a>
+        <a class="btn btn--gh btn--lg btn--onDark" href="stiahnut.html">Stiahnuť demo</a>
     </div>
   </div>
 </section>

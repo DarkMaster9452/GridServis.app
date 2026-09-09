@@ -3,7 +3,6 @@
 import os, io
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DL = '/api/stiahnut'
 
 ZNACKA = 'AutoAgenda'
 
@@ -160,11 +159,24 @@ def shot(img, alt, cls=''):
 
 
 def dl_btn(text='Stiahnuť demo', cls='btn--gh btn--lg'):
-    return '<a class="btn %s" href="%s" data-dl>%s</a>' % (cls, DL, text)
+    """Odkaz na stránku s demom. Samotné stiahnutie je až za objednávkou."""
+    return '<a class="btn %s" href="stiahnut.html">%s</a>' % (cls, text)
 
 
 def buy_btn(text='Predplatiť', cls='btn--pri btn--lg'):
-    return '<a class="btn %s" href="cennik.html" data-buy>%s</a>' % (cls, text)
+    return '<a class="btn %s" href="cennik.html">%s</a>' % (cls, text)
+
+
+def platba_btn(plan, text, cls='btn--pri btn--lg'):
+    """Tlačidlo, ktoré založí platbu v Stripe. Je to formulár, takže
+    funguje aj bez JavaScriptu a prehliadač ho nepredbieha načítaním."""
+    return ('<form class="pay" method="post" action="/api/checkout">\n'
+            '  <input type="hidden" name="plan" value="%s">\n'
+            '  <button class="btn %s" type="submit">%s</button>\n'
+            '</form>') % (plan, cls, text)
+
+
+OZNAM = '<p class="oznam" id="oznam" hidden></p>'
 
 
 # Upozornenie, ktoré musí kupujúci vidieť ešte pred zaplatením.
@@ -189,9 +201,9 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
       <h1>Celý servis v jednom programe.<br>Od príjmu auta po faktúru.</h1>
       <p class="lead">ZNACKA vedie zákazky, zákazníkov, sklad dielov aj cenník prác. Zo zákazky vytlačíte zákazkový list, faktúru aj štítok na kľúče. Program beží na počítači v dielni, dáta máte u seba.</p>
       <div class="row">
-        ''' + buy_btn('Predplatiť &mdash; ROK za rok') + dl_btn() + '''
+        ''' + buy_btn('Predplatiť &mdash; ROK za rok') + dl_btn('Vyskúšať demo') + '''
       </div>
-      <p class="fine">Demo si stiahnete zadarmo. Plnú verziu sprístupní predplatné &middot; Windows 10 a 11 &middot; ''' + VERZIA + '''</p>
+      <p class="fine">Demo je zadarmo, stačí zadať e-mail. Plnú verziu sprístupní predplatné &middot; Windows 10 a 11 &middot; ''' + VERZIA + '''</p>
     </div>
   </div>
   <div class="wrap hero__shot">
@@ -417,6 +429,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    ''' + OZNAM + '''
     <div class="plans">
       <article class="plan plan--best">
         <div class="plan__head">
@@ -425,7 +438,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         </div>
         <p class="plan__price"><b>ROK</b><span>/ rok</span></p>
         <p class="plan__per">Vychádza na MESACNE_Z_ROCNEHO mesačne. Dvanásť mesačných platieb by stálo ROCNE_MESACNE.</p>
-        <a class="btn btn--pri btn--lg btn--full" href="#upozornenie" data-buy="rok">Predplatiť na rok</a>
+''' + platba_btn('rok', 'Predplatiť na rok', 'btn--pri btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na dvanásť mesiacov</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
@@ -440,7 +453,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         </div>
         <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
         <p class="plan__per">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
-        <a class="btn btn--gh btn--lg btn--full" href="#upozornenie" data-buy="mesiac">Predplatiť na mesiac</a>
+''' + platba_btn('mesiac', 'Predplatiť na mesiac', 'btn--gh btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na jeden mesiac</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
@@ -484,11 +497,11 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
       <p>Najprv demo, potom platba. Plná verzia sa sťahuje až po zaplatení predplatného.</p>
     </header>
     <ol class="steps">
-      <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo si stiahnete zadarmo a bez registrácie. Zadáte pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
+      <li><span>1</span><div><h3>Vyskúšate demo</h3><p>Demo je zadarmo, stiahne sa cez objednávku za 0 €, kde zadáte len e-mail. Zapíšete pár zákaziek a pozriete, či vám sedí ovládanie a tlač dokladov.</p></div></li>
       <li><span>2</span><div><h3>Zvolíte obdobie</h3><p>Ročné predplatné za ROK, alebo mesačné za MESIAC bez viazanosti. Ročné je o USPORA lacnejšie.</p></div></li>
       <li><span>3</span><div><h3>Prečítate si upozornenie</h3><p>Inštalačka nie je podpísaná certifikátom, takže Windows ju označí za nebezpečnú. <a href="#upozornenie">Vysvetlenie je vyššie</a>, ešte pred platbou.</p></div></li>
-      <li><span>4</span><div><h3>Zaplatíte</h3><p>Cez platobnú bránu kartou, alebo prevodom, ak vám to vyhovuje viac.</p></div></li>
-      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>E-mailom príde odkaz na plnú verziu a licenčný kľúč. Kľúč vložíte v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
+      <li><span>4</span><div><h3>Zaplatíte</h3><p>Tlačidlo otvorí pokladňu Stripe, kde zaplatíte kartou. Platí sa raz za zvolené obdobie, nič sa nestrháva automaticky.</p></div></li>
+      <li><span>5</span><div><h3>Nainštalujete a aktivujete</h3><p>Po zaplatení sa rovno dostanete na stiahnutie. Licenčný kľúč pošlem e-mailom, vložíte ho v Nastaveniach do poľa Licencia a program sa odomkne.</p></div></li>
     </ol>
   </div>
 </section>
@@ -505,6 +518,8 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
       <details><summary>Vymenil som počítač, čo s predplatným?</summary><p>Napíšte mi a kľúč prepíšem na nový počítač. Za prenos sa neplatí, obdobie zostáva rovnaké.</p></details>
       <details><summary>Potrebujem program aj na počítač doma?</summary><p>Ak tam program spúšťate, potrebujete druhé predplatné. Ozvite sa, pri viacerých staniciach dohodneme cenu.</p></details>
       <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite.</p></details>
+      <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe. Kliknete na Predplatiť, na stránke Stripe zaplatíte kartou a vrátite sa späť na stiahnutie. Údaje o karte idú priamo Stripe, ja sa k nim nedostanem.</p></details>
+      <details><summary>Prečo aj pri deme zadávam e-mail?</summary><p>Demo sa sťahuje cez objednávku za 0 €. Karta sa nezadáva, e-mail potrebujem na to, aby som vedel, komu poslať licenčný kľúč, keby ste sa neskôr rozhodli pre predplatné.</p></details>
       <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát. <a href="#upozornenie">Podrobne to vysvetľujem vyššie</a> a to isté platí pre demo aj pre plnú verziu.</p></details>
     </div>
   </div>
@@ -528,12 +543,13 @@ stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
 <section class="phead">
   <div class="wrap">
     <h1>Demo na vyskúšanie</h1>
-    <p class="lead">Jeden inštalačný súbor, bez účtu a bez zadávania karty. Plnú verziu programu sprístupní predplatné.</p>
+    <p class="lead">Demo nič nestojí, sťahuje sa však cez objednávku za 0 €: v pokladni zadáte e-mail, kartu Stripe nepýta. Plnú verziu programu sprístupní predplatné.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    ''' + OZNAM + '''
     <div class="dl">
       <div class="dl__l">
         <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
@@ -542,9 +558,9 @@ stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
           <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span><span data-date-wrap> &middot; vydané <span data-date></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
         </div>
       </div>
-      ''' + dl_btn('Stiahnuť demo', 'btn--pri btn--lg') + '''
+      ''' + platba_btn('demo', 'Získať demo zadarmo', 'btn--pri btn--lg') + '''
     </div>
-    <p class="fine center">Sťahujete vždy poslednú vydanú verziu. Demo je zadarmo, plnú verziu dostanete po zaplatení predplatného &mdash; <a href="cennik.html">pozrieť cenník</a>.</p>
+    <p class="fine center">Tlačidlo otvorí pokladňu Stripe. Za demo sa neplatí, suma je 0 € a karta sa nezadáva &mdash; potrebný je len e-mail. Po potvrdení objednávky sa hneď dostanete na stiahnutie poslednej vydanej verzie. Plnú verziu sprístupní predplatné, <a href="cennik.html">pozrieť cenník</a>.</p>
 
     <div class="warn">
       <h3>Windows bude hlásiť, že súbor nie je bezpečný</h3>
@@ -635,8 +651,10 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
       <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti. Ročné predplatné je o USPORA lacnejšie, podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
       <details><summary>Je to predplatné, alebo sa platí raz?</summary><p>Je to predplatné. Platí sa za obdobie, ktoré si zvolíte — rok alebo mesiac — a po jeho skončení sa obnovuje.</p></details>
       <details><summary>Strháva sa platba automaticky?</summary><p>Nie. Pred koncom obdobia sa ozvem a predplatné obnovíte, len ak chcete.</p></details>
-      <details><summary>Kde stiahnem plnú verziu?</summary><p>Odkaz na stiahnutie dostanete e-mailom po zaplatení, spolu s licenčným kľúčom. Zo stránky sa sťahuje len demo.</p></details>
-      <details><summary>Musím platiť hneď?</summary><p>Nie. Najprv si stiahnete demo a vyskúšate ho. Predplatné riešite až potom.</p></details>
+      <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe, kartou. Po zaplatení sa vrátite na stránku, odkiaľ sa dá hneď stiahnuť inštalačka. Údaje o karte spracúva Stripe, ja ich nevidím.</p></details>
+      <details><summary>Kde stiahnem plnú verziu?</summary><p>Hneď po zaplatení na stránke, na ktorú vás Stripe vráti. Licenčný kľúč k nej pošlem e-mailom.</p></details>
+      <details><summary>Prečo sa demo sťahuje cez pokladňu, keď je zadarmo?</summary><p>Aby som vedel, kto si program skúša, a mal kam poslať kľúč, keby ste si predplatné kúpili. Suma je 0 €, karta sa nezadáva, stačí e-mail.</p></details>
+      <details><summary>Musím platiť hneď?</summary><p>Nie. Najprv si stiahnete demo, ktoré nič nestojí, a vyskúšate ho. Predplatné riešite až potom.</p></details>
       <details><summary>Prečo Windows pri inštalácii hlási, že súbor nie je bezpečný?</summary><p>Inštalačka nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>. Inštalácia pokračuje cez Ďalšie informácie a Spustiť tak či tak.</p></details>
       <details><summary>Čím sa demo líši od plnej verzie?</summary><p>Demo slúži na vyskúšanie ovládania a tlače dokladov. Plnú verziu bez obmedzení sprístupní zaplatené predplatné.</p></details>
     </div>
@@ -701,6 +719,62 @@ kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
 ''' + FOOT
 
 
+# ============================================================ PO PLATBE
+# Sem vráti Stripe kupujúceho po dokončení objednávky. Stránka si sama
+# overí reláciu cez /api/pristup a až potom ukáže odkaz na stiahnutie.
+# V navigácii nie je, chodí sa na ňu len z pokladne.
+
+hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
+              'Potvrdenie objednávky a stiahnutie programu ZNACKA.') + '''
+<section class="phead">
+  <div class="wrap wrap--nar">
+    <h1 id="hlava">Overujem objednávku</h1>
+    <p class="lead" id="podnadpis">Chvíľu to potrvá, stránku zatiaľ nezatvárajte.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <div class="dl" id="stiahnutie" hidden>
+      <div class="dl__l">
+        <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+        <div>
+          <b><span data-file>Inštalačný súbor</span></b>
+          <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
+        </div>
+      </div>
+      <a class="btn btn--pri btn--lg" id="odkaz" href="#">Stiahnuť</a>
+    </div>
+
+    <p class="fine center" id="poznamka" hidden></p>
+
+    <div class="box box--big" id="problem" hidden>
+      <h3>Objednávku sa nepodarilo overiť</h3>
+      <p id="problemtext">Skúste stránku obnoviť. Ak ste práve zaplatili a stále to nejde, napíšte mi a stiahnutie sprístupním ručne.</p>
+      <p class="mailrow"><a class="btn btn--pri" data-mail="podpora">Napísať e-mail</a>
+      <a class="btn btn--gh" href="cennik.html">Späť do cenníka</a></p>
+    </div>
+
+    <div class="warn" id="varovanie" hidden>
+      <h3>Windows bude hlásiť, že súbor nie je bezpečný</h3>
+      <p>Inštalačka nemá zakúpený podpisový certifikát, preto ju SmartScreen označí ako súbor od neznámeho vydavateľa. Nie je to vírus. Po kliknutí na <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b> inštalácia normálne pokračuje.</p>
+    </div>
+
+    <div class="two two--top" id="dalej" hidden>
+      <div class="box">
+        <h3>Odkaz si odložte</h3>
+        <p>Táto stránka funguje aj neskôr, kým máte v adrese číslo objednávky. Odložte si ju do záložiek, keby ste inštalačku potrebovali stiahnuť znova.</p>
+      </div>
+      <div class="box">
+        <h3>Niečo nesedí?</h3>
+        <p>Napíšte mi na e-mail v <a href="kontakt.html">kontakte</a> a pošlite číslo objednávky z adresy tejto stránky. Ozvem sa hneď, ako to bude možné.</p>
+      </div>
+    </div>
+  </div>
+</section>
+''' + FOOT
+
+
 # ============================================================ PRÁVNE STRÁNKY
 # Texty sú pripravený návrh podľa slovenskej a európskej úpravy.
 # Pred spustením webu ich dajte skontrolovať právnikovi.
@@ -731,7 +805,8 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
 
     <h2>Aké údaje spracúvam</h2>
     <ul>
-      <li><b>Pri objednávke predplatného:</b> meno alebo názov dielne, adresa, e-mail a údaje o platbe.</li>
+      <li><b>Pri objednávke predplatného:</b> e-mail, prípadne meno a fakturačná adresa, a údaje o platbe. Platbu spracúva Stripe; číslo karty sa ku mne nedostane, vidím len jej posledné štvorčíslie a stav platby.</li>
+      <li><b>Pri stiahnutí dema:</b> e-mail, ktorý zadáte v objednávke za 0 €. Slúži na sprístupnenie stiahnutia a na to, aby som vedel, komu poslať licenčný kľúč, ak si predplatné kúpite.</li>
       <li><b>Pri e-mailovej komunikácii:</b> e-mailová adresa, meno a obsah správy, ktorý mi pošlete.</li>
       <li><b>Pri prevádzke webu:</b> technické záznamy hostingu, napríklad IP adresa a čas požiadavky, ktoré vznikajú automaticky a slúžia na prevádzku a bezpečnosť.</li>
     </ul>
@@ -752,7 +827,7 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
     </ul>
 
     <h2>Komu sa údaje dostanú</h2>
-    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, poskytovateľovi platobnej brány a poskytovateľovi e-mailovej schránky. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
+    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, platobnej bráne Stripe Payments Europe, Ltd. a poskytovateľovi e-mailovej schránky. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
 
     <h2>Vaše práva</h2>
     <p>Máte právo na prístup k svojim údajom, na ich opravu, výmaz, obmedzenie spracúvania, na prenosnosť a právo namietať proti spracúvaniu založenému na oprávnenom záujme. Stačí napísať na e-mail uvedený vyššie. Ak si myslíte, že s údajmi nakladám nesprávne, môžete podať sťažnosť Úradu na ochranu osobných údajov Slovenskej republiky, Hraničná 12, 820 07 Bratislava.</p>
@@ -822,10 +897,10 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Predplatné sa kupuje na jeden počítač, na ktorom bude program spustený. Pri viacerých staniciach sa počet predplatných dohodne e-mailom.</p>
 
     <h2 id="objednavka">3. Objednávka a uzavretie zmluvy</h2>
-    <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez platobnú bránu alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
+    <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
 
     <h2 id="cena">4. Cena a platba</h2>
-    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné a platia za jeden počítač. Platí sa cez platobnú bránu alebo prevodom. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
+    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné a platia za jeden počítač. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
 
     <h2 id="trvanie">5. Trvanie, obnovenie a ukončenie</h2>
     <p>Predplatné začína plynúť dňom sprístupnenia plnej verzie a trvá zvolené obdobie, teda dvanásť mesiacov pri ročnom a jeden mesiac pri mesačnom predplatnom.</p>
@@ -833,7 +908,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 
     <h2 id="dodanie">6. Dodanie</h2>
     <p>Po pripísaní platby posiela predávajúci na e-mail kupujúceho odkaz na stiahnutie plnej verzie programu a licenčný kľúč. Dodanie prebieha bez zbytočného odkladu. Ak by dodanie meškalo, kupujúci má právo od zmluvy odstúpiť.</p>
-    <p>Program na vyskúšanie je dostupný ako demo zadarmo ešte pred zaplatením.</p>
+    <p>Program na vyskúšanie je dostupný ako demo zadarmo ešte pred zaplatením. Demo sa sprístupňuje cez objednávku s nulovou cenou, v ktorej kupujúci uvedie e-mail; platobné údaje sa pri nej nezadávajú a nevzniká platobná povinnosť.</p>
 
     <h2 id="podpis">7. Upozornenie na nepodpísanú inštalačku</h2>
     <p>Inštalačný súbor programu nie je podpísaný certifikátom pre podpisovanie kódu. Windows preto pri jeho spustení zobrazí upozornenie SmartScreen o neznámom vydavateľovi a o možnom riziku. Ide o dôsledok chýbajúceho certifikátu, nie o vlastnosť programu. Kupujúci berie túto skutočnosť na vedomie pred zaplatením; upozornenie je uvedené v <a href="cennik.html#upozornenie">cenníku</a> aj na stránke <a href="stiahnut.html">demo</a>.</p>
@@ -881,6 +956,7 @@ NAHRADY = [
 for name, content in [('index.html', index), ('funkcie.html', funkcie),
                       ('cennik.html', cennik), ('stiahnut.html', stiahnut),
                       ('faq.html', faq), ('kontakt.html', kontakt),
+                      ('hotovo.html', hotovo),
                       ('ochrana-sukromia.html', sukromie), ('cookies.html', cookies),
                       ('obchodne-podmienky.html', vop)]:
     content = content.replace('</a><a class="btn', '</a>\n        <a class="btn')
