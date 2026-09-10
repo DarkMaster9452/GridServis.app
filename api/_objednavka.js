@@ -63,7 +63,7 @@ async function spracuj(relacia, adresaWebu) {
   var vydana = await vydaj(udaje);
   var poslany = false;
   if (vydana.nova) {
-    poslany = await email.posli(udaje.email, vydana.kod, plan, vydana.platna_do, adresaWebu);
+    poslany = await email.posli(udaje.email, vydana.kod, plan, vydana.platna_do, adresaWebu, udaje.meno);
   }
   return {
     plan: plan,
