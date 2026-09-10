@@ -369,4 +369,15 @@
       each('[data-rel-off]', function (el) { el.hidden = true; });
     })
     .catch(function () { /* zostane náhradný text v [data-rel-off] */ });
+
+  /* ---------------- stiahnutie plnej verzie bez licencie ----------------
+     Tlačidlo stiahne inštalačku rovno (prehliadač zostane na stránke, je
+     to súbor, nie stránka), a keďže bez licencie sa program neodomkne,
+     hneď potom pošleme do cenníka, kde sa licencia kúpi. */
+  var plna = document.getElementById('stiahni-plnu');
+  if (plna) {
+    plna.addEventListener('click', function () {
+      setTimeout(function () { location.href = 'cennik.html'; }, 300);
+    });
+  }
 })();
