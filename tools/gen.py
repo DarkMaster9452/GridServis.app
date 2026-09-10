@@ -44,7 +44,7 @@ PAGES = [
     ('index.html',    'Domov'),
     ('funkcie.html',  'Funkcie'),
     ('cennik.html',   'Cenník'),
-    ('stiahnut.html', 'Demo'),
+    ('stiahnut.html', 'Inštalácia'),
     ('faq.html',      'FAQ'),
     ('kontakt.html',  'Kontakt'),
 ]
@@ -110,7 +110,7 @@ FOOT = '''</main>
       <h3>Program</h3>
       <a href="funkcie.html">Funkcie</a>
       <a href="cennik.html">Cenník a predplatné</a>
-      <a href="stiahnut.html">Demo na vyskúšanie</a>
+      <a href="stiahnut.html">Inštalácia programu</a>
     </div>
     <div class="foot__col">
       <h3>Podpora</h3>
@@ -527,29 +527,41 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
 
 
 # ============================================================ STIAHNUŤ
-stiahnut = head('stiahnut.html', 'Demo ZNACKA pre Windows',
-                'Demo programu ZNACKA na vyskúšanie zadarmo, systémové požiadavky a postup inštalácie. Plná verzia sa sťahuje po zaplatení predplatného.') + '''
+stiahnut = head('stiahnut.html', 'Inštalácia ZNACKA pre Windows',
+                'Stiahnutie programu ZNACKA: skúšobná verzia zadarmo aj plná verzia, systémové požiadavky a postup inštalácie. Plnú verziu odomkne licencia z predplatného.') + '''
 <section class="phead mriezka">
   <div class="wrap">
-    <h1>Demo na vyskúšanie</h1>
-    <p class="lead">Demo nič nestojí, sťahuje sa však cez objednávku za 0 €: v pokladni zadáte e-mail, kartu Stripe nepýta. Plnú verziu programu sprístupní predplatné.</p>
+    <h1>Inštalácia programu</h1>
+    <p class="lead">Skúšobnú verziu stiahnete hneď zadarmo cez objednávku za 0 € (len e-mail, kartu Stripe nepýta). Plnú verziu si môžete stiahnuť priamo, na jej odomknutie ale budete potrebovať licenciu z predplatného.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
     ''' + OZNAM + '''
-    <div class="dl">
-      <div class="dl__l">
-        <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        <div>
-          <b><span data-file>Inštalačný súbor</span> &mdash; demo</b>
-          <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span><span data-date-wrap> &middot; vydané <span data-date></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
+    <div class="dl-list">
+      <div class="dl">
+        <div class="dl__l">
+          <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+          <div>
+            <b>Skúšobná verzia</b>
+            <span>Zadarmo, cez objednávku za 0 &euro; &middot; Windows 10 a 11, 64-bit</span>
+          </div>
         </div>
+        ''' + platba_btn('demo', 'Získať zadarmo', 'btn--pri btn--lg') + '''
       </div>
-      ''' + platba_btn('demo', 'Získať demo zadarmo', 'btn--pri btn--lg') + '''
+      <div class="dl">
+        <div class="dl__l">
+          <span class="dl__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg></span>
+          <div>
+            <b><span data-file>Inštalačný súbor</span> &mdash; plná verzia</b>
+            <span><span data-rel-off>Posledná vydaná verzia</span><span data-rel hidden>Verzia <span data-tag></span><span data-size-wrap> &middot; <span data-size></span></span><span data-date-wrap> &middot; vydané <span data-date></span></span></span> &middot; Windows 10 a 11, 64-bit</span>
+          </div>
+        </div>
+        <a class="btn btn--gh btn--lg" href="/api/stiahnut-plna" id="stiahni-plnu">Stiahnuť plnú verziu</a>
+      </div>
     </div>
-    <p class="fine center">Tlačidlo otvorí pokladňu Stripe. Za demo sa neplatí, suma je 0 € a karta sa nezadáva &mdash; potrebný je len e-mail. Po potvrdení objednávky sa hneď dostanete na stiahnutie poslednej vydanej verzie. Plnú verziu sprístupní predplatné, <a href="cennik.html">pozrieť cenník</a>.</p>
+    <p class="fine center">Skúšobnú verziu si vyžiadate cez pokladňu Stripe za 0 &euro;, kartu nezadávate, stačí e-mail. Plnú verziu si stiahnete rovno bez objednávky &mdash; program sa spustí, no na odomknutie bez obmedzení potrebuje licenčný kľúč, ktorý dostanete po zaplatení predplatného. Po kliknutí na stiahnutie plnej verzie vás preto rovno prehodím do <a href="cennik.html">cenníka</a>.</p>
 
     <div class="warn">
       <h3>Windows bude hlásiť, že súbor nie je bezpečný</h3>
