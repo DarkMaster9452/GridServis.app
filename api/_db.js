@@ -2,7 +2,7 @@
 
    Web používa rolu web_klient, ktorá vidí len licencie, platby, návštevnosť
    a zariadenia. K zákazníckym dátam dielní (tabuľka zaznamy) ani k podpisovému
-   tajomstvu sa nedostane, aj keby sa niekto dostal k premenným prostredia. */
+   tajomstvu sa nedostane, aj keby sa niekto dostal k premenným prostredia */
 
 var URL_DB = process.env.DATABASE_URL || '';
 
