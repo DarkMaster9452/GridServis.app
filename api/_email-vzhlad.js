@@ -32,9 +32,11 @@ function kodBlok(hodnota, popis) {
     '\n    </td></tr>\n  </table>';
 }
 
-function znacka() {
-  return '\n  <tr><td style="background:' + FARBY.tmava + ';padding:24px 32px;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;">' +
-    '\n    <span style="font:700 19px/1 ' + FONT + ';color:#ffffff;letter-spacing:-.01em;">GridServis</span>' +
+/* Hlavička e-mailu — biela, so skutočným logom, rovnako ako .hdr na webe
+   (ten je tiež svetlý s tmavým logom, nie tmavý pruh). */
+function znacka(webUrl) {
+  return '\n  <tr><td style="background:' + FARBY.bg + ';padding:22px 32px;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;border-bottom:1px solid ' + FARBY.linka + ';">' +
+    '\n    <img src="' + webUrl + '/assets/img/gridservis-logo.png" width="149" height="30" alt="GridServis" style="display:block;width:149px;height:30px;border:0;">' +
     '\n  </td></tr>';
 }
 
@@ -62,7 +64,7 @@ function obalka(predmet, obsahHtml, webUrl, odpoved) {
     '\n</head>' +
     '\n<body style="margin:0;padding:32px 16px;background:' + FARBY.bg2 + ';font:400 15px/1.65 ' + FONT + ';color:' + FARBY.ink + ';">' +
     '\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:' + FARBY.bg + ';border-radius:' + RADIUS + ';overflow:hidden;box-shadow:0 2px 6px rgba(13,17,23,.05),0 18px 40px -28px rgba(13,17,23,.28);">' +
-    znacka() +
+    znacka(webUrl) +
     '\n    <tr><td style="padding:34px 32px 12px;">' +
     obsahHtml +
     '\n    </td></tr>' +
