@@ -1,0 +1,130 @@
+# Po publikovaní releasu na GitHube sa nová verzia sama vydá dielňam.
+#
+# Umiestnenie v repozitári:  .github/workflows/vydaj-verziu.yml
+# Potrebuje jediný secret:   DATABASE_URL  (pripojenie na Neon s právom zápisu)
+#
+# Ako to použiješ:
+#   1. zbuilduj build.bat a build_demo.bat
+#   2. sprav release s tagom v2.1.1 (vždy s malým "v")
+#   3. prilož GridServisSetup.exe, prípadne aj GridServisDemoSetup.exe
+#   4. klikni Publish release — zvyšok sa spraví sám
+#
+# Do popisu releasu môžeš napísať:
+#   [povinna]     aktualizácia bude vynútená
+#   [pripravena]  verzia sa zapíše, ale ponúkne sa až keď ju pustíš v admine
+
+name: Vydať verziu dielňam
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      verzia:
+        description: "Verzia bez v (napr. 2.1.1)"
+        required: true
+      povinna:
+        description: "Povinná aktualizácia"
+        type: boolean
+        default: false
+
+jobs:
+  vydaj:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Nájsť inštalačku v release
+        id: subory
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || format('v{0}', inputs.verzia) }}
+        run: |
+          set -euo pipefail
+          # Musí to byť browser_download_url — appka sťahuje bez prihlásenia.
+          plna=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+                   --jq '.assets[] | select(.name=="GridServisSetup.exe") | .browser_download_url')
+          if [ -z "$plna" ]; then
+            echo "::error::V release $TAG chýba súbor GridServisSetup.exe"
+            exit 1
+          fi
+          echo "plna=$plna" >> "$GITHUB_OUTPUT"
+          echo "Našiel som: $plna"
+
+      - name: Zapísať verziu do licenčnej databázy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          VERZIA: ${{ github.event.release.tag_name || inputs.verzia }}
+          URL_FULL: ${{ steps.subory.outputs.plna }}
+          POZNAMKY: ${{ github.event.release.body || 'Nová verzia GridServis.' }}
+          POVINNA: ${{ contains(github.event.release.body, '[povinna]') || inputs.povinna }}
+          PUBLIKOVAT: ${{ !contains(github.event.release.body, '[pripravena]') }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, ssl, sys, urllib.request
+
+          db = os.environ["DATABASE_URL"]
+          # z pripojovacieho reťazca vyrobíme adresu HTTPS rozhrania Neonu
+          host = db.split("@", 1)[1].split("/", 1)[0].replace("-pooler", "")
+          endpoint = f"https://{host}/sql"
+
+          def sql(dotaz, parametre=None):
+              telo = json.dumps({"query": dotaz, "params": parametre or []}).encode()
+              req = urllib.request.Request(endpoint, data=telo, method="POST", headers={
+                  "Content-Type": "application/json", "Neon-Connection-String": db})
+              with urllib.request.urlopen(req, timeout=120,
+                                          context=ssl.create_default_context()) as r:
+                  odpoved = json.loads(r.read().decode())
+              if "rows" not in odpoved:
+                  raise SystemExit("::error::databáza: " + odpoved.get("message", "neznáma chyba"))
+              return odpoved["rows"]
+
+          verzia = os.environ["VERZIA"].strip().lstrip("v")
+          url = os.environ["URL_FULL"].strip()
+          povinna = os.environ.get("POVINNA", "false").lower() == "true"
+          publikovat = os.environ.get("PUBLIKOVAT", "true").lower() == "true"
+          poznamky = os.environ.get("POZNAMKY", "").strip()
+
+          if not url.lower().startswith("https://"):
+              raise SystemExit(f"::error::adresa musí byť https, dostal som {url}")
+
+          # SHA-256 je poistka: appka si súbor po stiahnutí prepočíta a keď
+          # odtlačok nesedí, inštalačku zmaže a nespustí
+          print(f"Sťahujem {url} a počítam odtlačok…")
+          sha, velkost, prve = hashlib.sha256(), 0, b""
+          req = urllib.request.Request(url, headers={"User-Agent": "GridServisRelease"})
+          with urllib.request.urlopen(req, timeout=300,
+                                      context=ssl.create_default_context()) as r:
+              while True:
+                  kus = r.read(1 << 20)
+                  if not kus:
+                      break
+                  prve = prve or kus[:2]
+                  sha.update(kus); velkost += len(kus)
+
+          if velkost < 1_000_000 or prve != b"MZ":
+              raise SystemExit(f"::error::{url} nevyzerá na windowsovú inštalačku "
+                               f"({velkost} B)")
+
+          print(f"  SHA-256: {sha.hexdigest()}")
+          print(f"  veľkosť: {velkost / 1048576:.1f} MB")
+
+          sql("INSERT INTO verzie (verzia, url, sha256, velkost, poznamky, povinna, "
+              "                    aktivna, plati_od) "
+              "VALUES ($1, $2, $3, $4, $5, $6, $7, now()) "
+              "ON CONFLICT (verzia) DO UPDATE SET url = EXCLUDED.url, "
+              "  sha256 = EXCLUDED.sha256, velkost = EXCLUDED.velkost, "
+              "  poznamky = EXCLUDED.poznamky, povinna = EXCLUDED.povinna, "
+              "  aktivna = EXCLUDED.aktivna, plati_od = EXCLUDED.plati_od, vydane = now()",
+              [verzia, url, sha.hexdigest(), velkost, poznamky, povinna, publikovat])
+
+          koho = sql("SELECT COUNT(*) AS c FROM zariadenia WHERE stav = 'aktivne' "
+                     "AND cislo_verzie(COALESCE(verzia_appky, '0')) < cislo_verzie($1)",
+                     [verzia])[0]["c"]
+
+          stav = "vydaná dielňam" if publikovat else "pripravená — pustíš ju v admine"
+          zhrnutie = (f"Verzia **{verzia}** je {stav}"
+                      f"{' · **POVINNÁ**' if povinna else ''}.\n\n"
+                      f"Aktualizáciu dostane **{koho}** počítačov.")
+          print(zhrnutie)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write(zhrnutie + "\n")
+          PY
