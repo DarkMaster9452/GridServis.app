@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """Vygeneruje statické HTML stránky webu GridServis (bez build kroku v repe)."""
-import os, io
+import os, io, re
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ZNACKA = 'GridServis'
+
+# Ostrá adresa webu. Apex gridservis.app presmerováva (308) na www, takže
+# kánonické odkazy, sitemapa aj og:url musia ukazovať na tvar s www.
+WEB = 'https://www.gridservis.app'
 
 # Predávajúci. Program predáva fyzická osoba, nie firma, preto tu nie sú
 # IČO, DIČ ani zápis v registri — kontakt prebieha e-mailom.
@@ -50,7 +54,11 @@ PAGES = [
 ]
 
 
-def head(active, title, desc):
+def head(active, title, desc, extra=''):
+    """Hlavička stránky. `active` je názov vlastného súboru — slúži na
+    zvýraznenie v menu aj na kánonickú adresu. `extra` sa vloží na koniec
+    <head>, používa ho napríklad JSON-LD na cenníku."""
+    kanon = WEB + '/' + ('' if active == 'index.html' else active)
     nav = '\n'.join(
         '      <a href="%s"%s>%s</a>' % (h, ' class="on"' if h == active else '', t)
         for h, t in PAGES)
@@ -68,11 +76,20 @@ def head(active, title, desc):
 <meta property="og:description" content="%s">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
+<meta property="og:site_name" content="%s">
+<meta property="og:url" content="%s">
+<meta property="og:image" content="%s/assets/img/og-gridservis.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GridServis — celý servis v jednom programe">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="%s">
 <meta name="theme-color" content="#101722">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
-</head>
+%s</head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
 
@@ -93,7 +110,7 @@ def head(active, title, desc):
 </header>
 
 <main id="obsah">
-''' % (title, desc, title, desc, nav, mnav)
+''' % (title, desc, title, desc, ZNACKA, kanon, WEB, kanon, extra, nav, mnav)
 
 
 FOOT = '''</main>
@@ -155,13 +172,65 @@ def buy_btn(text='Predplatiť', cls='btn--pri btn--lg'):
     return '<a class="btn %s" href="cennik.html">%s</a>' % (cls, text)
 
 
+# Poučenie, ktoré musí kupujúci pri digitálnom obsahu výslovne odsúhlasiť.
+# Bez neho mu právo na odstúpenie do 14 dní nezaniká — § 7 ods. 6 písm. l)
+# zákona č. 102/2014 Z. z. Checkbox je povinný a overuje ho aj server.
+SUHLAS = ('  <label class="suhlas">\n'
+          '    <input type="checkbox" name="suhlas" value="1" required>\n'
+          '    <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem'
+          ' na vedomie, že tým <b>strácam právo na odstúpenie od zmluvy do 14 dní</b>.'
+          ' <a href="obchodne-podmienky.html#odstupenie">Prečítať poučenie</a></span>\n'
+          '  </label>\n')
+
+
 def platba_btn(plan, text, cls='btn--pri btn--lg'):
     """Tlačidlo, ktoré založí platbu v Stripe. Je to formulár, takže
-    funguje aj bez JavaScriptu a prehliadač ho nepredbieha načítaním."""
+    funguje aj bez JavaScriptu a prehliadač ho nepredbieha načítaním.
+
+    Pri platených plánoch je nad tlačidlom povinný súhlas so stratou práva
+    na odstúpenie; demo za 0 € ho nepotrebuje, nič sa pri ňom neplatí."""
     return ('<form class="pay" method="post" action="/api/checkout">\n'
             '  <input type="hidden" name="plan" value="%s">\n'
+            '%s'
             '  <button class="btn %s" type="submit">%s</button>\n'
-            '</form>') % (plan, cls, text)
+            '</form>') % (plan, SUHLAS if plan != 'demo' else '', cls, text)
+
+
+
+# Štruktúrované dáta o programe. Google vďaka nim vie ukázať cenu priamo vo
+# výsledkoch hľadania. Cena sa berie z CENY, nech nemôže rozísť s cenníkom.
+CENNIK_LD = '''<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "%s",
+  "description": "Program na vedenie zákaziek, zákazníkov, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na počítači používateľa.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "inLanguage": "sk",
+  "url": "%s/",
+  "image": "%s/assets/img/og-gridservis.png",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Ročné predplatné",
+      "price": "%.2f",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "url": "%s/cennik.html"
+    },
+    {
+      "@type": "Offer",
+      "name": "Mesačné predplatné",
+      "price": "%.2f",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "url": "%s/cennik.html"
+    }
+  ]
+}
+</script>
+''' % (ZNACKA, WEB, WEB, CENY['rok'], WEB, CENY['mesiac'], WEB)
 
 
 OZNAM = '<p class="oznam" id="oznam" hidden></p>'
@@ -407,7 +476,8 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 
 # ============================================================ CENNÍK
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
-              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.') + '''
+              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
+              extra=CENNIK_LD) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Ročne ROK, mesačne MESIAC</h1>
@@ -1067,6 +1137,29 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 ''' + FOOT
 
 
+
+# ============================================================ 404
+# Vercel túto stránku ukáže pri každej neexistujúcej adrese. Keďže adresa
+# môže byť ľubovoľne hlboká (/nieco/ine/), odkazy sa nižšie prepíšu na
+# absolútne — relatívne by z podadresára ukazovali vedľa.
+stranka404 = head('404.html', 'Stránka sa nenašla — ZNACKA',
+                  'Takáto stránka na webe ZNACKA nie je. Vráťte sa na domovskú stránku alebo do cenníka.',
+                  extra='<meta name="robots" content="noindex">\n') + '''
+<section class="phead mriezka">
+  <div class="wrap wrap--nar">
+    <h1>Takáto stránka tu nie je</h1>
+    <p class="lead">Adresa je asi preklep alebo starý odkaz. Program aj cenník nájdete cez menu vyššie, alebo rovno tu:</p>
+    <div class="row">
+      <a class="btn btn--pri btn--lg" href="index.html">Domov</a>
+      <a class="btn btn--gh btn--lg" href="cennik.html">Cenník</a>
+      <a class="btn btn--gh btn--lg" href="stiahnut.html">Stiahnuť demo</a>
+    </div>
+    <p class="fine">Ak ste sem prišli z odkazu na tomto webe, <a data-mail="podpora" href="kontakt.html">napíšte mi</a> a opravím ho.</p>
+  </div>
+</section>
+''' + FOOT
+
+
 NAHRADY = [
     ('LOGO', LOGO),
     ('ZNACKA', ZNACKA),
@@ -1077,15 +1170,58 @@ NAHRADY = [
     ('MESIAC', MESIAC),
 ]
 
+def absolutne(html):
+    """Relatívne odkazy prepíše na absolútne (assets/x → /assets/x).
+    Potrebuje to 404.html, ktorá sa zobrazuje aj na hlbokých adresách."""
+    return re.sub(r'(href|src)="(?!https?:|//|/|#|mailto:|data:)', r'\1="/', html)
+
+
 for name, content in [('index.html', index), ('funkcie.html', funkcie),
                       ('cennik.html', cennik), ('stiahnut.html', stiahnut),
                       ('faq.html', faq), ('kontakt.html', kontakt),
                       ('hotovo.html', hotovo), ('obnova.html', obnova),
                       ('ochrana-sukromia.html', sukromie), ('cookies.html', cookies),
-                      ('obchodne-podmienky.html', vop)]:
+                      ('obchodne-podmienky.html', vop),
+                      ('404.html', stranka404)]:
     content = content.replace('</a><a class="btn', '</a>\n        <a class="btn')
     for kluc, hodnota in NAHRADY:
         content = content.replace(kluc, hodnota)
+    if name == '404.html':
+        content = absolutne(content)
     with io.open(os.path.join(OUT, name), 'w', encoding='utf-8') as f:
         f.write(content)
     print('napísané', name)
+
+
+# ============================================================ SITEMAP, ROBOTS
+# Sitemapa sa generuje spolu so stránkami, nech sa pri pridaní novej stránky
+# nezabudne. Sú v nej len verejné stránky — hotovo.html a obnova.html sa
+# otvárajú z odkazu s parametrami a v hľadaní nemajú čo robiť.
+SITEMAP = [
+    ('',                          '1.0'),
+    ('funkcie.html',              '0.9'),
+    ('cennik.html',               '0.9'),
+    ('stiahnut.html',             '0.8'),
+    ('faq.html',                  '0.7'),
+    ('kontakt.html',              '0.6'),
+    ('obchodne-podmienky.html',   '0.3'),
+    ('ochrana-sukromia.html',     '0.3'),
+    ('cookies.html',              '0.3'),
+]
+
+riadky = '\n'.join(
+    '  <url><loc>%s/%s</loc><priority>%s</priority></url>' % (WEB, cesta, prio)
+    for cesta, prio in SITEMAP)
+
+with io.open(os.path.join(OUT, 'sitemap.xml'), 'w', encoding='utf-8') as f:
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + riadky + '\n</urlset>\n')
+print('napísané sitemap.xml')
+
+with io.open(os.path.join(OUT, 'robots.txt'), 'w', encoding='utf-8') as f:
+    f.write('User-agent: *\n'
+            'Allow: /\n'
+            '\n'
+            'Sitemap: %s/sitemap.xml\n' % WEB)
+print('napísané robots.txt')

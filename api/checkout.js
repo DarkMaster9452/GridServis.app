@@ -30,6 +30,21 @@ module.exports = async function (req, res) {
     return;
   }
 
+  /* Digitálny obsah sa sprístupní hneď po zaplatení, takže kupujúci musí
+     pri platených plánoch výslovne odsúhlasiť, že tým stráca právo na
+     odstúpenie do 14 dní (§ 7 ods. 6 písm. l) zákona č. 102/2014 Z. z.).
+     Checkbox je na stránke povinný; server to kontroluje znova, aby sa to
+     nedalo obísť odoslaním formulára mimo prehliadača. Demo za 0 € súhlas
+     nepotrebuje, pri ňom nevzniká platobná povinnosť. */
+  var suhlas = String((req.query && req.query.suhlas) || telo(req).suhlas || '');
+  var suhlasil = suhlas === '1' || suhlas === 'on' || suhlas === 'true';
+
+  if (p.obdobie && !suhlasil) {
+    if (chceJson(req)) { res.status(400).json({ chyba: 'Chýba súhlas so začatím sťahovania.' }); return; }
+    res.redirect(303, p.spat + '?chyba=suhlas');
+    return;
+  }
+
   if (!nastavene()) {
     /* Bez kľúča sa platba založiť nedá. Stránka na to upozorní a ponúkne
        objednávku e-mailom. */
@@ -68,7 +83,9 @@ module.exports = async function (req, res) {
       automatic_tax: { enabled: false },
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + p.spat + '?zrusene=1',
-      metadata: { plan: plan },
+      /* Dôkaz o súhlase zostáva pri objednávke v Stripe — keby ho niekto
+         neskôr spochybnil, je dohľadateľné, kedy ho kupujúci odklikol. */
+      metadata: { plan: plan, suhlas_odstupenie: suhlasil ? new Date().toISOString() : 'neziada sa' },
       line_items: [polozka]
     };
     /* nech je plán vidieť aj na predplatnom, nielen na objednávke */

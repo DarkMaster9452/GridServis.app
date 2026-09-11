@@ -9,10 +9,50 @@
 <meta property="og:description" content="Predplatné programu GridServis: 199,99 € ročne alebo 19,99 € mesačne na jeden počítač. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
+<meta property="og:site_name" content="GridServis">
+<meta property="og:url" content="https://www.gridservis.app/cennik.html">
+<meta property="og:image" content="https://www.gridservis.app/assets/img/og-gridservis.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GridServis — celý servis v jednom programe">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.gridservis.app/cennik.html">
 <meta name="theme-color" content="#101722">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "GridServis",
+  "description": "Program na vedenie zákaziek, zákazníkov, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na počítači používateľa.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "inLanguage": "sk",
+  "url": "https://www.gridservis.app/",
+  "image": "https://www.gridservis.app/assets/img/og-gridservis.png",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Ročné predplatné",
+      "price": "199.99",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "url": "https://www.gridservis.app/cennik.html"
+    },
+    {
+      "@type": "Offer",
+      "name": "Mesačné predplatné",
+      "price": "19.99",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "url": "https://www.gridservis.app/cennik.html"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -65,6 +105,10 @@
         <p class="plan__per">Vychádza na 16,67 € mesačne. Dvanásť mesačných platieb by stálo 239,88 €.</p>
 <form class="pay" method="post" action="/api/checkout">
   <input type="hidden" name="plan" value="rok">
+  <label class="suhlas">
+    <input type="checkbox" name="suhlas" value="1" required>
+    <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem na vedomie, že tým <b>strácam právo na odstúpenie od zmluvy do 14 dní</b>. <a href="obchodne-podmienky.html#odstupenie">Prečítať poučenie</a></span>
+  </label>
   <button class="btn btn--pri btn--lg btn--full" type="submit">Predplatiť na rok</button>
 </form>
         <ul class="ticks">
@@ -83,6 +127,10 @@
         <p class="plan__per">Za rok to je 239,88 €, teda o 39,89 € viac ako ročné predplatné.</p>
 <form class="pay" method="post" action="/api/checkout">
   <input type="hidden" name="plan" value="mesiac">
+  <label class="suhlas">
+    <input type="checkbox" name="suhlas" value="1" required>
+    <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem na vedomie, že tým <b>strácam právo na odstúpenie od zmluvy do 14 dní</b>. <a href="obchodne-podmienky.html#odstupenie">Prečítať poučenie</a></span>
+  </label>
   <button class="btn btn--gh btn--lg btn--full" type="submit">Predplatiť na mesiac</button>
 </form>
         <ul class="ticks">

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.gridservis.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://www.gridservis.app/funkcie.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.gridservis.app/cennik.html</loc><priority>0.9</priority></url>
+  <url><loc>https://www.gridservis.app/stiahnut.html</loc><priority>0.8</priority></url>
+  <url><loc>https://www.gridservis.app/faq.html</loc><priority>0.7</priority></url>
+  <url><loc>https://www.gridservis.app/kontakt.html</loc><priority>0.6</priority></url>
+  <url><loc>https://www.gridservis.app/obchodne-podmienky.html</loc><priority>0.3</priority></url>
+  <url><loc>https://www.gridservis.app/ochrana-sukromia.html</loc><priority>0.3</priority></url>
+  <url><loc>https://www.gridservis.app/cookies.html</loc><priority>0.3</priority></url>
+</urlset>
