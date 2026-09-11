@@ -133,12 +133,17 @@
       text = 'Platba bola zrušená a nič sa nestrhlo. Skúsiť znova môžete kedykoľvek.';
     } else if (dovod.get('chyba') === 'brana') {
       text = 'Platobná brána zatiaľ nie je nastavená. Napíšte mi a objednávku vybavíme e-mailom.';
+    } else if (dovod.get('chyba') === 'suhlas') {
+      text = 'Bez zaškrtnutého súhlasu so začatím sťahovania sa objednávka' +
+        ' založiť nedá. Zaškrtnite políčko nad tlačidlom a skúste to znova.';
     } else if (dovod.get('chyba') === 'platba') {
       text = 'Platbu sa nepodarilo založiť. Skúste to prosím znova, alebo mi napíšte.';
     }
     if (text) {
       oznam.textContent = text + ' ';
-      if (dovod.get('chyba')) {
+      /* Pri chýbajúcom súhlase nemá zmysel ponúkať objednávku e-mailom —
+         chyba je na strane formulára a rieši sa zaškrtnutím políčka. */
+      if (dovod.get('chyba') && dovod.get('chyba') !== 'suhlas') {
         var odkaz = document.createElement('a');
         odkaz.textContent = 'Napísať e-mail';
         odkaz.href = mailto(PREDMET.objednavka);
