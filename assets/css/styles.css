@@ -138,6 +138,13 @@ b,strong{font-weight:640;color:var(--ink)}
 .phead .lead{margin:0;max-width:60ch}
 .tagline{margin:0 0 14px;color:var(--acc);font-size:.78rem;font-weight:620;letter-spacing:.12em;text-transform:uppercase}
 
+/* ---------- stránka 404 ---------- */
+/* Číslo je hlavným písmom webu, len veľmi veľké — nie ozdobné, nech to
+   sedí so zvyškom stránok. Nula v akcentovej farbe ho drží pokope. */
+.e404{margin:0 0 .06em;font-size:clamp(5.5rem,17vw,11rem);line-height:.88;font-weight:700;letter-spacing:-.06em;color:var(--ink)}
+.e404 span{color:var(--acc)}
+.phead .e404+h1{font-size:clamp(1.7rem,3.4vw,2.5rem);max-width:22ch}
+
 /* ---------- snímky ---------- */
 .shot{margin:0;position:relative}
 .shot img{width:100%;border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--sh-l);background:var(--bg-2)}

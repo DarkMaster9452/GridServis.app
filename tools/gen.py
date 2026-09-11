@@ -1147,6 +1147,7 @@ stranka404 = head('404.html', 'Stránka sa nenašla — ZNACKA',
                   extra='<meta name="robots" content="noindex">\n') + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
+    <p class="e404">4<span>0</span>4</p>
     <h1>Takáto stránka tu nie je</h1>
     <p class="lead">Adresa je asi preklep alebo starý odkaz. Program aj cenník nájdete cez menu vyššie, alebo rovno tu:</p>
     <div class="row">
