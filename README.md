@@ -36,12 +36,30 @@ api/_db.js                 spojenie na licenčnú databázu (Neon)
 api/_licencia.js           generovanie a predlžovanie licencií
 api/_objednavka.js         čo sa deje po zaplatení
 api/_email.js              odoslanie licenčného kódu
-tools/gen.py               generátor HTML stránok
+404.html                   stránka pri neexistujúcej adrese (Vercel ju použije sám)
+sitemap.xml                zoznam stránok pre vyhľadávače (generuje sa)
+robots.txt                 pravidlá pre roboty a odkaz na sitemapu (generuje sa)
+favicon.ico                ikona pre prehliadače, ktoré si pýtajú /favicon.ico
+vercel.json                bezpečnostné hlavičky
+tools/gen.py               generátor HTML stránok, sitemapy a robots.txt
+tools/obrazky.py           generátor og:image náhľadu a favicon.ico (spúšťa sa ručne)
+ULOHY-PRED-SPUSTENIM.md    čo ešte treba spraviť mimo kódu (DNS, Stripe, Google)
+APLIKACIA-ULOHY.md         čo z toho vyplýva pre program na Windows
 ```
 
 HTML sa needituje ručne. Všetky stránky vygeneruje `python3 tools/gen.py`
 zo šablón a textov v tomto súbore; ceny, značka aj údaje predávajúceho sú
-tam na jednom mieste.
+tam na jednom mieste. Ten istý beh prepíše aj `sitemap.xml` a `robots.txt`,
+takže pri pridaní novej stránky stačí doplniť ju do zoznamu `SITEMAP`.
+
+Kánonická adresa webu je `WEB` v `tools/gen.py`. Z nej sa skladá `canonical`,
+`og:url` aj sitemapa. Je tam tvar s `www`, lebo apex `gridservis.app`
+naň presmerováva (308).
+
+Náhľadový obrázok do sociálnych sietí a `favicon.ico` sú binárky, preto sa
+negenerujú pri každom behu. Prerobí ich `python3 tools/obrazky.py`
+(potrebuje `pip install pillow`) — a to len vtedy, keď sa mení značka alebo
+veta pod logom.
 
 Statické stránky bez build kroku a bez externých zdrojov. Web si nesťahuje
 nič z cudzích domén: žiadne externé písma, analytika, ani vložený obsah.
@@ -57,13 +75,22 @@ Predplatné na jeden počítač:
 
 Ceny sú na dvoch miestach a musia sedieť:
 
-* `CENY` v `tools/gen.py` — texty na stránkach (po zmene spustiť generátor),
+* `CENY` v `tools/gen.py` — texty na stránkach aj štruktúrované dáta
+  (po zmene spustiť generátor),
 * `PLANY` v `api/_stripe.js` — sumy v centoch, ktoré sa účtujú v Stripe.
 
 ## Platby cez Stripe
 
 Sťahovať sa dá až po dokončenej objednávke, a to aj demo. Demo je
 objednávka s nulovou sumou: Stripe pri nej nepýta kartu, iba e-mail.
+
+Pri platených plánoch musí kupujúci pred odoslaním zaškrtnúť súhlas so
+začatím sťahovania ihneď po zaplatení a s tým, že mu tým zaniká právo na
+odstúpenie do 14 dní (§ 7 ods. 6 písm. l) zákona č. 102/2014 Z. z.).
+Checkbox je na stránke povinný a `api/checkout.js` ho kontroluje znova, aby
+sa nedal obísť odoslaním formulára mimo prehliadača. Čas odkliknutia sa
+ukladá k objednávke v Stripe (`metadata.suhlas_odstupenie`). Demo za 0 €
+súhlas nepotrebuje, pri ňom nevzniká platobná povinnosť.
 
 ```
 tlačidlo na stránke  ->  POST /api/checkout  ->  pokladňa Stripe
