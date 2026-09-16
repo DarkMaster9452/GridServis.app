@@ -91,6 +91,32 @@ module.exports = async function (req, res) {
     if (typ === 'checkout.session.completed') {
       /* načítame reláciu priamo zo Stripe, nie z tela správy */
       var relacia = await stripe('/checkout/sessions/' + objekt.id);
+      var meta = relacia.metadata || {};
+
+      /* presun licencie na iný počítač — nevydáva sa licencia, len sa uvoľní PC */
+      if (meta.typ === 'presun') {
+        var { sql } = require('./_db');
+        var { zapisPlatbu } = require('./_licencia');
+        await sql('DELETE FROM zariadenia WHERE kod = $1 AND odtlacok = $2', [meta.kod, meta.pc]);
+        await zapisPlatbu({
+          stripe_id: relacia.id,
+          druh: 'presun',
+          plan: 'presun',
+          email: (relacia.customer_details && relacia.customer_details.email) || '',
+          suma: relacia.amount_total,
+          mena: relacia.currency || 'eur',
+          kod: meta.kod,
+          poznamka: 'presun na iný počítač · uvoľnený odtlačok ' + meta.pc
+        });
+        var email = require('./_email');
+        if (email.posliPresun) {
+          await email.posliPresun((relacia.customer_details && relacia.customer_details.email) || '', meta.kod, web);
+        }
+        console.log('stripe-hook: presun', objekt.id, 'licencia ' + meta.kod + ' PC uvoľnený');
+        res.status(200).json({ ok: true });
+        return;
+      }
+
       var v = await spracuj(relacia, web);
       console.log('stripe-hook: checkout', objekt.id, v && v.kod ? 'licencia ' + v.kod : 'bez licencie');
 
