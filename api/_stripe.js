@@ -37,6 +37,14 @@ var PLANY = {
     popis: 'Predplatné programu GridServis na jeden počítač, obnovuje sa každý rok.',
     cena: process.env.STRIPE_PRICE_ROK || '',
     spat: '/cennik.html'
+  },
+  presun: {
+    suma: 500,
+    obdobie: '',                 // jednorazový poplatok, nie predplatné
+    nazov: 'GridServis — presun licencie na iný počítač',
+    popis: 'Jednorazový poplatok za uvoľnenie počítača a presun licencie na iný.',
+    cena: process.env.STRIPE_PRICE_PRESUN || '',
+    spat: '/presun.html'
   }
 };
 

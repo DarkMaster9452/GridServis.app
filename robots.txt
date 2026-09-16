@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /presun.html
+Disallow: /hotovo.html
+Disallow: /api/
 
 Sitemap: https://www.gridservis.app/sitemap.xml

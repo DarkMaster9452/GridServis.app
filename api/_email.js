@@ -77,4 +77,45 @@ async function posli(email, kod, plan, platnaDo, adresaWebu, meno) {
   }
 }
 
-module.exports = { posli: posli, nastavene: function () { return Boolean(KLUC && ODOSIELATEL); } };
+/* e-mail dielni po zaplatenom presune licencie na iný počítač */
+async function posliPresun(email, kod, adresaWebu) {
+  if (!email || !KLUC || !ODOSIELATEL) return false;
+  var obsah =
+    '\n      <h1 style="margin:0 0 14px;font:700 22px/1.3 -apple-system,sans-serif;letter-spacing:-.01em;">Počítač je uvoľnený</h1>' +
+    '\n      <p style="margin:0 0 4px;color:#0d1117;">Presun licencie ' + kod + ' na iný počítač je zaplatený. Predošlý počítač je odhlásený.</p>' +
+    '\n      <p style="margin:18px 0 0;color:#0d1117;">Na novom počítači zadajte pri spustení programu ten istý kód: <b>' + kod + '</b>. Licencia ani jej platnosť sa nemenili.</p>' +
+    '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Niečo nesedí alebo máte otázku? Napíšte na <a href="mailto:' + ODPOVED + '" style="color:#2563eb;">' + ODPOVED + '</a>.</p>';
+  var telo = obalka('Presun licencie zaplatený — počítač je uvoľnený', obsah, adresaWebu, ODPOVED);
+  var text = [
+    'Dobrý deň,', '',
+    'presun licencie ' + kod + ' na iný počítač je zaplatený. Predošlý počítač je odhlásený.', '',
+    'Na novom počítači zadajte pri spustení programu ten istý kód: ' + kod + '.',
+    'Licencia ani jej platnosť sa nemenili.', '',
+    'Otázky? Napíšte na ' + ODPOVED + '.'
+  ].join('\n');
+  try {
+    var r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + KLUC, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: ODOSIELATEL, to: [email], reply_to: ODPOVED,
+        subject: 'Presun licencie zaplatený — počítač je uvoľnený',
+        html: telo, text: text
+      })
+    });
+    if (!r.ok) {
+      console.error('email:', r.status, await r.text().catch(function () { return ''; }));
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('email:', e.message);
+    return false;
+  }
+}
+
+module.exports = {
+  posli: posli,
+  posliPresun: posliPresun,
+  nastavene: function () { return Boolean(KLUC && ODOSIELATEL); }
+};
