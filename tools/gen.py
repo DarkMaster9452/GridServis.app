@@ -85,8 +85,9 @@ def head(active, title, desc, extra=''):
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="%s">
 <meta name="theme-color" content="#101722">
-<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/img/favicon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
 %s</head>
