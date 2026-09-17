@@ -70,7 +70,7 @@ module.exports = async function (req, res) {
       mode: 'subscription',
       locale: 'sk',
       billing_address_collection: 'auto',
-      automatic_tax: { enabled: false },
+      /* automatic_tax sa zámerne neposiela — pozri poznámku v checkout.js */
       customer_email: licencia.kontakt || undefined,
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + '/obnova.html?kod=' + encodeURIComponent(kod) + '&zrusene=1',
