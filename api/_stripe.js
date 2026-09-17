@@ -128,6 +128,8 @@ async function overRelaciu(id) {
 
   return {
     plan: (r.metadata && r.metadata.plan) || '',
+    typ: (r.metadata && r.metadata.typ) || '',
+    kod: (r.metadata && r.metadata.kod) || '',
     email: (r.customer_details && r.customer_details.email) || '',
     suma: r.amount_total,
     mena: r.currency

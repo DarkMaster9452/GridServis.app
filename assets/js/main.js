@@ -290,6 +290,20 @@
     };
 
     var dobre = function (v) {
+      /* presun licencie na iný počítač — vlastné, oveľa kratšie potvrdenie,
+         žiadna licencia, sťahovanie ani inštalačný návod sa tu neukazuje */
+      if (v.typ === 'presun') {
+        hlava.textContent = 'Počítač je uvoľnený';
+        podnadpis.textContent = 'Presun licencie je zaplatený. Na novom počítači sa prihlásite tým istým kódom.';
+        var presunBox = document.getElementById('presun-hotovo');
+        if (presunBox) {
+          document.getElementById('presun-kod').textContent = v.kod || '';
+          presunBox.hidden = false;
+        }
+        zapis('platba_hotova', 'presun');
+        return;
+      }
+
       var platene = v.plan === 'rok' || v.plan === 'mesiac';
       hlava.textContent = platene ? 'Predplatné je zaplatené' : 'Demo je pripravené';
       podnadpis.textContent = platene
