@@ -809,6 +809,12 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
 
 <section class="sec">
   <div class="wrap wrap--mid">
+    <div class="kod" id="presun-hotovo" hidden>
+      <span class="kod__lbl">Licencia</span>
+      <b class="kod__val" id="presun-kod">&mdash;</b>
+      <span class="kod__note">Na novom počítači zadajte pri spustení programu tento istý kód. Predošlý počítač je odhlásený, licencia ani jej platnosť sa nemenia.</span>
+    </div>
+
     <div class="kod kod--skryty" id="licencia" hidden>
       <span class="kod__lbl">Licenčný kód</span>
       <span class="kod__box">
@@ -1224,6 +1230,9 @@ print('napísané sitemap.xml')
 with io.open(os.path.join(OUT, 'robots.txt'), 'w', encoding='utf-8') as f:
     f.write('User-agent: *\n'
             'Allow: /\n'
+            'Disallow: /presun.html\n'
+            'Disallow: /hotovo.html\n'
+            'Disallow: /api/\n'
             '\n'
             'Sitemap: %s/sitemap.xml\n' % WEB)
 print('napísané robots.txt')

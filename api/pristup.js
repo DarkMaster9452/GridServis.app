@@ -15,6 +15,15 @@ module.exports = async function (req, res) {
     var v = await overRelaciu(id);
     var odpoved = { ok: true, plan: v.plan, email: v.email, suma: v.suma, kod: '' };
 
+    /* presun licencie na iný počítač — kód je hneď z metadát, žiadna nová
+       licencia sa nevydáva, PC uvoľní webhook (viď stripe-hook.js) */
+    if (v.typ === 'presun') {
+      odpoved.typ = 'presun';
+      odpoved.kod = v.kod;
+      res.status(200).json(odpoved);
+      return;
+    }
+
     /* licenciu vydávame len pri predplatnom; demo ju nepotrebuje */
     if (v.plan === 'rok' || v.plan === 'mesiac') {
       try {
