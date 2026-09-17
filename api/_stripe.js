@@ -6,8 +6,11 @@
 var KLUC = process.env.STRIPE_SECRET_KEY || '';
 var API = process.env.STRIPE_API || 'https://api.stripe.com';
 
-/* Od verzie 2023-08-16 zvláda Checkout objednávky za 0 €, teda demo. */
-var VERZIA = '2023-08-16';
+/* Musí byť aspoň 2025-03-31.basil — staršie verzie API Managed Payments
+   (zapnuté na účte) vôbec nepoznajú a každú reláciu rovno odmietnu.
+   Objednávky za 0 € (demo) zvláda Checkout od 2023-08-16, takže v tejto
+   verzii to naďalej funguje. */
+var VERZIA = '2025-03-31.basil';
 
 /* Plány. Sumy sú v centoch a musia sedieť s cenami na webe
    (CENY v tools/gen.py a v assets/js/main.js).
