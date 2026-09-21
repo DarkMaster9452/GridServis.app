@@ -252,7 +252,7 @@ VAROVANIE = '''<div class="warn" id="upozornenie">
 
 # ============================================================ DOMOV
 index = head('index.html', 'ZNACKA — program na správu autoservisu',
-             'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program, predplatné ROK ročne alebo MESIAC mesačne.') + '''
+             'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program s predplatným, vyskúšajte demo zadarmo.') + '''
 <section class="hero mriezka">
   <div class="wrap hero__in">
     <div class="hero__txt">
