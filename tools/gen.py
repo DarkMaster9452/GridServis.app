@@ -160,7 +160,7 @@ FOOT = '''</main>
 def shot(img, alt, cls=''):
     """Snímka obrazovky. Pod obrázkom už nie je popiska, alt stačí."""
     return '''<figure class="shot %s">
-  <img src="assets/img/%s" alt="%s" %s width="1600" height="1000">
+  <img src="assets/img/%s" alt="%s" %s decoding="async" width="1600" height="1000">
 </figure>''' % (cls, img, alt,
                 'fetchpriority="high"' if 'hero' in cls else 'loading="lazy"')
 
@@ -574,14 +574,9 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
     </header>
     <div class="faq">
       <details><summary>Prečo je ročné predplatné výhodnejšie?</summary><p>Ročné stojí ROK, dvanásť mesačných platieb ROCNE_MESACNE. Rozdiel je USPORA, ktoré pri ročnej platbe neplatíte.</p></details>
-      <details><summary>Obnovuje sa predplatné samo?</summary><p>Áno. Po skončení obdobia sa z karty strhne ďalšia platba a licencia sa predĺži — v programe si ničoho nevšimnete. Obnovu vypnete v programe v Nastaveniach alebo mi napíšte.</p></details>
-      <details><summary>Čo sa stane, keď platba neprejde?</summary><p>Licencia sa zastaví a program sa uzamkne. Dáta zostávajú na vašom počítači a viete si ich vyexportovať aj v tomto stave. Program ukáže odkaz na obnovenie; po zaplatení sa tá istá licencia predĺži a pokračujete tam, kde ste skončili.</p></details>
-      <details><summary>Vymenil som počítač, čo s licenciou?</summary><p>Licencia sa pri aktivácii naviaže na jeden počítač a sama sa z neho neuvoľní. Napíšte mi a preložím ju na nový — za preloženie účtujem 10 €.</p></details>
-      <details><summary>Potrebujem program aj na počítač doma?</summary><p>Ak tam program spúšťate, potrebujete druhé predplatné. Ozvite sa, pri viacerých staniciach dohodneme cenu.</p></details>
-      <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite.</p></details>
+      <details><summary>Obnovuje sa predplatné samo?</summary><p>Áno. Po skončení obdobia sa z karty strhne ďalšia platba a licencia sa predĺži — v programe si ničoho nevšimnete. Obnovu vypnete v programe v Nastaveniach, licencia potom dobehne do konca zaplateného obdobia a ďalej sa neúčtuje.</p></details>
       <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe. Kliknete na Predplatiť, na stránke Stripe zaplatíte kartou a vrátite sa späť na stiahnutie. Údaje o karte idú priamo Stripe, ja sa k nim nedostanem.</p></details>
-      <details><summary>Prečo aj pri deme zadávam e-mail?</summary><p>Demo sa sťahuje cez objednávku za 0 €. Karta sa nezadáva, e-mail potrebujem na to, aby som vedel, komu poslať licenčný kľúč, keby ste sa neskôr rozhodli pre predplatné.</p></details>
-      <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát. <a href="#upozornenie">Podrobne to vysvetľujem vyššie</a> a to isté platí pre demo aj pre plnú verziu.</p></details>
+      <details><summary>Čo ak sa program neosvedčí?</summary><p>Preto je tu demo. Vyskúšate ho pred platbou, a ak vám nesadne, predplatné jednoducho nekúpite. Ďalšie odpovede sú v <a href="faq.html">častých otázkach</a>.</p></details>
     </div>
   </div>
 </section>
@@ -691,53 +686,25 @@ stiahnut = head('stiahnut.html', 'Inštalácia ZNACKA pre Windows',
 
 # ============================================================ FAQ
 faq = head('faq.html', 'Časté otázky — ZNACKA',
-           'Odpovede na otázky o programe ZNACKA: dáta, predplatné, viac počítačov, faktúry, DPH, zálohovanie a podpora.') + '''
+           'Odpovede na najčastejšie otázky o programe ZNACKA: kde sú dáta, čo program tlačí, koľko stojí a ako sa dá vyskúšať.') + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Časté otázky</h1>
-    <p class="lead">Ak tu odpoveď nenájdete, napíšte mi a doplním ju.</p>
+    <p class="lead">Osem otázok, ktoré dostávam najčastejšie. Ak tu odpoveď nenájdete, <a href="kontakt.html">napíšte mi</a> a doplním ju.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--nar">
-    <h2 class="gh">Program a dáta</h2>
     <div class="faq">
-      <details><summary>Kde sú uložené moje zákazky?</summary><p>V databáze na počítači, kde je program nainštalovaný. Nič sa neposiela na cudzí server, takže údaje o zákazníkoch zostávajú v dielni.</p></details>
-      <details><summary>Funguje program bez internetu?</summary><p>Databáza je na vašom počítači, takže na bežnú prácu so zákazkami pripojenie netreba. Internet potrebujete na stiahnutie programu a aktualizácií.</p></details>
-      <details><summary>Beží to na Macu alebo v mobile?</summary><p>Nie. Aktuálna verzia je program pre Windows 10 a 11.</p></details>
-      <details><summary>Môžu na dátach robiť dvaja ľudia naraz?</summary><p>Program je stavaný na jeden počítač s vlastnou databázou. Zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
-      <details><summary>Ako prenesiem dáta na iný počítač?</summary><p>Skopírujete súbor databázy zo starého počítača do nového a program ju načíta. Napíšte mi a pošlem presný postup pre vašu verziu.</p></details>
-    </div>
-
-    <h2 class="gh">Zákazky a doklady</h2>
-    <div class="faq">
-      <details><summary>Vystavuje program faktúry?</summary><p>Áno, priamo z detailu zákazky. Faktúra v PDF obsahuje rozpis vykonaných prác aj každého dielu zvlášť.</p></details>
-      <details><summary>Zvládne DPH?</summary><p>Áno. V nastaveniach zapnete, že ste platiteľ, zadáte IČ DPH a sadzbu. Faktúry sa potom počítajú s DPH.</p></details>
-      <details><summary>Čo je štítok na kľúče?</summary><p>Malý štítok s číslom zákazky, ŠPZ a menom zákazníka. Vytlačíte ho zo zákazky a zavesíte ku kľúčom, aby sa autá nepomiešali.</p></details>
-      <details><summary>Dá sa zákazka objednať na termín?</summary><p>Áno. Nastavíte dátum a čas a termín pridáte do Google kalendára alebo stiahnete ako súbor .ics do vlastného kalendára.</p></details>
-      <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže vidíte všetky predchádzajúce zákazky.</p></details>
-    </div>
-
-    <h2 class="gh">Predplatné a platba</h2>
-    <div class="faq">
-      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti. Ročné predplatné je o USPORA lacnejšie, podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
-      <details><summary>Je to predplatné, alebo sa platí raz?</summary><p>Je to predplatné. Platí sa za obdobie, ktoré si zvolíte — rok alebo mesiac — a po jeho skončení sa obnovuje samo, kým obnovu nevypnete.</p></details>
-      <details><summary>Strháva sa platba automaticky?</summary><p>Áno, po skončení obdobia sa predplatné obnoví z tej istej karty. Obnovu vypnete v programe v Nastaveniach — licencia potom dobehne do konca zaplateného obdobia a ďalej sa neúčtuje.</p></details>
-      <details><summary>Čo ak platba neprejde?</summary><p>Licencia sa zastaví a program sa uzamkne, dáta vám zostanú. Program ukáže odkaz na obnovenie; po zaplatení pokračuje tá istá licencia. Exportovať dáta sa dá aj v zastavenom stave.</p></details>
-      <details><summary>Dá sa licencia preložiť na iný počítač?</summary><p>Sama sa neuvoľní — po aktivácii je naviazaná na ten počítač. Napíšte mi a preložím ju; za preloženie účtujem 10 €.</p></details>
-      <details><summary>Ako prebieha platba?</summary><p>Cez pokladňu Stripe, kartou. Po zaplatení sa vrátite na stránku, odkiaľ sa dá hneď stiahnuť inštalačka. Údaje o karte spracúva Stripe, ja ich nevidím.</p></details>
-      <details><summary>Kde stiahnem plnú verziu?</summary><p>Hneď po zaplatení na stránke, na ktorú vás Stripe vráti. Licenčný kľúč k nej pošlem e-mailom.</p></details>
-      <details><summary>Prečo sa demo sťahuje cez pokladňu, keď je zadarmo?</summary><p>Aby som vedel, kto si program skúša, a mal kam poslať kľúč, keby ste si predplatné kúpili. Suma je 0 €, karta sa nezadáva, stačí e-mail.</p></details>
-      <details><summary>Musím platiť hneď?</summary><p>Nie. Najprv si stiahnete demo, ktoré nič nestojí, a vyskúšate ho. Predplatné riešite až potom.</p></details>
-      <details><summary>Prečo Windows pri inštalácii hlási, že súbor nie je bezpečný?</summary><p>Inštalačka nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>. Inštalácia pokračuje cez Ďalšie informácie a Spustiť tak či tak.</p></details>
-      <details><summary>Čím sa demo líši od plnej verzie?</summary><p>Demo slúži na vyskúšanie ovládania a tlače dokladov. Plnú verziu bez obmedzení sprístupní zaplatené predplatné.</p></details>
-    </div>
-
-    <h2 class="gh">Podpora</h2>
-    <div class="faq">
-      <details><summary>Našiel som chybu.</summary><p>Napíšte mi cez <a href="kontakt.html">kontakt</a>. Uveďte, čo ste robili, čo program vypísal a akú verziu používate.</p></details>
-      <details><summary>Chýba mi funkcia, ktorú by som potreboval.</summary><p>Ozvite sa. Návrhy zo servisov, ktoré program reálne používajú, majú prednosť.</p></details>
+      <details><summary>Kde sú uložené moje zákazky?</summary><p>V databáze na počítači, kde je program nainštalovaný. Nič sa neposiela na cudzí server, takže údaje o zákazníkoch aj o autách zostávajú v dielni. Na bežnú prácu so zákazkami preto netreba ani internet.</p></details>
+      <details><summary>Čo potrebujem, aby to bežalo?</summary><p>Windows 10 alebo 11 a bežný počítač. Na Macu ani v mobile program nebeží. Je stavaný na jeden počítač s vlastnou databázou — zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
+      <details><summary>Vystavuje program faktúry? Zvládne DPH?</summary><p>Áno, faktúru aj zákazkový list vytlačíte priamo z detailu zákazky, v PDF a s rozpisom prác a každého dielu zvlášť. Ak ste platiteľ DPH, zapnete to v nastaveniach a faktúry sa počítajú s DPH.</p></details>
+      <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže pri každej ďalšej návšteve vidíte všetky predchádzajúce zákazky aj s cenou.</p></details>
+      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — na jeden počítač. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
+      <details><summary>Dá sa program najprv vyskúšať?</summary><p>Áno, na to je demo. Nič nestojí, stiahnete si ho hneď a zapíšete doň vlastné zákazky. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p></details>
+      <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne, ale dáta vám zostanú na počítači a viete si ich vyexportovať aj v tomto stave. Po zaplatení pokračuje tá istá licencia tam, kde ste skončili. Obnovu vypnete v programe v Nastaveniach.</p></details>
+      <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Nie je to vírus ani chyba programu. Inštalácia pokračuje cez <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>.</p></details>
     </div>
   </div>
 </section>

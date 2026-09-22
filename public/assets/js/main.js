@@ -24,8 +24,22 @@
   /* ---------------- hlavička ---------------- */
   var hdr = document.getElementById('hdr');
   if (hdr) {
-    var stick = function () { hdr.classList.toggle('on', window.scrollY > 6); };
-    window.addEventListener('scroll', stick, { passive: true });
+    /* Prepínač sa púšťa cez requestAnimationFrame a mení triedu len vtedy,
+       keď sa naozaj mení. Inak by pri každom pohybu kolieskom zbytočne nútil
+       prehliadač prepočítať štýly a scrollovanie by sekalo. */
+    var pripnuta = null;
+    var ceka = false;
+    var stick = function () {
+      ceka = false;
+      var ma = window.scrollY > 6;
+      if (ma !== pripnuta) {
+        pripnuta = ma;
+        hdr.classList.toggle('on', ma);
+      }
+    };
+    window.addEventListener('scroll', function () {
+      if (!ceka) { ceka = true; requestAnimationFrame(stick); }
+    }, { passive: true });
     stick();
   }
 
