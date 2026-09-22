@@ -1,3 +1,5 @@
-# Generátor stránok sa nenasadzuje, na webe nemá čo robiť.
+# Na Vercel ide len public/ (web) a api/ (funkcie). Zvyšok je vývojárska
+# výbava a na serveri nemá čo robiť.
 tools/
+docs/
 README.md
