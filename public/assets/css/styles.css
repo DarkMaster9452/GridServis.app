@@ -35,7 +35,7 @@ html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100
 body{
   margin:0;background:var(--bg);color:var(--ink);
   font:16.5px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip;
 }
 img{max-width:100%;height:auto;display:block}
 h1,h2,h3{margin:0 0 .5em;font-weight:660;color:var(--ink)}
@@ -83,7 +83,7 @@ b,strong{font-weight:640;color:var(--ink)}
 .row--c{justify-content:center}
 
 /* ---------- hlavička ---------- */
-.hdr{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.82);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.hdr{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);border-bottom:1px solid transparent;transition:border-color .2s}
 .hdr.on{border-bottom-color:var(--line)}
 .hdr__in{display:flex;align-items:center;gap:22px;height:74px}
 .logo{display:inline-flex;align-items:center;color:var(--ink)}
@@ -120,6 +120,7 @@ b,strong{font-weight:640;color:var(--ink)}
   background-position:center top;
   -webkit-mask-image:radial-gradient(120% 90% at 50% 30%,#000 35%,transparent 78%);
   mask-image:radial-gradient(120% 90% at 50% 30%,#000 35%,transparent 78%);
+  transform:translateZ(0);
 }
 
 /* ---------- hero ---------- */
