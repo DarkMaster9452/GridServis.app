@@ -93,29 +93,17 @@ ukladá len typ udalosti a stránku: žiadne cookies, žiadna IP adresa.
 
 ### Čo sa deje na pozadí
 
-```
-Zákazník na cennik.html
-        │  POST /api/checkout          (+ povinný súhlas s okamžitým sťahovaním)
-        ▼
-    Stripe Checkout
-        │
-        ├─► POST /api/stripe-hook      webhook: vydá licenciu, pošle kód e‑mailom,
-        │                              obnovy a zrušenia predplatného
-        └─► hotovo.html
-               │  GET /api/pristup     zobrazí kód hneď, aj keď webhook mešká
-               └─ GET /api/stiahnut    inštalačka až po dokončenej objednávke
+Tlačidlo v cenníku otvorí pokladňu Stripe. Po zaplatení dostane zákazník
+licenčný kód — zobrazí sa mu hneď na stránke a príde aj e-mailom — a sprístupní
+sa mu stiahnutie plnej inštalačky. Demo je tiež objednávka, len za 0 €, takže
+Stripe pri nej nepýta kartu, iba e-mail.
 
-Program v dielni
-        ├─ GET  /api/verzia            je nová verzia?
-        ├─ POST /api/portal            zrušenie obnovy v Stripe portáli
-        └─ obnova.html / presun.html   predĺženie licencie, presun na iný počítač
-```
+Program v dielni si sám zisťuje, či nevyšla nová verzia, a vie otvoriť Stripe
+portál na zrušenie obnovy. Keď predplatné skončí alebo platba neprejde, licencia
+sa zastaví a program ponúkne odkaz na jej obnovenie — dáta zostávajú na počítači
+dielne a po zaplatení sa pokračuje tam, kde sa skončilo.
 
-Licenčný kód má tvar `MECH-XXXX-XXXX-XXXX` a platí na jeden počítač. Vydávanie je
-odolné voči zopakovaniu — kľúčom je `stripe_id` v tabuľke platieb, takže tá istá
-udalosť zo Stripe nikdy nevydá licenciu dvakrát.
-
-Demo je tiež objednávka, len za 0 € — Stripe pri nej nepýta kartu, iba e‑mail.
+Licencia platí na jeden počítač. Presun na iný sa rieši cez `presun.html`.
 
 ---
 
@@ -169,27 +157,12 @@ python3 tools/obrazky.py
 Vercel, napojený priamo na tento repozitár. Bez build kroku — výstupný adresár je
 `public/`, funkcie v `api/` si Vercel nájde sám.
 
-Funkcie potrebujú tieto premenné prostredia:
+Funkcie potrebujú nastavené premenné prostredia pre Stripe, licenčnú databázu
+(Neon) a odosielanie e-mailov. Sú vo Vercel projekte, nie v repe — konkrétne
+názvy vidno priamo v `api/`.
 
-| Premenná | Načo |
-| --- | --- |
-| `DATABASE_URL` | licenčná databáza (Neon), rola `web_klient` |
-| `STRIPE_SECRET_KEY` | tajný kľúč Stripe |
-| `STRIPE_WEBHOOK_SECRET` | overenie podpisu webhooku |
-| `STRIPE_PRICE_ROK`, `STRIPE_PRICE_MESIAC` | ceny predplatného |
-| `STRIPE_PRICE_DEMO`, `STRIPE_PRICE_PRESUN` | demo (0 €) a presun licencie |
-| `RELEASE_REPO`, `RELEASE_ASSET`, `RELEASE_ASSET_DEMO` | odkiaľ sa berie inštalačka |
-| `RELEASE_TOKEN` | prístup k súkromnému repu s vydaniami |
-| `RESEND_API_KEY`, `RESEND_FROM`, `RESEND_REPLY_TO` | odosielanie licenčných kódov |
-| `SITE_URL` | ostrá adresa webu pre návratové odkazy zo Stripe |
-
-Keď chýba `RESEND_API_KEY`, e‑mail sa jednoducho nepošle a licencia sa aj tak
-vydá — kód zostáva na stránke po platbe. Odosielanie e‑mailov nikdy nesmie
-zhodiť vydanie licencie.
-
-Databázová rola `web_klient` vidí len licencie, platby, návštevnosť a zariadenia.
-K zákazníckym dátam dielní sa nedostane, ani keby niekto získal premenné
-prostredia.
+Odosielanie e-mailov nikdy nesmie zhodiť vydanie licencie: keď sa e-mail poslať
+nedá, kód zostáva zobrazený na stránke po platbe a licencia sa vydá tak či tak.
 
 ---
 
