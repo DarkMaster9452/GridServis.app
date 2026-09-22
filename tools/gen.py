@@ -2,7 +2,8 @@
 """Vygeneruje statické HTML stránky webu GridServis (bez build kroku v repe)."""
 import os, io, re
 
-OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KOREN = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(KOREN, 'public')   # web sa nasadzuje z public/, nie z koreňa repa
 
 ZNACKA = 'GridServis'
 

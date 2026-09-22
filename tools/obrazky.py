@@ -16,7 +16,8 @@ import os
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KOREN = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(KOREN, 'public')   # web sa nasadzuje z public/, nie z koreňa repa
 IMG = os.path.join(OUT, 'assets', 'img')
 
 # Rozmer, ktorý čakajú Facebook, Messenger aj Twitter/X.
