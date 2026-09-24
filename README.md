@@ -99,3 +99,12 @@ sledovanie, žiadna IP adresa.
 ## Kontakt
 
 strananekm@gmail.com
+
+---
+
+## Licencia
+
+© 2026 DarkMaster9452. Všetky práva vyhradené. Kód je zverejnený len na
+prezeranie — kopírovanie, úpravy ani použitie v inom projekte či na vlastný
+prospech nie sú bez písomného súhlasu dovolené. Podrobnosti sú v súbore
+[LICENSE](LICENSE).
