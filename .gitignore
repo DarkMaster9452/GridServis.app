@@ -1,3 +1,43 @@
+# ── Závislosti a build ────────────────────────────────────────────
 node_modules/
 __pycache__/
 *.pyc
+.venv/
+venv/
+
+# ── Tajomstvá (Stripe, DB, e-mail) — nikdy nesmú ísť na GitHub ───
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Vercel CLI (obsahuje ID projektu a tímu) ─────────────────────
+.vercel/
+
+# ── Súkromné poznámky a úlohy ─────────────────────────────────────
+# Čokoľvek sem dáš, zostane len u teba na disku.
+_privat/
+privat/
+*.local.md
+*.private.*
+docs/ulohy-*.md
+docs/aplikacia-*.md
+
+# ── Claude Code — lokálne nastavenia a poznámky ──────────────────
+.claude/settings.local.json
+CLAUDE.local.md
+
+# ── Logy a dočasné súbory ─────────────────────────────────────────
+*.log
+npm-debug.log*
+*.tmp
+*.bak
+
+# ── Systém a editory ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
