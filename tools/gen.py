@@ -32,6 +32,11 @@ PRESUN = 5
 # Google neprečítal, noindex by nevidel a adresu by mohol zaindexovať aj tak.
 NOINDEX = '<meta name="robots" content="noindex, nofollow">\n'
 
+# Stránky, ktoré sú verejné a prelinkované, ale nemajú sa indexovať —
+# v hľadaní má byť len domov, cenník a stiahnutie (demo). "follow" necháva
+# Google prejsť odkazy na cenník aj demo, ktoré tieto stránky obsahujú.
+NOINDEX_FOLLOW = '<meta name="robots" content="noindex, follow">\n'
+
 
 def eur(n):
     """Suma v slovenskom tvare, napríklad 1 199,99 €."""
@@ -409,7 +414,8 @@ def blok(anchor, tag, h2, p, body_ul, img, alt, rev=False):
 
 
 funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
-               'Prehľad obrazoviek programu ZNACKA: zákazky, detail zákazky, zákazníci, sklad dielov, cenník prác, štatistiky a nastavenia dielne.') + '''
+               'Prehľad obrazoviek programu ZNACKA: zákazky, detail zákazky, zákazníci, sklad dielov, cenník prác, štatistiky a nastavenia dielne.',
+               extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Čo program vie</h1>
@@ -695,7 +701,8 @@ stiahnut = head('stiahnut.html', 'Inštalácia ZNACKA pre Windows',
 
 # ============================================================ FAQ
 faq = head('faq.html', 'Časté otázky — ZNACKA',
-           'Odpovede na najčastejšie otázky o programe ZNACKA: kde sú dáta, čo program tlačí, koľko stojí a ako sa dá vyskúšať.') + '''
+           'Odpovede na najčastejšie otázky o programe ZNACKA: kde sú dáta, čo program tlačí, koľko stojí a ako sa dá vyskúšať.',
+           extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Časté otázky</h1>
@@ -722,7 +729,8 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
 
 # ============================================================ KONTAKT
 kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
-               'Kontakt na objednávku predplatného, podporu pri inštalácii a hlásenie chýb v programe ZNACKA.') + '''
+               'Kontakt na objednávku predplatného, podporu pri inštalácii a hlásenie chýb v programe ZNACKA.',
+               extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Napíšte mi</h1>
@@ -1060,7 +1068,8 @@ PREDAVAJUCI = '''
 
 
 sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
-                'Aké osobné údaje spracúvam pri predaji predplatného programu ZNACKA, na aký účel, ako dlho a aké práva máte.') + '''
+                'Aké osobné údaje spracúvam pri predaji predplatného programu ZNACKA, na aký účel, ako dlho a aké práva máte.',
+                extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Ochrana súkromia</h1>
@@ -1119,7 +1128,8 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
 
 
 cookies = head('cookies.html', 'Cookies — ZNACKA',
-               'Tento web nepoužíva sledovacie ani analytické cookies. Vysvetlenie, čo sa v prehliadači ukladá a prečo nie je zobrazovaná lišta so súhlasom.') + '''
+               'Tento web nepoužíva sledovacie ani analytické cookies. Vysvetlenie, čo sa v prehliadači ukladá a prečo nie je zobrazovaná lišta so súhlasom.',
+               extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Cookies</h1>
@@ -1157,7 +1167,8 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
 
 
 vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
-           'Všeobecné obchodné podmienky predplatného programu ZNACKA vrátane ceny, dodania, trvania predplatného, odstúpenia od zmluvy a reklamácií.') + '''
+           'Všeobecné obchodné podmienky predplatného programu ZNACKA vrátane ceny, dodania, trvania predplatného, odstúpenia od zmluvy a reklamácií.',
+           extra=NOINDEX_FOLLOW) + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Obchodné podmienky</h1>
@@ -1290,14 +1301,8 @@ for name, content in [('index.html', index), ('funkcie.html', funkcie),
 # otvárajú z odkazu s parametrami a majú noindex (pozri NOINDEX).
 SITEMAP = [
     ('',                          '1.0'),
-    ('funkcie.html',              '0.9'),
     ('cennik.html',               '0.9'),
     ('stiahnut.html',             '0.8'),
-    ('faq.html',                  '0.7'),
-    ('kontakt.html',              '0.6'),
-    ('obchodne-podmienky.html',   '0.3'),
-    ('ochrana-sukromia.html',     '0.3'),
-    ('cookies.html',              '0.3'),
 ]
 
 riadky = '\n'.join(
