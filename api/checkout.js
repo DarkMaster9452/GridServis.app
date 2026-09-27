@@ -4,7 +4,7 @@
    nulovú sumu: Checkout pri nej nepýta kartu, iba e-mail. Stiahnutie
    sa sprístupní až po dokončení tejto objednávky. */
 
-var { PLANY, stripe, adresaWebu, nastavene } = require('./_stripe');
+var { PLANY, DANOVY_KOD, stripe, adresaWebu, nastavene } = require('./_stripe');
 
 function telo(req) {
   if (req.body && typeof req.body === 'object') return req.body;
@@ -60,7 +60,7 @@ module.exports = async function (req, res) {
     polozka.price_data = {
       currency: 'eur',
       unit_amount: p.suma,
-      product_data: { name: p.nazov, description: p.popis }
+      product_data: { name: p.nazov, description: p.popis, tax_code: DANOVY_KOD }
     };
     /* Predplatné potrebuje opakovanie; demo za 0 € je jednorazová objednávka. */
     if (p.obdobie) polozka.price_data.recurring = { interval: p.obdobie };
