@@ -4,7 +4,7 @@
    istým kódom na novom. Licencia a jej platnosť sa nemenia — mení sa len
    záznam v `zariadenia`, a to až webhook po zaplatení (viď stripe-hook.js). */
 
-var { PLANY, stripe, adresaWebu, nastavene, chyba } = require('./_stripe');
+var { PLANY, DANOVY_KOD, stripe, adresaWebu, nastavene } = require('./_stripe');
 var { riadok } = require('./_db');
 
 function telo(req) {
@@ -47,8 +47,17 @@ module.exports = async function (req, res) {
       return;
     }
 
-    var cena = PLANY.presun && PLANY.presun.cena;
-    if (!cena) throw chyba(503, 'Cena za presun nie je nastavená.');
+    var p = PLANY.presun;
+    var polozka = { quantity: 1 };
+    if (p.cena) {
+      polozka.price = p.cena;
+    } else {
+      polozka.price_data = {
+        currency: 'eur',
+        unit_amount: p.suma,
+        product_data: { name: p.nazov, description: p.popis, tax_code: DANOVY_KOD }
+      };
+    }
 
     var web = adresaWebu(req);
     var relacia = await stripe('/checkout/sessions', {
@@ -58,7 +67,7 @@ module.exports = async function (req, res) {
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + '/presun.html?kod=' + encodeURIComponent(kod) + '&pc=' + encodeURIComponent(pc) + '&zrusene=1',
       metadata: { typ: 'presun', kod: kod, pc: pc },
-      line_items: [{ price: cena, quantity: 1 }]
+      line_items: [polozka]
     });
 
     res.status(200).json({ ok: true, url: relacia.url });
