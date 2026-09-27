@@ -4,7 +4,7 @@
    obnova alebo predplatné skončilo). Po zaplatení sa tá istá licencia
    predĺži — dielňa nezadáva nový kód a o dáta nepríde. */
 
-var { PLANY, stripe, adresaWebu, nastavene } = require('./_stripe');
+var { PLANY, DANOVY_KOD, stripe, adresaWebu, nastavene } = require('./_stripe');
 var { riadok } = require('./_db');
 
 function telo(req) {
@@ -61,7 +61,7 @@ module.exports = async function (req, res) {
         currency: 'eur',
         unit_amount: p.suma,
         recurring: { interval: p.obdobie },
-        product_data: { name: p.nazov, description: p.popis }
+        product_data: { name: p.nazov, description: p.popis, tax_code: DANOVY_KOD }
       };
     }
 

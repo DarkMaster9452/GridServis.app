@@ -12,6 +12,12 @@ var API = process.env.STRIPE_API || 'https://api.stripe.com';
    verzii to naďalej funguje. */
 var VERZIA = '2025-03-31.basil';
 
+/* Managed Payments odmietne položku bez daňového kódu produktu
+   ("the product tax code is missing"). txcd_10103001 = Software as a Service,
+   business use — program sa predáva dielňam ako predplatné. Pre ceny
+   zo STRIPE_PRICE_* treba kód nastaviť na produkte v Stripe dashboarde. */
+var DANOVY_KOD = process.env.STRIPE_TAX_CODE || 'txcd_10103001';
+
 /* Plány. Sumy sú v centoch a musia sedieť s cenami na webe
    (CENY v tools/gen.py a v assets/js/main.js).
    STRIPE_PRICE_* je nepovinné: keď je vyplnené, použije sa cena
@@ -148,6 +154,7 @@ function adresaWebu(req) {
 
 module.exports = {
   PLANY: PLANY,
+  DANOVY_KOD: DANOVY_KOD,
   stripe: stripe,
   chyba: chyba,
   jeRelacia: jeRelacia,

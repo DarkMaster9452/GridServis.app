@@ -24,6 +24,14 @@ ROCNE_MESACNE = CENY['mesiac'] * 12          # 239,88 € — rok platený po me
 USPORA = ROCNE_MESACNE - CENY['rok']         # 39,89 € — zľava pri ročnom predplatnom
 MESACNE_Z_ROCNEHO = CENY['rok'] / 12         # 16,67 € — koľko vyjde mesiac pri ročnom
 
+# Presun licencie na iný počítač. Rovnaká suma je v api/_stripe.js (PLANY.presun).
+PRESUN = 5
+
+# Stránky, na ktoré sa chodí len z odkazu s parametrami (z programu alebo
+# z pokladne). Blokuje ich meta tag, nie robots.txt — zakázanú stránku by
+# Google neprečítal, noindex by nevidel a adresu by mohol zaindexovať aj tak.
+NOINDEX = '<meta name="robots" content="noindex, nofollow">\n'
+
 
 def eur(n):
     """Suma v slovenskom tvare, napríklad 1 199,99 €."""
@@ -199,9 +207,10 @@ def platba_btn(plan, text, cls='btn--pri btn--lg'):
 
 
 
-# Štruktúrované dáta o programe. Google vďaka nim vie ukázať cenu priamo vo
-# výsledkoch hľadania. Cena sa berie z CENY, nech nemôže rozísť s cenníkom.
-CENNIK_LD = '''<script type="application/ld+json">
+# Štruktúrované dáta o programe (na domovskej stránke aj v cenníku). Google
+# vďaka nim vie ukázať cenu priamo vo výsledkoch hľadania. Cena sa berie
+# z CENY, nech sa nemôže rozísť s cenníkom.
+PROGRAM_LD ='''<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -253,7 +262,8 @@ VAROVANIE = '''<div class="warn" id="upozornenie">
 
 # ============================================================ DOMOV
 index = head('index.html', 'ZNACKA — program na správu autoservisu',
-             'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program s predplatným, vyskúšajte demo zadarmo.') + '''
+             'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program s predplatným, vyskúšajte demo zadarmo.',
+             extra=PROGRAM_LD) + '''
 <section class="hero mriezka">
   <div class="wrap hero__in">
     <div class="hero__txt">
@@ -479,7 +489,7 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 # ============================================================ CENNÍK
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
               'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
-              extra=CENNIK_LD) + '''
+              extra=PROGRAM_LD) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Ročne ROK, mesačne MESIAC</h1>
@@ -533,7 +543,6 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
           <li>Plná verzia programu bez obmedzení</li>
           <li>Všetky moduly, žiadne platené doplnky</li>
           <li>Opravy chýb a nové verzie počas predplatného</li>
-          <li>Prenos na nový počítač po dohode</li>
           <li>E-mailová podpora pri inštalácii a nastavení</li>
         </ul>
       </div>
@@ -541,7 +550,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         <h3>V predplatnom nie je</h3>
         <ul class="crosses">
           <li>Používanie programu po skončení predplatného</li>
-          <li>Preloženie licencie na iný počítač zadarmo — stojí 10 € a rieši sa e-mailom</li>
+          <li>Presun licencie na iný počítač zadarmo — stojí jednorazovo PRESUN_SUMA a zaplatíte ho priamo z programu</li>
           <li>Úpravy programu na mieru</li>
           <li>Prevádzka na serveri alebo zdieľaná databáza medzi počítačmi</li>
           <li>Podpisový certifikát inštalačky, preto Windows hlási neznámeho vydavateľa</li>
@@ -726,7 +735,7 @@ kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
     <div class="two two--top">
       <div class="box box--big">
         <h3>Objednávka predplatného</h3>
-        <p>Napíšte mi, či chcete ročné predplatné za ROK, alebo mesačné za MESIAC, a na koľkých počítačoch bude program bežať. Pošlem pokyny na platbu a po jej prijatí odkaz na plnú verziu s licenčným kľúčom.</p>
+        <p>Ročné predplatné za ROK alebo mesačné za MESIAC si kúpite priamo v cenníku. Zaplatíte kartou cez Stripe a licenčný kód sa ukáže hneď po platbe, príde aj e-mailom. Napíšte mi, ak potrebujete program na viacerých počítačoch — dohodneme cenu.</p>
         <p class="mailrow"><a class="btn btn--pri" data-mail="objednavka">Napísať e-mail</a>
         <a class="btn btn--gh" href="cennik.html">Prejsť do cenníka</a></p>
       </div>
@@ -767,7 +776,8 @@ kontakt = head('kontakt.html', 'Kontakt — ZNACKA',
 # V navigácii nie je, chodí sa na ňu len z pokladne.
 
 hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
-              'Potvrdenie objednávky a stiahnutie programu ZNACKA.') + '''
+              'Potvrdenie objednávky a stiahnutie programu ZNACKA.',
+              extra=NOINDEX) + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1 id="hlava">Overujem objednávku</h1>
@@ -873,7 +883,8 @@ hotovo = head('hotovo.html', 'Stiahnutie &mdash; ZNACKA',
 # stránka prečíta z adresy a po zaplatení sa tá istá licencia predĺži.
 
 obnova = head('obnova.html', 'Obnovenie licencie — ZNACKA',
-              'Obnovenie zastavenej licencie programu ZNACKA. Po zaplatení sa licencia predĺži a dáta zostávajú.') + '''
+              'Obnovenie zastavenej licencie programu ZNACKA. Po zaplatení sa licencia predĺži a dáta zostávajú.',
+              extra=NOINDEX) + '''
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Obnovenie licencie</h1>
@@ -927,11 +938,113 @@ obnova = head('obnova.html', 'Obnovenie licencie — ZNACKA',
       </div>
       <div class="box">
         <h3>Niečo nesedí?</h3>
-        <p>Ak vám platba neprešla alebo potrebujete licenciu preložiť na iný počítač, napíšte mi na <a data-mail-txt href="#">&nbsp;</a> a dohodneme sa.</p>
+        <p>Ak vám platba neprešla, napíšte mi na <a data-mail-txt href="#">&nbsp;</a> a dohodneme sa. Presun licencie na iný počítač spustíte priamo z programu.</p>
       </div>
     </div>
   </div>
 </section>
+''' + FOOT
+
+
+# ============================================================ PRESUN LICENCIE
+# Sem vedie odkaz z programu s parametrami ?kod=…&pc=… (kód licencie a odtlačok
+# počítača, ktorý sa má uvoľniť). Po zaplatení vráti Stripe kupujúceho na hotovo.html.
+
+presun = head('presun.html', 'Presun licencie — ZNACKA',
+              'Presun licencie programu ZNACKA na iný počítač za jednorazový poplatok.',
+              extra=NOINDEX) + '''
+<section class="phead mriezka">
+  <div class="wrap wrap--nar">
+    <h1>Presun licencie na iný počítač</h1>
+    <p class="lead">Jednorazový poplatok PRESUN_SUMA. Po zaplatení sa tento počítač uvoľní a na novom sa prihlásite tým istým kódom. Licencia ani jej platnosť sa nemenia.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    ''' + OZNAM + '''
+
+    <div class="kod" id="licencia">
+      <span class="kod__lbl">Licencia na presun</span>
+      <b class="kod__val" id="kodhodnota">&mdash;</b>
+      <span class="kod__note" id="kodpozn">Tento odkaz otvorte priamo z aplikácie ZNACKA — appka doňho vloží kód aj odtlačok počítača, ktorý sa má uvoľniť.</span>
+    </div>
+
+    <div class="plans" id="plany" hidden>
+      <article class="plan plan--best">
+        <div class="plan__head">
+          <h2>Presun na iný počítač</h2>
+          <span class="plan__badge">Jednorazovo</span>
+        </div>
+        <p class="plan__price"><b>PRESUN_SUMA</b><span>/ jednorazovo</span></p>
+        <p class="plan__per">Uvoľní tento počítač, aby ste sa mohli tým istým kódom prihlásiť na novom. Licencia sa nemení.</p>
+        <button class="btn btn--pri btn--lg btn--full" type="button" id="zaplatit">Zaplatiť PRESUN_SUMA a uvoľniť počítač</button>
+      </article>
+    </div>
+
+    <div class="two two--top">
+      <div class="box">
+        <h3>Čo sa presunom zmení</h3>
+        <p>Nič na licencii — kód, platnosť ani zákazky sa nemenia. Zmení sa len to, ktorý počítač je na kód prihlásený.</p>
+      </div>
+      <div class="box">
+        <h3>Niečo nesedí?</h3>
+        <p>Ak odkaz nefunguje alebo platba neprešla, napíšte mi na <a data-mail-txt href="#">&nbsp;</a> a dohodneme sa.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var kod = (q.get('kod') || '').trim().toUpperCase();
+  var pc = (q.get('pc') || '').trim();
+
+  var oznam = document.getElementById('oznam');
+  var kodhodnota = document.getElementById('kodhodnota');
+  var kodpozn = document.getElementById('kodpozn');
+  var plany = document.getElementById('plany');
+  var tlacidlo = document.getElementById('zaplatit');
+
+  function ukazOznam(text) {
+    oznam.textContent = text;
+    oznam.hidden = false;
+  }
+
+  if (q.get('zrusene')) {
+    ukazOznam('Platba bola zrušená a nič sa nestrhlo. Skúsiť znova môžete kedykoľvek z aplikácie.');
+  }
+
+  if (!kod || !pc) {
+    ukazOznam('Tento odkaz otvorte priamo z aplikácie ZNACKA.');
+    return;
+  }
+
+  kodhodnota.textContent = kod;
+  kodpozn.textContent = 'Po zaplatení sa tento počítač uvoľní a na novom sa prihlásite kódom ' + kod + '. Licencia ani jej platnosť sa nemenia.';
+  plany.hidden = false;
+
+  tlacidlo.addEventListener('click', function () {
+    tlacidlo.disabled = true;
+    tlacidlo.textContent = 'Pripravujem platbu…';
+    fetch('/api/presun', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ kod: kod, pc: pc })
+    })
+      .then(function (r) { return r.json().then(function (v) { return { stav: r.status, v: v }; }); })
+      .then(function (r) {
+        if (r.v && r.v.ok && r.v.url) { location.href = r.v.url; return; }
+        throw new Error((r.v && r.v.chyba) || 'Platbu sa nepodarilo založiť.');
+      })
+      .catch(function (e) {
+        tlacidlo.disabled = false;
+        tlacidlo.textContent = 'Zaplatiť PRESUN_SUMA a uvoľniť počítač';
+        ukazOznam(e.message || 'Platbu sa nepodarilo založiť. Skúste to prosím znova, alebo mi napíšte.');
+      });
+  });
+})();
+</script>
 ''' + FOOT
 
 
@@ -1067,7 +1180,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
 
     <h2 id="cena">4. Cena a platba</h2>
-    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné, platia za jeden počítač a v rovnakej výške sa účtujú aj pri automatickej obnove. Preloženie licencie na iný počítač stojí jednorazovo 10 €. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
+    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné, platia za jeden počítač a v rovnakej výške sa účtujú aj pri automatickej obnove. Presun licencie na iný počítač stojí jednorazovo PRESUN_SUMA. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
 
     <h2 id="trvanie">5. Trvanie, automatická obnova a ukončenie</h2>
     <p>Predplatné začína plynúť dňom sprístupnenia plnej verzie a trvá zvolené obdobie, teda dvanásť mesiacov pri ročnom a jeden mesiac pri mesačnom predplatnom.</p>
@@ -1085,7 +1198,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <h2 id="licencia">8. Licenčné podmienky</h2>
     <p>Kupujúci získava nevýhradné právo používať program na jednom počítači počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
     <p>Kupujúci nesmie program ani licenčný kľúč ďalej predávať, prenajímať, sprístupňovať tretím osobám ani rozmnožovať nad rámec zaplateného počtu počítačov. Nesmie program spätne prekladať, dekompilovať ani inak zisťovať jeho zdrojový kód, s výnimkou prípadov, ktoré výslovne pripúšťa zákon.</p>
-    <p>Licencia sa pri aktivácii naviaže na konkrétny počítač a sama sa z neho neuvoľní. Preloženie na iný počítač vybaví predávajúci po e-mailovej žiadosti; za preloženie si účtuje jednorazový poplatok 10 €.</p>
+    <p>Licencia sa pri aktivácii naviaže na konkrétny počítač a sama sa z neho neuvoľní. Presun na iný počítač si kupujúci spustí priamo z programu. Po zaplatení jednorazového poplatku PRESUN_SUMA sa pôvodný počítač uvoľní a na novom sa kupujúci prihlási tým istým licenčným kódom; licencia ani jej platnosť sa nemenia.</p>
 
     <h2 id="odstupenie">9. Odstúpenie od zmluvy a vrátenie peňazí</h2>
     <p>Kupujúci, ktorý je spotrebiteľom, má právo odstúpiť od zmluvy do štrnástich dní od jej uzavretia bez uvedenia dôvodu.</p>
@@ -1137,6 +1250,7 @@ stranka404 = head('404.html', 'Stránka sa nenašla — ZNACKA',
 
 
 NAHRADY = [
+    ('PRESUN_SUMA', '%d €' % PRESUN),
     ('LOGO', LOGO),
     ('ZNACKA', ZNACKA),
     ('ROCNE_MESACNE', eur(ROCNE_MESACNE)),
@@ -1156,6 +1270,7 @@ for name, content in [('index.html', index), ('funkcie.html', funkcie),
                       ('cennik.html', cennik), ('stiahnut.html', stiahnut),
                       ('faq.html', faq), ('kontakt.html', kontakt),
                       ('hotovo.html', hotovo), ('obnova.html', obnova),
+                      ('presun.html', presun),
                       ('ochrana-sukromia.html', sukromie), ('cookies.html', cookies),
                       ('obchodne-podmienky.html', vop),
                       ('404.html', stranka404)]:
@@ -1171,8 +1286,8 @@ for name, content in [('index.html', index), ('funkcie.html', funkcie),
 
 # ============================================================ SITEMAP, ROBOTS
 # Sitemapa sa generuje spolu so stránkami, nech sa pri pridaní novej stránky
-# nezabudne. Sú v nej len verejné stránky — hotovo.html a obnova.html sa
-# otvárajú z odkazu s parametrami a v hľadaní nemajú čo robiť.
+# nezabudne. Sú v nej len verejné stránky — hotovo, obnova a presun sa
+# otvárajú z odkazu s parametrami a majú noindex (pozri NOINDEX).
 SITEMAP = [
     ('',                          '1.0'),
     ('funkcie.html',              '0.9'),
@@ -1198,8 +1313,6 @@ print('napísané sitemap.xml')
 with io.open(os.path.join(OUT, 'robots.txt'), 'w', encoding='utf-8') as f:
     f.write('User-agent: *\n'
             'Allow: /\n'
-            'Disallow: /presun.html\n'
-            'Disallow: /hotovo.html\n'
             'Disallow: /api/\n'
             '\n'
             'Sitemap: %s/sitemap.xml\n' % WEB)
