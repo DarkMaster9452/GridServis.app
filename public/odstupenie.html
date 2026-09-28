@@ -3,27 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Presun licencie — GridServis</title>
-<meta name="description" content="Presun licencie programu GridServis na iný počítač za jednorazový poplatok.">
-<meta property="og:title" content="Presun licencie — GridServis">
-<meta property="og:description" content="Presun licencie programu GridServis na iný počítač za jednorazový poplatok.">
+<title>Odstúpenie od zmluvy — GridServis</title>
+<meta name="description" content="Formulár na odstúpenie od zmluvy o predplatnom programu GridServis. Potvrdenie príde e-mailom.">
+<meta property="og:title" content="Odstúpenie od zmluvy — GridServis">
+<meta property="og:description" content="Formulár na odstúpenie od zmluvy o predplatnom programu GridServis. Potvrdenie príde e-mailom.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta property="og:site_name" content="GridServis">
-<meta property="og:url" content="https://www.gridservis.app/presun.html">
+<meta property="og:url" content="https://www.gridservis.app/odstupenie.html">
 <meta property="og:image" content="https://www.gridservis.app/assets/img/og-gridservis.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="GridServis — celý servis v jednom programe">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://www.gridservis.app/presun.html">
+<link rel="canonical" href="https://www.gridservis.app/odstupenie.html">
 <meta name="theme-color" content="#101722">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/img/favicon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex, follow">
+<link rel="stylesheet" href="assets/css/ucet.css">
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -60,96 +61,55 @@
 
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
-    <h1>Presun licencie na iný počítač</h1>
-    <p class="lead">Jednorazový poplatok 5 €. Po zaplatení sa tento počítač uvoľní a na novom sa prihlásite tým istým kódom. Licencia ani jej platnosť sa nemenia.</p>
+    <h1>Odstúpenie od zmluvy</h1>
+    <p class="lead">Tu odstúpite od zmluvy o predplatnom bez prihlásenia a bez písania e-mailu. Po odoslaní vám hneď príde potvrdenie s dátumom a časom.</p>
   </div>
 </section>
 
 <section class="sec">
-  <div class="wrap wrap--mid">
+  <div class="wrap wrap--nar">
     <p class="oznam" id="oznam" hidden></p>
 
-    <div class="kod" id="licencia">
-      <span class="kod__lbl">Licencia na presun</span>
-      <b class="kod__val" id="kodhodnota">&mdash;</b>
-      <span class="kod__note" id="kodpozn">Tento odkaz otvorte priamo z aplikácie GridServis — appka doňho vloží kód aj odtlačok počítača, ktorý sa má uvoľniť.</span>
+    <form class="box u-login" id="odst-form" novalidate>
+      <h3>Údaje o zmluve</h3>
+      <label class="u-pole"><span>Meno a priezvisko</span>
+        <input name="meno" autocomplete="name" required maxlength="120"></label>
+      <label class="u-pole"><span>E-mail z objednávky</span>
+        <input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+      <label class="u-pole"><span>Licenčný kód alebo číslo objednávky</span>
+        <input name="zmluva" autocomplete="off" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" required maxlength="200"></label>
+      <label class="u-pole"><span>Poznámka (nepovinné)</span>
+        <textarea name="poznamka" rows="3" maxlength="2000"></textarea></label>
+      <label class="u-skryte" aria-hidden="true">Web <input name="web" tabindex="-1" autocomplete="off"></label>
+      <button class="btn btn--pri btn--lg btn--full" type="submit">Odstúpiť od zmluvy tu</button>
+    </form>
+
+    <div class="box u-login" id="odst-kontrola" hidden>
+      <h3>Skontrolujte a potvrďte</h3>
+      <dl class="specs" id="odst-suhrn"></dl>
+      <p class="fine">Kliknutím na tlačidlo nižšie odstupujete od zmluvy.</p>
+      <button class="btn btn--pri btn--lg btn--full" id="odst-potvrdit" type="button">Potvrdiť odstúpenie od zmluvy</button>
+      <button class="btn btn--gh btn--full" id="odst-upravit" type="button">Upraviť údaje</button>
     </div>
 
-    <div class="plans" id="plany" hidden>
-      <article class="plan plan--best">
-        <div class="plan__head">
-          <h2>Presun na iný počítač</h2>
-          <span class="plan__badge">Jednorazovo</span>
-        </div>
-        <p class="plan__price"><b>5 €</b><span>/ jednorazovo</span></p>
-        <p class="plan__per">Uvoľní tento počítač, aby ste sa mohli tým istým kódom prihlásiť na novom. Licencia sa nemení.</p>
-        <button class="btn btn--pri btn--lg btn--full" type="button" id="zaplatit">Zaplatiť 5 € a uvoľniť počítač</button>
-      </article>
+    <div class="box box--ok u-login" id="odst-hotovo" hidden>
+      <h3>Odstúpenie je odoslané</h3>
+      <p id="odst-vysledok"></p>
+      <p class="fine">Potvrdenie s obsahom odstúpenia a presným časom sme poslali na váš e-mail. Ak vám vzniká nárok na vrátenie platby, vrátime ju do 14 dní rovnakým spôsobom, akým prišla.</p>
     </div>
 
     <div class="two two--top">
       <div class="box">
-        <h3>Čo sa presunom zmení</h3>
-        <p>Nič na licencii — kód, platnosť ani zákazky sa nemenia. Zmení sa len to, ktorý počítač je na kód prihlásený.</p>
+        <h3>Kedy môžete odstúpiť</h3>
+        <p>Spotrebiteľ môže odstúpiť do 14 dní od uzavretia zmluvy. Pri programe, ktorý ste si so svojím výslovným súhlasom stiahli ešte pred uplynutím tejto lehoty, právo na odstúpenie zaniklo — podrobnosti sú v <a href="obchodne-podmienky.html#odstupenie">obchodných podmienkach</a>. Formulár prijmeme v každom prípade a odpovieme vám.</p>
       </div>
       <div class="box">
-        <h3>Niečo nesedí?</h3>
-        <p>Ak odkaz nefunguje alebo platba neprešla, napíšte mi na <a data-mail-txt href="#">&nbsp;</a> a dohodneme sa.</p>
+        <h3>Chcete len zrušiť obnovu?</h3>
+        <p>Automatickú obnovu predplatného vypnete kedykoľvek v programe v Nastaveniach alebo v <a href="ucet.html">Mojom účte</a>. Predplatné potom dobehne do konca zaplateného obdobia.</p>
       </div>
     </div>
   </div>
 </section>
-<script>
-(function () {
-  var q = new URLSearchParams(location.search);
-  var kod = (q.get('kod') || '').trim().toUpperCase();
-  var pc = (q.get('pc') || '').trim();
-
-  var oznam = document.getElementById('oznam');
-  var kodhodnota = document.getElementById('kodhodnota');
-  var kodpozn = document.getElementById('kodpozn');
-  var plany = document.getElementById('plany');
-  var tlacidlo = document.getElementById('zaplatit');
-
-  function ukazOznam(text) {
-    oznam.textContent = text;
-    oznam.hidden = false;
-  }
-
-  if (q.get('zrusene')) {
-    ukazOznam('Platba bola zrušená a nič sa nestrhlo. Skúsiť znova môžete kedykoľvek z aplikácie.');
-  }
-
-  if (!kod || !pc) {
-    ukazOznam('Tento odkaz otvorte priamo z aplikácie GridServis.');
-    return;
-  }
-
-  kodhodnota.textContent = kod;
-  kodpozn.textContent = 'Po zaplatení sa tento počítač uvoľní a na novom sa prihlásite kódom ' + kod + '. Licencia ani jej platnosť sa nemenia.';
-  plany.hidden = false;
-
-  tlacidlo.addEventListener('click', function () {
-    tlacidlo.disabled = true;
-    tlacidlo.textContent = 'Pripravujem platbu…';
-    fetch('/api/presun', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ kod: kod, pc: pc })
-    })
-      .then(function (r) { return r.json().then(function (v) { return { stav: r.status, v: v }; }); })
-      .then(function (r) {
-        if (r.v && r.v.ok && r.v.url) { location.href = r.v.url; return; }
-        throw new Error((r.v && r.v.chyba) || 'Platbu sa nepodarilo založiť.');
-      })
-      .catch(function (e) {
-        tlacidlo.disabled = false;
-        tlacidlo.textContent = 'Zaplatiť 5 € a uvoľniť počítač';
-        ukazOznam(e.message || 'Platbu sa nepodarilo založiť. Skúste to prosím znova, alebo mi napíšte.');
-      });
-  });
-})();
-</script>
 </main>
 
 <footer class="foot">
@@ -188,5 +148,6 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script src="assets/js/odstupenie.js"></script>
 </body>
 </html>
