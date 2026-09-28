@@ -27,7 +27,7 @@
 var crypto = require('crypto');
 var { sql, riadok } = require('../_db');
 var { stripe, adresaWebu, nastavene } = require('../_stripe');
-var { kodBlok, obalka } = require('../_email-vzhlad');
+var { otpBlok, tlacidlo, obalka, FONT } = require('../_email-vzhlad');
 
 var COOKIE = 'gs_ucet';
 var COOKIE_OAUTH = 'gs_ucet_oauth';
@@ -40,7 +40,9 @@ var ENV = process.env;
 var GOOGLE = Boolean(ENV.GOOGLE_CLIENT_ID && ENV.GOOGLE_CLIENT_SECRET);
 var APPLE = Boolean(ENV.APPLE_CLIENT_ID && ENV.APPLE_TEAM_ID && ENV.APPLE_KEY_ID && ENV.APPLE_PRIVATE_KEY);
 var RESEND = Boolean(ENV.RESEND_API_KEY && ENV.RESEND_FROM);
-var ODPOVED = ENV.RESEND_REPLY_TO || 'strananekm@gmail.com';
+/* kontakt v e-mailoch účtu a ostrá adresa webu (logo, odkazy v pätičke) */
+var PODPORA = 'support@gridservis.app';
+var WEB_OSTRY = (ENV.SITE_URL || 'https://www.gridservis.app').replace(/\/+$/, '');
 
 /* ---------- podpisy a cookies ---------- */
 
@@ -139,21 +141,28 @@ function hashKodu(email, kod) {
 }
 
 async function posliKod(email, kod, web) {
+  /* jedným klikom: stránka si kód a e-mail prečíta z časti za #, ktorá sa
+     na server ani do logov nikdy neposiela */
+  var klik = web + '/ucet.html#prihlasit=' + encodeURIComponent(email) + ':' + kod;
   var obsah =
-    '\n      <h1 style="margin:0 0 14px;font:700 22px/1.3 -apple-system,sans-serif;letter-spacing:-.01em;">Prihlásenie do účtu</h1>' +
+    '\n      <h1 style="margin:0 0 14px;font-family:' + FONT + ';font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-.01em;color:#0d1117;">Prihlásenie do účtu</h1>' +
     '\n      <p style="margin:0 0 4px;color:#0d1117;">Na prihlásenie do správy licencie GridServis zadajte tento kód:</p>' +
-    kodBlok(kod, 'KÓD NA PRIHLÁSENIE') +
-    '\n      <p style="margin:0;color:#55606e;font-size:14px;">Platí ' + KOD_MINUT + ' minút a dá sa použiť len raz. Ak ste o prihlásenie nežiadali, e-mail pokojne ignorujte.</p>';
+    otpBlok(kod, 'KÓD NA PRIHLÁSENIE') +
+    '\n      <p style="margin:0;color:#55606e;font-size:14px;">Platí ' + KOD_MINUT + ' minút a dá sa použiť len raz. Kód nemusíte prepisovať — stačí kliknúť:</p>' +
+    tlacidlo('Prihlásiť sa jedným klikom →', klik) +
+    '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Ak ste o prihlásenie nežiadali, e-mail pokojne ignorujte — bez kódu sa do účtu nikto nedostane.</p>';
   var r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + ENV.RESEND_API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: ENV.RESEND_FROM, to: [email], reply_to: ODPOVED,
+      from: ENV.RESEND_FROM, to: [email], reply_to: PODPORA,
       subject: kod + ' — kód na prihlásenie do GridServis',
-      html: obalka('Kód na prihlásenie', obsah, web, ODPOVED),
+      html: obalka('Kód na prihlásenie', obsah, WEB_OSTRY, PODPORA),
       text: 'Kód na prihlásenie do správy licencie GridServis: ' + kod +
         '\n\nPlatí ' + KOD_MINUT + ' minút a dá sa použiť len raz.' +
-        '\nAk ste o prihlásenie nežiadali, e-mail ignorujte.'
+        '\nPrihlásenie jedným klikom: ' + klik +
+        '\n\nAk ste o prihlásenie nežiadali, e-mail ignorujte.' +
+        '\nOtázky: ' + PODPORA
     })
   });
   if (!r.ok) throw new Error('resend ' + r.status + ' ' + (await r.text().catch(function () { return ''; })));

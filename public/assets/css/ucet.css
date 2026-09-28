@@ -1,7 +1,6 @@
 /* Môj účet — SKÚŠOBNÁ správa licencie. Patrí len k ucet.html,
    dá sa zmazať spolu s ňou. Stavia na premenných zo styles.css. */
 
-.u-preview{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-ink);font-size:.7rem;letter-spacing:.06em}
 
 /* prihlásenie */
 .u-login{max-width:460px;margin-inline:auto;display:grid;gap:16px}

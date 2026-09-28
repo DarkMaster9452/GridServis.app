@@ -68,6 +68,13 @@ PAGES = [
 ]
 
 
+# Tlačidlo do správy licencie (ucet.html). Stránka sa píše ručne, nie tu,
+# lebo je to aplikácia — hlavičku však zdieľa s ostatnými.
+UCET_IKONA = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+              '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>')
+
+
 def head(active, title, desc, extra=''):
     """Hlavička stránky. `active` je názov vlastného súboru — slúži na
     zvýraznenie v menu aj na kánonickú adresu. `extra` sa vloží na koniec
@@ -116,16 +123,19 @@ def head(active, title, desc, extra=''):
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
 %s
     </nav>
+    <a class="btn btn--gh btn--sm hdr__cta hdr__ucet" href="ucet.html">%s</a>
     <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
 %s
+    <a href="ucet.html"%s>Môj účet</a>
   </nav>
 </header>
 
 <main id="obsah">
-''' % (title, desc, title, desc, ZNACKA, kanon, WEB, kanon, extra, nav, mnav)
+''' % (title, desc, title, desc, ZNACKA, kanon, WEB, kanon, extra, nav,
+       UCET_IKONA + 'Prihlásiť', mnav, ' class="on"' if active == 'ucet.html' else '')
 
 
 FOOT = '''</main>

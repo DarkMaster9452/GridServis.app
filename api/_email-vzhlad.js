@@ -13,8 +13,11 @@ var FARBY = {
 };
 
 var RADIUS = '14px';
-var FONT = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-var MONO = 'ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace';
+/* Rovnaké písma ako na webe. Názvy s medzerou musia byť v jednoduchých
+   úvodzovkách — dvojité by predčasne ukončili atribút style="…" a e-mailový
+   klient by celý štýl zahodil (kód bol potom malý a obyčajným písmom). */
+var FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI Variable Text','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
+var MONO = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace";
 
 function tlacidlo(text, href) {
   return '\n  <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 8px;">' +
@@ -74,4 +77,15 @@ function obalka(predmet, obsahHtml, webUrl, odpoved) {
     '\n</html>';
 }
 
-module.exports = { tlacidlo: tlacidlo, kodBlok: kodBlok, obalka: obalka };
+/* Veľký jednorazový kód na prihlásenie. E-mail nevie spustiť skript, takže
+   „klik a skopírovať“ sa nedá; kód je preto veľký, dá sa ľahko označiť
+   a Gmail/iOS ho z predmetu samy ponúknu na skopírovanie. */
+function otpBlok(hodnota, popis) {
+  return '\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0;">' +
+    '\n    <tr><td align="center" style="padding:26px 18px;border:2px solid ' + FARBY.tmava + ';border-radius:' + RADIUS + ';background:' + FARBY.bg + ';">' +
+    '\n      <div style="font-family:' + FONT + ';font-size:11px;line-height:1;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:' + FARBY.mut + ';margin-bottom:12px;">' + (popis || 'KÓD') + '</div>' +
+    '\n      <div style="font-family:' + MONO + ';font-size:44px;line-height:1.2;font-weight:700;letter-spacing:.18em;color:' + FARBY.ink + ';background:' + FARBY.bg2 + ';display:inline-block;padding:8px 10px 8px 18px;border-radius:12px;-webkit-user-select:all;user-select:all;">' + hodnota + '</div>' +
+    '\n    </td></tr>\n  </table>';
+}
+
+module.exports = { tlacidlo: tlacidlo, kodBlok: kodBlok, otpBlok: otpBlok, obalka: obalka, FONT: FONT };

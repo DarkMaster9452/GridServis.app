@@ -206,7 +206,7 @@
 
   async function nacitaj() {
     var d = await api('ja');
-    if (d.ok) { vykresli(d); return; }
+    if (d.ok) { vykresli(d); return true; }
     prehlad.hidden = true;
     formular.hidden = false;
     ukazKrok(1);
@@ -303,5 +303,23 @@
     }
   });
 
-  nacitaj();
+  /* prihlásenie jedným klikom z e-mailu: #prihlasit=<email>:<kód> */
+  async function start() {
+    var m = /^#prihlasit=([^:]+):(\d{6})$/.exec(location.hash);
+    if (m) {
+      history.replaceState(null, '', location.pathname);
+      try {
+        var d = await api('overit', { email: decodeURIComponent(m[1]), kod: m[2] });
+        if (!d.ok) {
+          if (await nacitaj()) return;     // už prihlásený — starý odkaz netreba riešiť
+          krok1.email.value = decodeURIComponent(m[1]);
+          hlas(d.chyba || 'Odkaz už neplatí. Požiadajte o nový kód.');
+          return;
+        }
+      } catch (e) { /* spadne na bežné prihlásenie */ }
+    }
+    nacitaj();
+  }
+
+  start();
 })();
