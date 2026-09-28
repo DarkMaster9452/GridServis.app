@@ -72,8 +72,9 @@
     <p class="oznam" id="oznam" hidden></p>
 
     <!-- prihlásenie -->
-    <div class="box u-login" id="prihlasenie" hidden>
-      <h3>Prihlásenie</h3>
+    <div class="pulz u-login-obal" id="prihlasenie" hidden>
+    <div class="box u-login u-login--velke">
+      <h2 class="u-login__nadpis">Prihlásenie</h2>
 
       <div class="u-soc" id="socialne" hidden>
         <a class="btn btn--gh btn--lg btn--full u-soc__btn" id="google" href="/api/ucet/google" hidden>
@@ -87,7 +88,7 @@
       <form class="u-krok" id="krok1" novalidate>
         <label class="u-pole">
           <span>Licenčný kód</span>
-          <input name="licencia" autocomplete="off" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" required>
+          <input name="licencia" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" maxlength="19" required data-licencia>
         </label>
         <label class="u-pole">
           <span>E-mail</span>
@@ -107,7 +108,8 @@
         <p class="fine u-cas">Kód platí ešte <b id="odpocet">15:00</b>. <button class="u-link" type="button" id="znova">Poslať nový</button> · <button class="u-link" type="button" id="spat">Zmeniť údaje</button></p>
       </form>
 
-      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili. Kód z e-mailu funguje vždy. Prihlásenie platí 8 hodín.</p>
+      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili.</p>
+    </div>
     </div>
 
     <!-- prehľad po prihlásení -->
@@ -177,7 +179,7 @@
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="odstupenie.html"><b>Odstúpiť od zmluvy tu</b></a>
+      <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>

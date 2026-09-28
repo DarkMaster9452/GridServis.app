@@ -8,7 +8,7 @@ var { tlacidlo, kodBlok, obalka, odosli, FONT } = require('./_email-vzhlad');
 
 var KLUC = process.env.RESEND_API_KEY || '';
 var ODOSIELATEL = process.env.RESEND_FROM || '';
-var ODPOVED = process.env.RESEND_REPLY_TO || 'strananekm@gmail.com';
+var ODPOVED = process.env.RESEND_REPLY_TO || 'support@gridservis.app';
 
 function text(kod, plan, platnaDo, adresaWebu) {
   var obdobie = plan === 'rok' ? 'ročné' : 'mesačné';

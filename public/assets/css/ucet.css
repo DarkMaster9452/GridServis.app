@@ -81,3 +81,10 @@
 .u-pole textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
 .u-skryte{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 #odst-kontrola .specs dd{word-break:break-word}
+
+/* väčšie prihlásenie v pulzujúcej mriežke */
+.u-login-obal{max-width:540px;margin:36px auto}
+.u-login--velke{max-width:none;padding:38px 40px;gap:18px;box-shadow:var(--sh)}
+.u-login__nadpis{margin:0;font-size:1.6rem}
+.u-login--velke .u-pole input{padding:.85em 1em;font-size:1.05rem}
+@media (max-width:520px){.u-login--velke{padding:28px 22px}}

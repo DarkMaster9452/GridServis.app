@@ -164,8 +164,8 @@
     var g = d.google || {};
     $('google-box').hidden = !g.zapnute && !g.prepojene;
     $('google-stav').textContent = g.prepojene
-      ? 'Prepojené s účtom ' + g.prepojene + '. Prihlásiť sa môžete cez Google aj kódom z e-mailu.'
-      : 'Po prepojení sa môžete prihlasovať jedným klikom cez Google. Kód z e-mailu bude fungovať aj naďalej.';
+      ? 'Prepojené s účtom ' + g.prepojene + '.'
+      : 'Po prepojení sa môžete prihlasovať jedným klikom cez Google.';
     $('google-akcie').innerHTML = g.prepojene
       ? '<button class="btn btn--gh btn--sm" type="button" id="odpojit">Odpojiť Google</button>'
       : '<a class="btn btn--pri btn--sm" href="/api/ucet/google?prepojit=1">Prepojiť s Google</a>';
@@ -177,6 +177,22 @@
   }
 
   var krok1 = $('krok1');
+
+  /* Licenčný kód ako v programe: veľké písmená, pomlčky sa doplnia samé
+     po každých štyroch znakoch, najviac MECH-XXXX-XXXX-XXXX (19 znakov). */
+  function formatujKod(v) {
+    var z = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16);
+    return (z.match(/.{1,4}/g) || []).join('-');
+  }
+  krok1.licencia.addEventListener('input', function () {
+    var pred = this.value;
+    var koniec = this.selectionStart === pred.length;
+    var novy = formatujKod(pred);
+    if (novy !== pred) {
+      this.value = novy;
+      if (koniec) this.setSelectionRange(novy.length, novy.length);
+    }
+  });
   var krok2 = $('krok2');
   var odpocet = null;
 
@@ -230,7 +246,7 @@
     nastavenia();
     var q = new URLSearchParams(location.search);
     /* licenčný kód z odkazu (napr. z programu) sa predvyplní */
-    if (q.get('kod') && !krok1.licencia.value) krok1.licencia.value = q.get('kod');
+    if (q.get('kod') && !krok1.licencia.value) krok1.licencia.value = formatujKod(q.get('kod'));
     /* chyba po návrate z Google */
     if (q.get('chyba')) hlas(q.get('chyba'));
   }

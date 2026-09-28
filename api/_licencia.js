@@ -61,10 +61,11 @@ async function vydaj(platba) {
 
   await sql(
     `INSERT INTO licencie (kod, dielna, kontakt, max_zariadeni, platna_do, stav, poznamka)
-     VALUES ($1, $2, $3, 1, $4::date, 'aktivna', $5)`,
+     VALUES ($1, $2, $3, $6::int, $4::date, 'aktivna', $5)`,
     [kod, dielna, platba.email || '', dokedy,
      'GridServis web · ' + (platba.plan === 'rok' ? 'ročné' : 'mesačné') +
-     ' predplatné · ' + platba.stripe_id]
+     ' predplatné · ' + (platba.pocitace || 1) + ' PC · ' + platba.stripe_id,
+     platba.pocitace || 1]
   );
 
   await zapisPlatbu({ ...platba, kod: kod });
@@ -129,8 +130,9 @@ async function obnov(kod, koniecObdobia, platba) {
   await sql(
     `UPDATE licencie
         SET platna_do = GREATEST(COALESCE(platna_do, current_date), $2::date),
-            stav = 'aktivna'
-      WHERE kod = $1`, [kod, dokedy]);
+            stav = 'aktivna',
+            max_zariadeni = GREATEST(max_zariadeni, $3::int)
+      WHERE kod = $1`, [kod, dokedy, platba.pocitace || 1]);
 
   await zapisPlatbu({ ...platba, kod: kod, druh: 'obnova' });
   return { kod: kod, platna_do: dokedy };

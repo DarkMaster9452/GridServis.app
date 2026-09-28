@@ -36,7 +36,9 @@ async function spracuj(relacia, adresaWebu) {
     suma: relacia.amount_total,
     mena: relacia.currency || 'eur',
     stripe_zakaznik: id(relacia.customer),
-    stripe_predplatne: id(relacia.subscription)
+    stripe_predplatne: id(relacia.subscription),
+    /* počet počítačov z cenníka; staršie objednávky ho nemajú → 1 */
+    pocitace: Math.max(1, parseInt((relacia.metadata && relacia.metadata.pocitace) || '1', 10) || 1)
   };
 
   /* demo je objednávka za 0 € bez licencie — program má vlastnú demo edíciu */

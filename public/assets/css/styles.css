@@ -348,5 +348,38 @@ b,strong{font-weight:640;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
 /* ---------- tlačidlo Prihlásiť v hlavičke ---------- */
-.hdr__ucet{margin-right:-12px}
-.hdr__ucet svg{width:1.05em;height:1.05em}
+.hdr__ucet{margin-right:-12px;padding:.55em 1.15em;font-size:.97rem;color:var(--acc);border-color:var(--acc-line);background:var(--acc-soft)}
+.hdr__ucet:hover{color:var(--acc-d);border-color:var(--acc);background:#e3ecff}
+.hdr__ucet svg{width:1.1em;height:1.1em}
+
+/* ---------- pulzujúca mriežka ----------
+   Jemná sieť okolo dôležitého prvku (prihlásenie, cenník). Rovnaký vzor ako
+   .mriezka, len sa pomaly nadychuje; pri obmedzenom pohybe stojí. */
+.pulz{position:relative;isolation:isolate}
+.pulz::before{
+  content:"";position:absolute;inset:-56px -64px;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(37,99,235,.30) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.30) 1px,transparent 1px);
+  background-size:var(--grid-krok) var(--grid-krok);
+  background-position:center;
+  -webkit-mask-image:radial-gradient(closest-side,#000 60%,transparent 100%);
+  mask-image:radial-gradient(closest-side,#000 60%,transparent 100%);
+  animation:pulz 4.5s ease-in-out infinite;
+}
+@keyframes pulz{
+  0%,100%{opacity:.45;transform:scale(.985)}
+  50%{opacity:1;transform:scale(1.015)}
+}
+@media (prefers-reduced-motion:reduce){.pulz::before{animation:none;opacity:.6}}
+@media (max-width:520px){.pulz::before{inset:-32px -16px}}
+
+/* ---------- výber počtu počítačov v cenníku ---------- */
+.pc-volba{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:0 0 30px;padding:18px 22px;border:1px solid var(--acc-line);border-radius:var(--r);background:var(--acc-soft)}
+.pc-volba__txt b{display:block;font-size:1.02rem}
+.pc-volba__txt span{color:var(--ink-2);font-size:.92rem}
+.pc-volba__krok{display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:12px;background:var(--bg);overflow:hidden}
+.pc-volba__krok button{width:46px;height:44px;border:0;background:none;font:600 1.3rem/1 inherit;color:var(--ink);cursor:pointer}
+.pc-volba__krok button:hover:not(:disabled){background:var(--bg-2)}
+.pc-volba__krok button:disabled{color:var(--line-2);cursor:default}
+.pc-volba__krok output{min-width:48px;text-align:center;font-weight:680;font-size:1.15rem;font-variant-numeric:tabular-nums;border-inline:1px solid var(--line-2);line-height:44px}
