@@ -79,20 +79,15 @@
     return { text: 'aktívna', cls: 'u-stav--ok' };
   }
 
-  /* stĺpce tabuľky zariadenia sa môžu líšiť — vyberie sa, čo tam je */
-  function pole(z, vzor) {
-    for (var k in z) if (vzor.test(k) && z[k]) return z[k];
-    return '';
-  }
-
   function zariadenie(z, l, moznoPresun) {
-    var nazov = pole(z, /^(nazov|meno|pc|pocitac|hostname)$/i);
-    var kedy = pole(z, /(aktiv|vytvor|cas|datum|posled)/i);
     var odtlacok = String(z.odtlacok || '');
+    var detail = [z.os, z.verzia_appky ? 'v' + z.verzia_appky : '', z.stav,
+      z.aktivovane ? 'od ' + datum(z.aktivovane) : '',
+      z.posledna_kontrola ? 'naposledy ' + datum(z.posledna_kontrola) : ''].filter(Boolean).join(' · ');
     return '<li><div>' +
-      (nazov ? '<b>' + esc(nazov) + '</b>' : '') +
+      '<b>' + esc(z.nazov_pc || 'Počítač') + '</b>' +
       '<code title="' + esc(odtlacok) + '">' + esc(odtlacok.slice(0, 18)) + (odtlacok.length > 18 ? '…' : '') + '</code>' +
-      '<small>' + esc(z.stav || '') + (kedy ? ' · od ' + esc(datum(kedy)) : '') + '</small>' +
+      '<small>' + esc(detail) + '</small>' +
       '</div>' +
       (moznoPresun
         ? '<button class="btn btn--gh btn--sm" type="button" data-presun="' + esc(l.kod) + '" data-pc="' + esc(odtlacok) + '">Uvoľniť (5 €)</button>'
@@ -120,7 +115,7 @@
         '<span class="u-lic__dielna">' + esc(l.dielna || '') + '</span>' +
       '</div><span class="u-stav ' + s.cls + '">' + esc(s.text) + '</span></div>' +
       '<dl class="specs">' +
-        '<div><dt>Platí do</dt><dd>' + esc(datum(l.platna_do)) + '</dd></div>' +
+        '<div><dt>Platí do</dt><dd>' + esc(l.platna_do ? datum(l.platna_do) : 'bez obmedzenia') + '</dd></div>' +
         '<div><dt>Počítače</dt><dd>' + pc.length + ' / ' + l.max_zariadeni + '</dd></div>' +
         '<div><dt>Predplatné</dt><dd>' + (l.predplatne ? 'cez web (Stripe)' : 'bez automatickej obnovy') + '</dd></div>' +
       '</dl>' +
