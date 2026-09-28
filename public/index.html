@@ -187,20 +187,50 @@
 </section>
 
 <section class="sec sec--alt">
-  <div class="wrap wrap--mid">
+  <div class="wrap">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
       <p>Predplatné na jeden počítač, viac počítačov čoskoro. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
-    <div class="pricebig">
-      <p class="pricebig__lbl">Ročné predplatné</p>
-      <p class="pricebig__sum"><b>199,99 €</b><span>/ rok</span></p>
-      <p class="pricebig__save">Ušetríte 39,89 € oproti mesačnému</p>
-      <p class="pricebig__note">To je 16,67 € na mesiac. Mesačne bez viazanosti vyjde na 19,99 €.</p>
-      <div class="row row--c">
-        <a class="btn btn--pri btn--lg" href="cennik.html">Prejsť do cenníka</a>
-        <a class="btn btn--gh btn--lg" href="stiahnut.html">Najprv skúsiť demo</a>
-      </div>
+    <div class="plans plans--tri plans--kratke pulz pulz--velky">
+      <article class="plan plan--best">
+        <div class="plan__head">
+          <h2>Ročne</h2>
+          <span class="plan__badge">Ušetríte 39,89 €</span>
+        </div>
+        <p class="plan__price"><b>199,99 €</b><span>/ rok</span></p>
+        <p class="plan__per">Vychádza na 16,67 € mesačne.</p>
+        <a class="btn btn--pri btn--lg btn--full" href="cennik.html">Predplatiť na rok</a>
+      </article>
+      <article class="plan">
+        <div class="plan__head">
+          <h2>Mesačne</h2>
+          <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
+        </div>
+        <p class="plan__price"><b>19,99 €</b><span>/ mesiac</span></p>
+        <p class="plan__per">Bez viazanosti, obnovu vypnete v programe.</p>
+        <a class="btn btn--gh btn--lg btn--full" href="cennik.html">Predplatiť na mesiac</a>
+      </article>
+      <article class="plan plan--coskoro" aria-labelledby="coskoro-domov">
+        <div class="plan__rozmazane" aria-hidden="true">
+          <div class="plan__head">
+            <h2>Viac počítačov</h2>
+            <span class="plan__badge plan__badge--mut">Pre väčšie dielne</span>
+          </div>
+          <p class="plan__price"><b>+ 99,99 €</b><span>/ PC / rok</span></p>
+          <p class="plan__per">Prvý počítač za plnú cenu, každý ďalší lacnejšie.</p>
+          <span class="btn btn--gh btn--lg btn--full">Zvoliť počet počítačov</span>
+        </div>
+        <div class="plan__coskoro">
+          <span class="coskoro">Čoskoro</span>
+          <h2 id="coskoro-domov">Viac počítačov</h2>
+          <p>Predplatné na viac počítačov pripravujeme.</p>
+        </div>
+      </article>
+    </div>
+    <div class="row row--c plans__pod">
+      <a class="link" href="cennik.html">Celý cenník a čo je v predplatnom</a>
+      <a class="link" href="stiahnut.html">Najprv skúsiť demo</a>
     </div>
   </div>
 </section>
