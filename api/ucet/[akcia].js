@@ -280,8 +280,23 @@ async function overit(req, res) {
 
 /* ---------- Google: prepojenie a prihlásenie ---------- */
 
-function spatUrl(req) {
-  return adresaWebu(req) + '/api/ucet/google-spat';
+/* Google nepozná v redirect URI hviezdičku, preto sa každé prihlásenie —
+   aj z ľubovoľného preview na Verceli — vracia na jednu pevnú adresu na
+   ostrom webe. Tá podľa `state` vie, odkiaľ prihlásenie začalo, a návrat
+   prepošle tam; výmenu kódu a overenie urobí až pôvodný web (má cookie).
+   V Google Cloud tak stačí jediná redirect URI. */
+var SPAT_URL = ENV.GOOGLE_SPAT_URL || 'https://www.gridservis.app/api/ucet/google-spat';
+var POVOLENE_WEBY = /^https:\/\/((www\.)?gridservis\.app|gridservis-[a-z0-9-]+-darksimperium\.vercel\.app)$/;
+
+function spatUrl() {
+  return SPAT_URL;
+}
+
+/* state = náhodná časť ~ adresa webu, kde prihlásenie začalo */
+function webZoStavu(stav) {
+  var i = String(stav || '').indexOf('~');
+  if (i === -1) return '';
+  try { return Buffer.from(String(stav).slice(i + 1), 'base64url').toString(); } catch (e) { return ''; }
 }
 
 function zacniGoogle(req, res) {
@@ -289,13 +304,14 @@ function zacniGoogle(req, res) {
   var email = relacia(req);
   if (prepojit && !email) return naStranku(req, res, 'Najprv sa prihláste kódom z e-mailu.');
 
-  var stav = crypto.randomBytes(18).toString('base64url');
+  var stav = crypto.randomBytes(18).toString('base64url') + '~' +
+    Buffer.from(adresaWebu(req)).toString('base64url');
   var nonce = crypto.randomBytes(18).toString('base64url');
   /* návrat z Google je presmerovanie z inej domény — SameSite=Lax */
   nastavCookie(COOKIE_OAUTH, zapecat({ s: stav, n: nonce, p: prepojit ? email : '' }, 600), 600, 'Lax');
   res.setHeader('Set-Cookie', noveCookies);
   res.redirect(302, 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({
-    client_id: ENV.GOOGLE_CLIENT_ID, redirect_uri: spatUrl(req),
+    client_id: ENV.GOOGLE_CLIENT_ID, redirect_uri: spatUrl(),
     response_type: 'code', scope: 'openid email', state: stav, nonce: nonce,
     prompt: 'select_account'
   }));
@@ -303,6 +319,17 @@ function zacniGoogle(req, res) {
 
 async function googleSpat(req, res) {
   var q = req.query || {};
+
+  /* návrat patrí inému webu (preview) — len ho tam prepošli */
+  var odkial = webZoStavu(q.state);
+  if (odkial && odkial !== adresaWebu(req)) {
+    if (!POVOLENE_WEBY.test(odkial)) return naStranku(req, res, 'Neplatný návrat z prihlásenia.');
+    var dalej = new URLSearchParams();
+    ['code', 'state', 'error'].forEach(function (k) { if (q[k]) dalej.set(k, q[k]); });
+    res.redirect(302, odkial + '/api/ucet/google-spat?' + dalej);
+    return;
+  }
+
   var o = otvor(cookie(req, COOKIE_OAUTH));
   nastavCookie(COOKIE_OAUTH, '', 0, 'Lax');
   if (!o || !q.state || !rovnake(o.s, q.state)) return naStranku(req, res, 'Prihlásenie vypršalo, skúste to znova.');
@@ -313,7 +340,7 @@ async function googleSpat(req, res) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       code: q.code, client_id: ENV.GOOGLE_CLIENT_ID, client_secret: ENV.GOOGLE_CLIENT_SECRET,
-      redirect_uri: spatUrl(req), grant_type: 'authorization_code'
+      redirect_uri: spatUrl(), grant_type: 'authorization_code'
     })
   });
   var t = await r.json().catch(function () { return {}; });
