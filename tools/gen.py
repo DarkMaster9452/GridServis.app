@@ -294,6 +294,25 @@ VAROVANIE = '''<div class="warn" id="upozornenie">
 
 
 # ============================================================ DOMOV
+# Tretia karta „Viac počítačov — Čoskoro“ v skrátenej podobe (domovská stránka).
+PLAN_COSKORO_KRATKY = '''      <article class="plan plan--coskoro" aria-labelledby="coskoro-domov">
+        <div class="plan__rozmazane" aria-hidden="true">
+          <div class="plan__head">
+            <h2>Viac počítačov</h2>
+            <span class="plan__badge plan__badge--mut">Pre väčšie dielne</span>
+          </div>
+          <p class="plan__price"><b>+ DALSI_ROK</b><span>/ PC / rok</span></p>
+          <p class="plan__per">Prvý počítač za plnú cenu, každý ďalší lacnejšie.</p>
+          <span class="btn btn--gh btn--lg btn--full">Zvoliť počet počítačov</span>
+        </div>
+        <div class="plan__coskoro">
+          <span class="coskoro">Čoskoro</span>
+          <h2 id="coskoro-domov">Viac počítačov</h2>
+          <p>Predplatné na viac počítačov pripravujeme.</p>
+        </div>
+      </article>'''
+
+
 index = head('index.html', 'ZNACKA — program na správu autoservisu',
              'Zákazky, zákazníci, sklad dielov, cenník prác, faktúry a štatistiky pre autoservis. Windows program s predplatným, vyskúšajte demo zadarmo.',
              extra=PROGRAM_LD) + '''
@@ -389,20 +408,35 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
 </section>
 
 <section class="sec sec--alt">
-  <div class="wrap wrap--mid">
+  <div class="wrap">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
       <p>Predplatné na jeden počítač, viac počítačov čoskoro. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
-    <div class="pricebig">
-      <p class="pricebig__lbl">Ročné predplatné</p>
-      <p class="pricebig__sum"><b>ROK</b><span>/ rok</span></p>
-      <p class="pricebig__save">Ušetríte USPORA oproti mesačnému</p>
-      <p class="pricebig__note">To je MESACNE_Z_ROCNEHO na mesiac. Mesačne bez viazanosti vyjde na MESIAC.</p>
-      <div class="row row--c">
-        ''' + buy_btn('Prejsť do cenníka') + '''
-        ''' + dl_btn('Najprv skúsiť demo') + '''
-      </div>
+    <div class="plans plans--tri plans--kratke pulz pulz--velky">
+      <article class="plan plan--best">
+        <div class="plan__head">
+          <h2>Ročne</h2>
+          <span class="plan__badge">Ušetríte USPORA</span>
+        </div>
+        <p class="plan__price"><b>ROK</b><span>/ rok</span></p>
+        <p class="plan__per">Vychádza na MESACNE_Z_ROCNEHO mesačne.</p>
+        <a class="btn btn--pri btn--lg btn--full" href="cennik.html">Predplatiť na rok</a>
+      </article>
+      <article class="plan">
+        <div class="plan__head">
+          <h2>Mesačne</h2>
+          <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
+        </div>
+        <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
+        <p class="plan__per">Bez viazanosti, obnovu vypnete v programe.</p>
+        <a class="btn btn--gh btn--lg btn--full" href="cennik.html">Predplatiť na mesiac</a>
+      </article>
+''' + ('' if VIAC_PC else PLAN_COSKORO_KRATKY) + '''
+    </div>
+    <div class="row row--c plans__pod">
+      <a class="link" href="cennik.html">Celý cenník a čo je v predplatnom</a>
+      <a class="link" href="stiahnut.html">Najprv skúsiť demo</a>
     </div>
   </div>
 </section>
@@ -534,17 +568,62 @@ PC_VOLBA = '''<div class="pc-volba" data-pc-volba data-max="MAX_PC_N">
       </div>
     </div>'''
 
-PC_COSKORO = '''<div class="pc-volba pc-volba--coskoro">
-      <div class="pc-volba__txt">
-        <b>Na viac počítačov <span class="coskoro">Čoskoro</span></b>
-        <span>Pripravujeme predplatné, v ktorom si zvolíte počet počítačov a každý ďalší bude lacnejší. Dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</span>
-      </div>
-      <div class="pc-volba__krok" aria-hidden="true">
-        <button type="button" disabled tabindex="-1">−</button>
-        <output>1</output>
-        <button type="button" disabled tabindex="-1">+</button>
-      </div>
-    </div>'''
+# Tretí plán v cenníku, kým predplatné na viac PC nie je spustené:
+# obsah je rozmazaný a cez neho je nápis Čoskoro.
+PLAN_COSKORO = '''      <article class="plan plan--coskoro" aria-labelledby="coskoro-nadpis">
+        <div class="plan__rozmazane" aria-hidden="true">
+          <div class="plan__head">
+            <h2>Viac počítačov</h2>
+            <span class="plan__badge plan__badge--mut">Pre väčšie dielne</span>
+          </div>
+          <p class="plan__price"><b>+ DALSI_ROK</b><span>/ PC / rok</span></p>
+          <p class="plan__per">Prvý počítač za plnú cenu, každý ďalší lacnejšie. Počet si zvolíte sami.</p>
+          <span class="btn btn--gh btn--lg btn--full">Zvoliť počet počítačov</span>
+          <ul class="ticks">
+            <li>Jeden licenčný kód pre všetky počítače</li>
+            <li>Počet počítačov si zvolíte sami</li>
+            <li>Každý ďalší počítač lacnejšie</li>
+            <li>Všetko ako pri ročnom a mesačnom</li>
+          </ul>
+        </div>
+        <div class="plan__coskoro">
+          <span class="coskoro">Čoskoro</span>
+          <h2 id="coskoro-nadpis">Viac počítačov</h2>
+          <p>Predplatné, v ktorom si zvolíte počet počítačov, pripravujeme. Dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</p>
+        </div>
+      </article>'''
+
+
+# Porovnanie pod plánmi: čo v predplatnom je (✓) a čo nie (–).
+def _riadok(nazov, mesiac, rok, pozn=''):
+    znak = lambda x: ('<td class="ano"><span aria-label="áno">✓</span></td>' if x
+                      else '<td class="nie"><span aria-label="nie">–</span></td>')
+    return ('        <tr><th scope="row">%s%s</th>%s%s</tr>\n'
+            % (nazov, ('<small>%s</small>' % pozn) if pozn else '', znak(mesiac), znak(rok)))
+
+POROVNANIE = ('''<div class="porovnanie">
+      <h2>Čo je v predplatnom</h2>
+      <table class="porovnanie__tab">
+        <thead><tr><th scope="col"><span class="sr">Funkcia</span></th><th scope="col">Mesačne</th><th scope="col">Ročne</th></tr></thead>
+        <tbody>
+'''
+    + _riadok('Celý program bez obmedzení', True, True, 'zákazky, zákazníci, sklad, cenník prác, faktúry, štatistiky')
+    + _riadok('Všetky moduly, žiadne platené doplnky', True, True)
+    + _riadok('Opravy chýb a nové verzie', True, True, 'počas celého predplatného')
+    + _riadok('E-mailová podpora', True, True, 'pri inštalácii a nastavení')
+    + _riadok('Správa licencie v Mojom účte', True, True, 'platnosť, počítače, platby')
+    + _riadok('Dáta zostávajú u vás', True, True, 'na počítači v dielni, nie v cudzom cloude')
+    + _riadok('Automatická obnova, zrušíte kedykoľvek', True, True)
+    + _riadok('Jedna platba za celý rok', False, True)
+    + _riadok('Ušetríte USPORA ročne', False, True)
+    + _riadok('Presun licencie na iný počítač zadarmo', False, False, 'stojí jednorazovo PRESUN_SUMA, zaplatíte ho z programu')
+    + _riadok('Používanie po skončení predplatného', False, False, 'dáta si viete vyexportovať aj potom')
+    + _riadok('Úpravy programu na mieru', False, False)
+    + _riadok('Zdieľaná databáza medzi počítačmi', False, False, 'každý počítač má vlastnú')
+    + _riadok('Podpisový certifikát inštalačky', False, False, 'preto Windows hlási neznámeho vydavateľa')
+    + '''        </tbody>
+      </table>
+    </div>''')
 
 
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
@@ -558,10 +637,10 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
 </section>
 
 <section class="sec">
-  <div class="wrap wrap--mid">
+  <div class="wrap">
     ''' + OZNAM + '''
-    ''' + (PC_VOLBA if VIAC_PC else PC_COSKORO) + '''
-    <div class="plans pulz">
+    ''' + (PC_VOLBA if VIAC_PC else '') + '''
+    <div class="plans plans--tri pulz pulz--velky">
       <article class="plan plan--best">
         <div class="plan__head">
           <h2>Ročne</h2>
@@ -592,32 +671,13 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
           <li>E-mailová podpora pri inštalácii a nastavení</li>
         </ul>
       </article>
+''' + ('' if VIAC_PC else PLAN_COSKORO) + '''
     </div>
     <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Predplatné na viac počítačov pripravujeme — dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</p>
 
     ''' + VAROVANIE + '''
 
-    <div class="two two--top">
-      <div class="box box--ok">
-        <h3>V predplatnom je</h3>
-        <ul class="ticks">
-          <li>Plná verzia programu bez obmedzení</li>
-          <li>Všetky moduly, žiadne platené doplnky</li>
-          <li>Opravy chýb a nové verzie počas predplatného</li>
-          <li>E-mailová podpora pri inštalácii a nastavení</li>
-        </ul>
-      </div>
-      <div class="box">
-        <h3>V predplatnom nie je</h3>
-        <ul class="crosses">
-          <li>Používanie programu po skončení predplatného</li>
-          <li>Presun licencie na iný počítač zadarmo — stojí jednorazovo PRESUN_SUMA a zaplatíte ho priamo z programu</li>
-          <li>Úpravy programu na mieru</li>
-          <li>Prevádzka na serveri alebo zdieľaná databáza medzi počítačmi</li>
-          <li>Podpisový certifikát inštalačky, preto Windows hlási neznámeho vydavateľa</li>
-        </ul>
-      </div>
-    </div>
+    ''' + POROVNANIE + '''
   </div>
 </section>
 
@@ -1360,7 +1420,7 @@ ucet = head('ucet.html', 'Môj účet — ZNACKA',
     <p class="oznam" id="oznam" hidden></p>
 
     <!-- prihlásenie -->
-    <div class="pulz u-login-obal" id="prihlasenie" hidden>
+    <div class="pulz pulz--velky u-login-obal" id="prihlasenie" hidden>
     <div class="box u-login u-login--velke">
       <h2 class="u-login__nadpis">Prihlásenie</h2>
 
