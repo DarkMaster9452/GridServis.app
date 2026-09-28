@@ -4,7 +4,7 @@
    nulovú sumu: Checkout pri nej nepýta kartu, iba e-mail. Stiahnutie
    sa sprístupní až po dokončení tejto objednávky. */
 
-var { PLANY, DANOVY_KOD, stripe, adresaWebu, nastavene } = require('./_stripe');
+var { PLANY, stripe, adresaWebu, nastavene, pocetPc, polozky } = require('./_stripe');
 
 function telo(req) {
   if (req.body && typeof req.body === 'object') return req.body;
@@ -32,7 +32,7 @@ module.exports = async function (req, res) {
 
   /* Digitálny obsah sa sprístupní hneď po zaplatení, takže kupujúci musí
      pri platených plánoch výslovne odsúhlasiť, že tým stráca právo na
-     odstúpenie do 14 dní (§ 7 ods. 6 písm. l) zákona č. 102/2014 Z. z.).
+     odstúpenie do 14 dní (§ 19 ods. 1 zákona č. 108/2024 Z. z.).
      Checkbox je na stránke povinný; server to kontroluje znova, aby sa to
      nedalo obísť odoslaním formulára mimo prehliadača. Demo za 0 € súhlas
      nepotrebuje, pri ňom nevzniká platobná povinnosť. */
@@ -53,18 +53,8 @@ module.exports = async function (req, res) {
     return;
   }
 
-  var polozka = { quantity: 1 };
-  if (p.cena) {
-    polozka.price = p.cena;
-  } else {
-    polozka.price_data = {
-      currency: 'eur',
-      unit_amount: p.suma,
-      product_data: { name: p.nazov, description: p.popis, tax_code: DANOVY_KOD }
-    };
-    /* Predplatné potrebuje opakovanie; demo za 0 € je jednorazová objednávka. */
-    if (p.obdobie) polozka.price_data.recurring = { interval: p.obdobie };
-  }
+  /* počet počítačov — prvý za plnú cenu, každý ďalší za príplatok */
+  var pocitace = p.dalsi ? pocetPc((req.query && req.query.pocitace) || telo(req).pocitace) : 1;
 
   var web = adresaWebu(req);
 
@@ -85,11 +75,14 @@ module.exports = async function (req, res) {
       cancel_url: web + p.spat + '?zrusene=1',
       /* Dôkaz o súhlase zostáva pri objednávke v Stripe — keby ho niekto
          neskôr spochybnil, je dohľadateľné, kedy ho kupujúci odklikol. */
-      metadata: { plan: plan, suhlas_odstupenie: suhlasil ? new Date().toISOString() : 'neziada sa' },
-      line_items: [polozka]
+      metadata: {
+        plan: plan, pocitace: String(pocitace),
+        suhlas_odstupenie: suhlasil ? new Date().toISOString() : 'neziada sa'
+      },
+      line_items: polozky(p, pocitace)
     };
     /* nech je plán vidieť aj na predplatnom, nielen na objednávke */
-    if (p.obdobie) poziadavka.subscription_data = { metadata: { plan: plan } };
+    if (p.obdobie) poziadavka.subscription_data = { metadata: { plan: plan, pocitace: String(pocitace) } };
 
     var relacia = await stripe('/checkout/sessions', poziadavka);
 

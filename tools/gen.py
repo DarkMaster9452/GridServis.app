@@ -14,11 +14,20 @@ WEB = 'https://www.gridservis.app'
 # Predávajúci. Program predáva fyzická osoba, nie firma, preto tu nie sú
 # IČO, DIČ ani zápis v registri — kontakt prebieha e-mailom.
 PREDAJCA = {
-    'email': 'strananekm@gmail.com',
+    'email': 'support@gridservis.app',
 }
 
 # Ceny predplatného. Rovnaké hodnoty sú v assets/js/main.js (premenná CENY).
 CENY = {'rok': 199.99, 'mesiac': 19.99}
+
+# Každý ďalší počítač nad prvý. Rovnaké sumy sú v api/_stripe.js (PLANY.*.dalsi)
+# a v assets/js/main.js (DALSI_PC). Cez web sa dá objednať najviac MAX_PC.
+DALSI_PC = {'rok': 99.99, 'mesiac': 9.99}
+MAX_PC = 10
+# Predplatné na viac počítačov je zatiaľ „čoskoro“ — na webe sa ukazuje len
+# ako pripravované a server ho nepustí, kým nie je VIAC_PC=1 (api/_stripe.js).
+# Po spustení: VIAC_PC = True tu aj na Verceli, texty nižšie sa prepnú samé.
+VIAC_PC = False
 
 ROCNE_MESACNE = CENY['mesiac'] * 12          # 239,88 € — rok platený po mesiacoch
 USPORA = ROCNE_MESACNE - CENY['rok']         # 39,89 € — zľava pri ročnom predplatnom
@@ -66,6 +75,13 @@ PAGES = [
     ('faq.html',      'FAQ'),
     ('kontakt.html',  'Kontakt'),
 ]
+
+
+# Tlačidlo do správy licencie (ucet.html). Stránka sa píše ručne, nie tu,
+# lebo je to aplikácia — hlavičku však zdieľa s ostatnými.
+UCET_IKONA = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+              '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>')
 
 
 def head(active, title, desc, extra=''):
@@ -116,16 +132,19 @@ def head(active, title, desc, extra=''):
     <nav class="hdr__nav" aria-label="Hlavná navigácia">
 %s
     </nav>
+    <a class="btn btn--gh btn--sm hdr__cta hdr__ucet" href="ucet.html">%s</a>
     <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
   <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
 %s
+    <a href="ucet.html"%s>Môj účet</a>
   </nav>
 </header>
 
 <main id="obsah">
-''' % (title, desc, title, desc, ZNACKA, kanon, WEB, kanon, extra, nav, mnav)
+''' % (title, desc, title, desc, ZNACKA, kanon, WEB, kanon, extra, nav,
+       UCET_IKONA + 'Prihlásiť', mnav, ' class="on"' if active == 'ucet.html' else '')
 
 
 FOOT = '''</main>
@@ -149,11 +168,12 @@ FOOT = '''</main>
       <a href="faq.html">Časté otázky</a>
       <a href="kontakt.html">Kontakt</a>
       <a href="kontakt.html" data-mail="podpora">Nahlásiť chybu</a>
+      <a href="ucet.html">Môj účet</a>
     </div>
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="obchodne-podmienky.html#odstupenie">Zrušenie a vrátenie peňazí</a>
+      <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
@@ -168,6 +188,12 @@ FOOT = '''</main>
 </body>
 </html>
 '''
+
+
+def foot(*skripty):
+    """Pätička s ďalšími skriptmi za main.js (napríklad ucet.js)."""
+    return FOOT.replace('</body>', ''.join(
+        '<script src="assets/js/%s"></script>\n' % x for x in skripty) + '</body>')
 
 
 def shot(img, alt, cls=''):
@@ -188,8 +214,9 @@ def buy_btn(text='Predplatiť', cls='btn--pri btn--lg'):
 
 
 # Poučenie, ktoré musí kupujúci pri digitálnom obsahu výslovne odsúhlasiť.
-# Bez neho mu právo na odstúpenie do 14 dní nezaniká — § 7 ods. 6 písm. l)
-# zákona č. 102/2014 Z. z. Checkbox je povinný a overuje ho aj server.
+# Bez neho mu právo na odstúpenie do 14 dní nezaniká — § 19 ods. 1
+# zákona č. 108/2024 Z. z. (predtým § 7 ods. 6 písm. l) zák. 102/2014).
+# Checkbox je povinný a overuje ho aj server.
 SUHLAS = ('  <label class="suhlas">\n'
           '    <input type="checkbox" name="suhlas" value="1" required>\n'
           '    <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem'
@@ -206,6 +233,7 @@ def platba_btn(plan, text, cls='btn--pri btn--lg'):
     na odstúpenie; demo za 0 € ho nepotrebuje, nič sa pri ňom neplatí."""
     return ('<form class="pay" method="post" action="/api/checkout">\n'
             '  <input type="hidden" name="plan" value="%s">\n'
+            + ('  <input type="hidden" name="pocitace" value="1" data-pocitace>\n' if plan != 'demo' else '') +
             '%s'
             '  <button class="btn %s" type="submit">%s</button>\n'
             '</form>') % (plan, SUHLAS if plan != 'demo' else '', cls, text)
@@ -364,7 +392,7 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
   <div class="wrap wrap--mid">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
-      <p>Predplatné na jeden počítač. Obnovuje sa samo, zrušiť ho viete v programe.</p>
+      <p>Predplatné na jeden počítač, viac počítačov čoskoro. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
     <div class="pricebig">
       <p class="pricebig__lbl">Ročné predplatné</p>
@@ -493,6 +521,32 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 
 
 # ============================================================ CENNÍK
+# Výber počtu počítačov (keď bude VIAC_PC zapnuté) a jeho „čoskoro“ verzia.
+PC_VOLBA = '''<div class="pc-volba" data-pc-volba data-max="MAX_PC_N">
+      <div class="pc-volba__txt">
+        <b>Na koľko počítačov?</b>
+        <span>Prvý za plnú cenu, každý ďalší za DALSI_ROK ročne alebo DALSI_MESIAC mesačne.</span>
+      </div>
+      <div class="pc-volba__krok" role="group" aria-label="Počet počítačov">
+        <button type="button" data-pc="-1" aria-label="Menej počítačov">−</button>
+        <output data-pc-pocet aria-live="polite">1</output>
+        <button type="button" data-pc="1" aria-label="Viac počítačov">+</button>
+      </div>
+    </div>'''
+
+PC_COSKORO = '''<div class="pc-volba pc-volba--coskoro">
+      <div class="pc-volba__txt">
+        <b>Na viac počítačov <span class="coskoro">Čoskoro</span></b>
+        <span>Pripravujeme predplatné, v ktorom si zvolíte počet počítačov a každý ďalší bude lacnejší. Dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</span>
+      </div>
+      <div class="pc-volba__krok" aria-hidden="true">
+        <button type="button" disabled tabindex="-1">−</button>
+        <output>1</output>
+        <button type="button" disabled tabindex="-1">+</button>
+      </div>
+    </div>'''
+
+
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
               'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
               extra=PROGRAM_LD) + '''
@@ -506,14 +560,15 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
 <section class="sec">
   <div class="wrap wrap--mid">
     ''' + OZNAM + '''
-    <div class="plans">
+    ''' + (PC_VOLBA if VIAC_PC else PC_COSKORO) + '''
+    <div class="plans pulz">
       <article class="plan plan--best">
         <div class="plan__head">
           <h2>Ročne</h2>
           <span class="plan__badge">Ušetríte USPORA</span>
         </div>
-        <p class="plan__price"><b>ROK</b><span>/ rok</span></p>
-        <p class="plan__per">Vychádza na MESACNE_Z_ROCNEHO mesačne. Dvanásť mesačných platieb by stálo ROCNE_MESACNE.</p>
+        <p class="plan__price"><b data-cena="rok" data-zaklad="CENA_ROK_N" data-dalsi="DALSI_ROK_N">ROK</b><span>/ rok</span></p>
+        <p class="plan__per" data-per="rok">Vychádza na MESACNE_Z_ROCNEHO mesačne. Dvanásť mesačných platieb by stálo ROCNE_MESACNE.</p>
 ''' + platba_btn('rok', 'Predplatiť na rok', 'btn--pri btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na dvanásť mesiacov</li>
@@ -527,8 +582,8 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
           <h2>Mesačne</h2>
           <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
         </div>
-        <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
-        <p class="plan__per">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
+        <p class="plan__price"><b data-cena="mesiac" data-zaklad="CENA_MESIAC_N" data-dalsi="DALSI_MESIAC_N">MESIAC</b><span>/ mesiac</span></p>
+        <p class="plan__per" data-per="mesiac">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
 ''' + platba_btn('mesiac', 'Predplatiť na mesiac', 'btn--gh btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na jeden mesiac</li>
@@ -538,7 +593,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         </ul>
       </article>
     </div>
-    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Predplatné na viac počítačov pripravujeme — dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</p>
 
     ''' + VAROVANIE + '''
 
@@ -717,7 +772,7 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
       <details><summary>Čo potrebujem, aby to bežalo?</summary><p>Windows 10 alebo 11 a bežný počítač. Na Macu ani v mobile program nebeží. Je stavaný na jeden počítač s vlastnou databázou — zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
       <details><summary>Vystavuje program faktúry? Zvládne DPH?</summary><p>Áno, faktúru aj zákazkový list vytlačíte priamo z detailu zákazky, v PDF a s rozpisom prác a každého dielu zvlášť. Ak ste platiteľ DPH, zapnete to v nastaveniach a faktúry sa počítajú s DPH.</p></details>
       <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže pri každej ďalšej návšteve vidíte všetky predchádzajúce zákazky aj s cenou.</p></details>
-      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — na jeden počítač. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
+      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — na jeden počítač. Predplatné na viac počítačov čoskoro pribudne. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
       <details><summary>Dá sa program najprv vyskúšať?</summary><p>Áno, na to je demo. Nič nestojí, stiahnete si ho hneď a zapíšete doň vlastné zákazky. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p></details>
       <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne, ale dáta vám zostanú na počítači a viete si ich vyexportovať aj v tomto stave. Po zaplatení pokračuje tá istá licencia tam, kde ste skončili. Obnovu vypnete v programe v Nastaveniach.</p></details>
       <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Nie je to vírus ani chyba programu. Inštalácia pokračuje cez <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>.</p></details>
@@ -1093,12 +1148,24 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
       <li><b>Pri prevádzke webu:</b> technické záznamy hostingu, napríklad IP adresa a čas požiadavky, ktoré vznikajú automaticky a slúžia na prevádzku a bezpečnosť.</li>
       <li><b>Pri pohybe po webe:</b> anonymné počítadlo návštevnosti — typ udalosti (zobrazenie stránky, kliknutie na predplatné, dokončená platba), názov stránky a doména, z ktorej ste prišli. Nezapisuje sa IP adresa ani nič, podľa čoho by sa dal človek identifikovať, a nepoužívajú sa na to cookies. Slúži mi to len na to, aby som vedel, ktoré časti webu ľuďom nesadli.</li>
     </ul>
-    <p>Nezbieram nič, čo na vybavenie objednávky alebo odpoveď nepotrebujem. Web neobsahuje formuláre, ktoré by údaje odosielali na server — kontakt prebieha e-mailom.</p>
+    <p>Nezbieram nič, čo na vybavenie objednávky alebo odpoveď nepotrebujem.</p>
+
+    <h2 id="ucet">Môj účet na webe</h2>
+    <ul>
+      <li><b>Prihlásenie kódom:</b> licenčný kód a e-mail, ktoré zadáte, a jednorazový 6-ciferný kód, ktorý vám pošlem. V databáze nie je kód samotný, len jeho zašifrovaný odtlačok, a zmaže sa hneď po prihlásení, po piatich zlých pokusoch alebo najneskôr po 15 minútach.</li>
+      <li><b>Prihlásenie cez Google:</b> len ak si ho v účte sami prepojíte. Od Google dostanem iba identifikátor vášho účtu a e-mail — žiadne kontakty, súbory ani heslo. Prepojenie trvá, kým ho neodpojíte alebo nezmažete účet.</li>
+      <li><b>Čo v účte vidíte:</b> údaje o vašich licenciách, počítačoch a platbách, ktoré už spracúvam kvôli licencii (pozri nižšie). Dáta z programu, IP adresy počítačov ani údaje o karte sa v účte nezobrazujú.</li>
+      <li><b>Zmazanie účtu:</b> tlačidlom Zmazať účet v Mojom účte sa hneď zmaže prihlásenie, prepojenie s Google a rozpracované kódy. Licencia a doklady o platbách ostávajú, lebo sú potrebné na fungovanie programu a zákon vyžaduje ich uchovanie. O výmaz ostatných údajov môžete požiadať e-mailom.</li>
+    </ul>
+
+    <h2 id="odstupenie">Odstúpenie od zmluvy</h2>
+    <p>Ak použijete formulár <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>, spracúvam meno, e-mail, licenčný kód alebo číslo objednávky, poznámku a čas odoslania. Slúži to na vybavenie odstúpenia a potvrdenie, ktoré vám musím poslať podľa zákona o ochrane spotrebiteľa. Záznam uchovávam, kým možno uplatniť nároky z odstúpenia, najviac štyri roky.</p>
 
     <h2>Na akom právnom základe a prečo</h2>
     <ul>
       <li><b>Plnenie zmluvy</b> podľa čl. 6 ods. 1 písm. b) GDPR — sprístupnenie programu, licenčného kľúča a podpory.</li>
-      <li><b>Zákonná povinnosť</b> podľa čl. 6 ods. 1 písm. c) GDPR — uchovanie dokladov o platbe, ak to zákon vyžaduje.</li>
+      <li><b>Zákonná povinnosť</b> podľa čl. 6 ods. 1 písm. c) GDPR — uchovanie dokladov o platbe, ak to zákon vyžaduje, a vybavenie odstúpenia od zmluvy.</li>
+      <li><b>Plnenie zmluvy</b> aj pri Mojom účte — prihlásenie a správa licencie, ktorú ste si kúpili. Prepojenie s Google je dobrovoľné a zapnete ho sami.</li>
       <li><b>Oprávnený záujem</b> podľa čl. 6 ods. 1 písm. f) GDPR — odpoveď na e-mail, ktorý mi napíšete, a bezpečnosť webu.</li>
     </ul>
 
@@ -1107,13 +1174,15 @@ sukromie = head('ochrana-sukromia.html', 'Ochrana súkromia — ZNACKA',
       <li>Doklady o platbe po dobu, ktorú predpisuje zákon.</li>
       <li>Údaje o predplatnom po dobu jeho platnosti, aby sa dal kľúč obnoviť alebo preniesť.</li>
       <li>E-mailovú komunikáciu najviac dva roky od poslednej správy.</li>
+      <li>Jednorazové kódy na prihlásenie najviac 15 minút, prihlásenie v prehliadači 8 hodín.</li>
+      <li>Prepojenie s Google, kým ho neodpojíte alebo nezmažete účet.</li>
     </ul>
 
     <h2>Komu sa údaje dostanú</h2>
-    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, platobnej bráne Stripe Payments Europe, Ltd., službe na odosielanie e-mailov s licenčným kódom a poskytovateľovi e-mailovej schránky. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
+    <p>Len tomu, kto sa podieľa na vybavení objednávky: poskytovateľovi hostingu webu, platobnej bráne Stripe Payments Europe, Ltd., službe na odosielanie e-mailov s licenčným kódom a kódmi na prihlásenie, poskytovateľovi databázy a poskytovateľovi e-mailovej schránky. Ak si prepojíte prihlásenie cez Google, Google Ireland Limited sa dozvie, že sa prihlasujete na tento web. Údaje nepredávam a neposkytujem na marketing. Mimo Európskeho hospodárskeho priestoru ich neprenášam nad rámec toho, čo vyplýva z použitia uvedených služieb, ktoré majú na takýto prenos vlastné záruky.</p>
 
     <h2>Vaše práva</h2>
-    <p>Máte právo na prístup k svojim údajom, na ich opravu, výmaz, obmedzenie spracúvania, na prenosnosť a právo namietať proti spracúvaniu založenému na oprávnenom záujme. Stačí napísať na e-mail uvedený vyššie. Ak si myslíte, že s údajmi nakladám nesprávne, môžete podať sťažnosť Úradu na ochranu osobných údajov Slovenskej republiky, Hraničná 12, 820 07 Bratislava.</p>
+    <p>Máte právo na prístup k svojim údajom, na ich opravu, výmaz, obmedzenie spracúvania, na prenosnosť a právo namietať proti spracúvaniu založenému na oprávnenom záujme. Účet na webe si zmažete sami v <a href="ucet.html">Mojom účte</a>; v ostatných prípadoch stačí napísať na e-mail uvedený vyššie a odpoviem najneskôr do mesiaca. Ak si myslíte, že s údajmi nakladám nesprávne, môžete podať sťažnosť Úradu na ochranu osobných údajov Slovenskej republiky, Hraničná 12, 820 07 Bratislava.</p>
 
     <h2>Údaje o licencii</h2>
     <p>K vydanej licencii si vediem licenčný kód, e-mail z objednávky, obdobie platnosti a záznam o počítači, na ktorom je licencia aktivovaná (názov počítača, verzia systému a programu, odtlačok počítača). Slúži to na overovanie licencie, riešenie problémov a na to, aby sa jeden kód nepoužíval na viacerých počítačoch, než koľko je zaplatených. Program tieto údaje posiela pri aktivácii a potom pri občasnej kontrole licencie.</p>
@@ -1133,7 +1202,7 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
 <section class="phead mriezka">
   <div class="wrap wrap--nar">
     <h1>Cookies</h1>
-    <p class="lead">Krátka odpoveď: tento web nepoužíva sledovacie ani analytické cookies a nezobrazuje lištu so súhlasom, pretože nie je čo odsúhlasovať.</p>
+    <p class="lead">Krátka odpoveď: tento web nepoužíva sledovacie ani analytické cookies a nezobrazuje lištu so súhlasom, pretože nie je čo odsúhlasovať. Jediné vlastné cookies sú technické — na prihlásenie do Môjho účtu.</p>
   </div>
 </section>
 
@@ -1151,11 +1220,18 @@ cookies = head('cookies.html', 'Cookies — ZNACKA',
     <h2>Čo sa môže uložiť</h2>
     <p>Poskytovateľ hostingu môže nastaviť technické cookies nutné na prevádzku a bezpečnosť, napríklad na rozloženie záťaže alebo ochranu pred zneužitím. Takéto cookies neslúžia na sledovanie a podľa zákona o elektronických komunikáciách nevyžadujú súhlas.</p>
 
+    <h2>Cookies pri prihlásení do Môjho účtu</h2>
+    <p>Iba ak sa prihlásite do <a href="ucet.html">Môjho účtu</a>, web uloží tieto technické cookies. Bez nich by prihlásenie nefungovalo, preto podľa § 109 ods. 8 zákona č. 452/2021 Z. z. o elektronických komunikáciách nevyžadujú súhlas. Nesledujú vás, neposielajú sa nikomu tretiemu a prehliadač ich posiela len na adresu prihlasovania, nie na ostatné stránky webu.</p>
+    <dl class="specs">
+      <div><dt>gs_ucet</dt><dd>udržiava prihlásenie, platí 8 hodín alebo do odhlásenia</dd></div>
+      <div><dt>gs_ucet_oauth</dt><dd>ochrana pri prihlásení cez Google, platí 10 minút</dd></div>
+    </dl>
+
     <h2>Vlastné počítadlo návštevnosti</h2>
     <p>Web si počíta, koľkokrát sa zobrazila ktorá stránka a koľkokrát niekto klikol na predplatné alebo demo. Zapisuje sa len typ udalosti, názov stránky a doména, z ktorej ste prišli — žiadna IP adresa a nič, podľa čoho by sa dal človek identifikovať. Nepoužívajú sa na to cookies; jednotlivé zobrazenia spája náhodné číslo uložené v pamäti karty prehliadača (sessionStorage), ktoré sa po jej zavretí zmaže a nikam sa neposiela.</p>
 
     <h2>Ako si cookies zmazať</h2>
-    <p>V nastaveniach prehliadača v časti Súkromie alebo Ochrana osobných údajov nájdete zoznam uložených údajov pre jednotlivé stránky a možnosť ich vymazať. Blokovanie cookies fungovanie tohto webu neobmedzí.</p>
+    <p>V nastaveniach prehliadača v časti Súkromie alebo Ochrana osobných údajov nájdete zoznam uložených údajov pre jednotlivé stránky a možnosť ich vymazať. Blokovanie cookies fungovanie tohto webu neobmedzí, len sa nebudete môcť prihlásiť do Môjho účtu.</p>
 
     <h2>Súvisiace</h2>
     <p>Podrobnosti o tom, aké údaje spracúvam pri objednávke a v komunikácii, nájdete v <a href="ochrana-sukromia.html">ochrane súkromia</a>.</p>
@@ -1185,7 +1261,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 
     <h2 id="predmet">2. Čo sa predáva</h2>
     <p>Predmetom je predplatné na používanie počítačového programu ZNACKA, ktorý slúži na vedenie zákaziek, zákazníkov, skladu a fakturácie v autoservise. Program sa dodáva elektronicky a inštaluje sa na počítač kupujúceho.</p>
-    <p>Predplatné sa kupuje na jeden počítač, na ktorom bude program spustený. Pri viacerých staniciach sa počet predplatných dohodne e-mailom.</p>
+    <p>Predplatné sa kupuje na jeden počítač, na ktorom bude program spustený. Predplatné na viac počítačov sa pripravuje; dovtedy sa počet predplatných pri viacerých staniciach dohodne e-mailom.</p>
 
     <h2 id="objednavka">3. Objednávka a uzavretie zmluvy</h2>
     <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
@@ -1203,6 +1279,11 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Po pripísaní platby posiela predávajúci na e-mail kupujúceho odkaz na stiahnutie plnej verzie programu a licenčný kľúč. Dodanie prebieha bez zbytočného odkladu. Ak by dodanie meškalo, kupujúci má právo od zmluvy odstúpiť.</p>
     <p>Program na vyskúšanie je dostupný ako demo zadarmo ešte pred zaplatením. Demo sa sprístupňuje cez objednávku s nulovou cenou, v ktorej kupujúci uvedie e-mail; platobné údaje sa pri nej nezadávajú a nevzniká platobná povinnosť.</p>
 
+    <h2 id="ucet">6a. Môj účet na webe</h2>
+    <p>Kupujúci si môže licenciu spravovať na webe v <a href="ucet.html">Mojom účte</a> — vidí tam platnosť licencie, aktivované počítače a platby, spravuje predplatné a uvoľní počítač. Účet nie je potrebné zakladať ani používať; program funguje len s licenčným kódom.</p>
+    <p>Do účtu sa kupujúci prihlási licenčným kódom a e-mailom, na ktorý je licencia vedená. Na tento e-mail príde jednorazový 6-ciferný kód platný 15 minút. Ak si to kupujúci v účte zapne, môže sa prihlasovať aj cez svoj účet Google. Kupujúci je povinný chrániť svoj e-mail a licenčný kód pred zneužitím.</p>
+    <p>Účet môže kupujúci kedykoľvek sám zmazať priamo v Mojom účte. Zmazaním účtu sa nezruší licencia ani predplatné — tie sa ukončujú podľa bodu 5.</p>
+
     <h2 id="podpis">7. Upozornenie na nepodpísanú inštalačku</h2>
     <p>Inštalačný súbor programu nie je podpísaný certifikátom pre podpisovanie kódu. Windows preto pri jeho spustení zobrazí upozornenie SmartScreen o neznámom vydavateľovi a o možnom riziku. Ide o dôsledok chýbajúceho certifikátu, nie o vlastnosť programu. Kupujúci berie túto skutočnosť na vedomie pred zaplatením; upozornenie je uvedené v <a href="cennik.html#upozornenie">cenníku</a> aj na stránke <a href="stiahnut.html">demo</a>.</p>
 
@@ -1213,9 +1294,9 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 
     <h2 id="odstupenie">9. Odstúpenie od zmluvy a vrátenie peňazí</h2>
     <p>Kupujúci, ktorý je spotrebiteľom, má právo odstúpiť od zmluvy do štrnástich dní od jej uzavretia bez uvedenia dôvodu.</p>
-    <p>Program sa však dodáva ako digitálny obsah, ktorý sa neposiela na hmotnom nosiči. Ak kupujúci pri objednávke výslovne súhlasí so začatím dodávania pred uplynutím lehoty na odstúpenie a vyhlási, že bol poučený o strate tohto práva, právo na odstúpenie mu podľa § 7 ods. 6 písm. l) zákona č. 102/2014 Z. z. zaniká momentom sprístupnenia programu na stiahnutie.</p>
+    <p>Program sa však dodáva ako digitálny obsah, ktorý sa neposiela na hmotnom nosiči. Ak kupujúci pri objednávke výslovne súhlasí so začatím dodávania pred uplynutím lehoty na odstúpenie a vyhlási, že bol poučený o strate tohto práva, právo na odstúpenie mu podľa § 19 ods. 1 zákona č. 108/2024 Z. z. o ochrane spotrebiteľa zaniká momentom sprístupnenia programu na stiahnutie. Predávajúci mu tento súhlas a vyhlásenie potvrdí e-mailom.</p>
     <p>Práve preto je k dispozícii demo. Odporúčam vyskúšať ho pred zaplatením.</p>
-    <p>Ak právo na odstúpenie nezaniklo, kupujúci ho uplatní e-mailom na adrese uvedenej vyššie. Predávajúci vráti peniaze rovnakým spôsobom, akým platba prišla, najneskôr do štrnástich dní od doručenia odstúpenia.</p>
+    <p>Ak právo na odstúpenie nezaniklo, kupujúci od zmluvy odstúpi cez funkciu <a href="odstupenie.html"><b>Odstúpiť od zmluvy tu</b></a>, ktorá je dostupná na každej stránke webu bez prihlásenia, alebo e-mailom na adrese uvedenej vyššie. Po odoslaní cez web dostane kupujúci bez zbytočného odkladu potvrdenie s obsahom odstúpenia, dátumom a časom na svoj e-mail. Predávajúci vráti peniaze rovnakým spôsobom, akým platba prišla, najneskôr do štrnástich dní od doručenia odstúpenia.</p>
 
     <h2 id="reklamacie">10. Reklamácie a vady</h2>
     <p>Ak program nefunguje tak, ako je popísané na tomto webe, kupujúci to oznámi e-mailom. V hlásení pomôže uviesť verziu programu, verziu systému Windows, znenie chybovej hlášky a postup, ktorý k chybe viedol.</p>
@@ -1224,10 +1305,10 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Záruka sa nevzťahuje na chyby spôsobené zásahom do programu, prevádzkou na nepodporovanom systéme, poškodením databázy zo strany kupujúceho alebo stratou dát, ktoré kupujúci nezálohoval.</p>
 
     <h2 id="spory">11. Riešenie sporov</h2>
-    <p>Spory sa riešia prednostne dohodou. Spotrebiteľ má právo obrátiť sa na predávajúceho so žiadosťou o nápravu, a ak na ňu predávajúci odpovie zamietavo alebo neodpovie do tridsiatich dní, môže podať návrh na začatie alternatívneho riešenia sporu subjektu podľa zákona č. 391/2015 Z. z., najmä Slovenskej obchodnej inšpekcii. Návrh sa dá podať aj cez platformu Európskej komisie na riešenie sporov online.</p>
+    <p>Spory sa riešia prednostne dohodou. Spotrebiteľ má právo obrátiť sa na predávajúceho so žiadosťou o nápravu, a ak na ňu predávajúci odpovie zamietavo alebo neodpovie do tridsiatich dní, môže podať návrh na začatie alternatívneho riešenia sporu subjektu podľa zákona č. 391/2015 Z. z., najmä Slovenskej obchodnej inšpekcii.</p>
 
     <h2 id="zaverecne">12. Záverečné ustanovenia</h2>
-    <p>Vzťahy neupravené týmito podmienkami sa riadia právnym poriadkom Slovenskej republiky, najmä Občianskym zákonníkom, zákonom č. 102/2014 Z. z. a zákonom č. 250/2007 Z. z., ak je kupujúci spotrebiteľom.</p>
+    <p>Vzťahy neupravené týmito podmienkami sa riadia právnym poriadkom Slovenskej republiky, najmä Občianskym zákonníkom a zákonom č. 108/2024 Z. z. o ochrane spotrebiteľa, ak je kupujúci spotrebiteľom.</p>
     <p>Predávajúci môže podmienky meniť. Na už uzavreté zmluvy sa vzťahuje znenie platné v čase objednávky.</p>
 
     <p class="doc__date">Účinné od <span data-rok>2026</span>.</p>
@@ -1260,8 +1341,180 @@ stranka404 = head('404.html', 'Stránka sa nenašla — ZNACKA',
 ''' + FOOT
 
 
+# ============================================================ MÔJ ÚČET
+# Správa licencie cez web. Logika je v assets/js/ucet.js a api/ucet/[akcia].js,
+# tu je len kostra stránky.
+ucet = head('ucet.html', 'Môj účet — ZNACKA',
+            'Správa licencie programu ZNACKA — platnosť, počítače a predplatné.',
+            extra=NOINDEX + '<link rel="stylesheet" href="assets/css/ucet.css">\n') + '''
+<section class="phead mriezka">
+  <div class="wrap wrap--mid">
+    <p class="tagline">Môj účet</p>
+    <h1 id="nadpis">Správa licencie</h1>
+    <p class="lead" id="uvod">Prihláste sa licenčným kódom a e-mailom, na ktorý prišiel — pošleme vám jednorazový kód. Uvidíte platnosť licencie, aktivované počítače a platby. Zákazky ani iné dáta z programu tu nie sú &mdash; tie zostávajú na počítači v dielni.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <p class="oznam" id="oznam" hidden></p>
+
+    <!-- prihlásenie -->
+    <div class="pulz u-login-obal" id="prihlasenie" hidden>
+    <div class="box u-login u-login--velke">
+      <h2 class="u-login__nadpis">Prihlásenie</h2>
+
+      <div class="u-soc" id="socialne" hidden>
+        <a class="btn btn--gh btn--lg btn--full u-soc__btn" id="google" href="/api/ucet/google" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.56-5.17 3.56-8.73Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.28a12 12 0 0 0 0 10.8l4.01-3.1Z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.8l3.44-3.44A11.97 11.97 0 0 0 1.28 6.6l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75Z"/></svg>
+          Prihlásiť sa cez Google
+        </a>
+        <p class="u-deli"><span>alebo licenčným kódom</span></p>
+      </div>
+
+      <!-- krok 1: licencia + e-mail -->
+      <form class="u-krok" id="krok1" novalidate>
+        <label class="u-pole">
+          <span>Licenčný kód</span>
+          <input name="licencia" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" maxlength="19" required data-licencia>
+        </label>
+        <label class="u-pole">
+          <span>E-mail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="dielna@priklad.sk" required>
+        </label>
+        <button class="btn btn--gh btn--lg btn--full" type="submit">Poslať kód na e-mail</button>
+      </form>
+
+      <!-- krok 2: 6-ciferný kód -->
+      <form class="u-krok" id="krok2" novalidate hidden>
+        <p class="u-info">Na <b id="kam"></b> sme poslali 6-ciferný kód.</p>
+        <label class="u-pole">
+          <span>Kód z e-mailu</span>
+          <input class="u-otp" name="kod" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" placeholder="000000" required>
+        </label>
+        <button class="btn btn--pri btn--lg btn--full" type="submit">Prihlásiť sa</button>
+        <p class="fine u-cas">Kód platí ešte <b id="odpocet">15:00</b>. <button class="u-link" type="button" id="znova">Poslať nový</button> · <button class="u-link" type="button" id="spat">Zmeniť údaje</button></p>
+      </form>
+
+      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili.</p>
+    </div>
+    </div>
+
+    <!-- prehľad po prihlásení -->
+    <div id="prehlad" hidden>
+      <div class="u-lista">
+        <span>Prihlásený ako <b id="kto"></b></span>
+        <button class="btn btn--gh btn--sm" id="odhlasit" type="button">Odhlásiť</button>
+      </div>
+
+      <div class="u-stat" id="stat"></div>
+
+      <h2 class="u-h2">Licencie</h2>
+      <div class="u-grid" id="licencie"></div>
+
+      <h2 class="u-h2">Platby</h2>
+      <div class="u-tab-wrap">
+        <table class="u-tab" id="platby">
+          <thead><tr><th>Dátum</th><th>Druh</th><th>Licencia</th><th>Suma</th><th>Stav</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 class="u-h2">Účet</h2>
+      <div class="u-grid u-grid--ucet">
+        <article class="u-lic" id="google-box" hidden>
+          <h3>Prihlásenie cez Google</h3>
+          <p class="u-pc__nic" id="google-stav"></p>
+          <div class="u-lic__akcie" id="google-akcie"></div>
+        </article>
+        <article class="u-lic">
+          <h3>Odstúpenie od zmluvy</h3>
+          <p class="u-pc__nic">Ak ste spotrebiteľ a máte právo odstúpiť od zmluvy, urobíte to cez formulár — potvrdenie príde e-mailom.</p>
+          <div class="u-lic__akcie"><a class="btn btn--gh btn--sm" href="odstupenie.html">Odstúpiť od zmluvy tu</a></div>
+        </article>
+        <article class="u-lic u-lic--zmazat">
+          <h3>Zmazať účet</h3>
+          <p class="u-pc__nic">Zmaže prihlásenie na webe a prepojenie s Google. Licencia v programe funguje ďalej a doklady o platbách musíme podľa zákona uchovať. O výmaz ďalších údajov môžete požiadať na <a href="mailto:support@gridservis.app">support@gridservis.app</a>.</p>
+          <div class="u-lic__akcie"><button class="btn btn--gh btn--sm u-zmazat" id="zmazat" type="button">Zmazať účet</button></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+''' + foot('ucet.js')
+
+
+# ============================================================ ODSTÚPENIE
+# Funkcia na odstúpenie od zmluvy podľa § 20a zákona č. 108/2024 Z. z.
+# (povinná od 19. 6. 2026): dostupná bez prihlásenia, označená „odstúpiť
+# od zmluvy tu“, s osobitným potvrdením a potvrdením e-mailom.
+odstupenie = head('odstupenie.html', 'Odstúpenie od zmluvy — ZNACKA',
+                  'Formulár na odstúpenie od zmluvy o predplatnom programu ZNACKA. Potvrdenie príde e-mailom.',
+                  extra=NOINDEX_FOLLOW + '<link rel="stylesheet" href="assets/css/ucet.css">\n') + '''
+<section class="phead mriezka">
+  <div class="wrap wrap--nar">
+    <h1>Odstúpenie od zmluvy</h1>
+    <p class="lead">Tu odstúpite od zmluvy o predplatnom bez prihlásenia a bez písania e-mailu. Po odoslaní vám hneď príde potvrdenie s dátumom a časom.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--nar">
+    <p class="oznam" id="oznam" hidden></p>
+
+    <form class="box u-login" id="odst-form" novalidate>
+      <h3>Údaje o zmluve</h3>
+      <label class="u-pole"><span>Meno a priezvisko</span>
+        <input name="meno" autocomplete="name" required maxlength="120"></label>
+      <label class="u-pole"><span>E-mail z objednávky</span>
+        <input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+      <label class="u-pole"><span>Licenčný kód alebo číslo objednávky</span>
+        <input name="zmluva" autocomplete="off" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" required maxlength="200"></label>
+      <label class="u-pole"><span>Poznámka (nepovinné)</span>
+        <textarea name="poznamka" rows="3" maxlength="2000"></textarea></label>
+      <label class="u-skryte" aria-hidden="true">Web <input name="web" tabindex="-1" autocomplete="off"></label>
+      <button class="btn btn--pri btn--lg btn--full" type="submit">Odstúpiť od zmluvy tu</button>
+    </form>
+
+    <div class="box u-login" id="odst-kontrola" hidden>
+      <h3>Skontrolujte a potvrďte</h3>
+      <dl class="specs" id="odst-suhrn"></dl>
+      <p class="fine">Kliknutím na tlačidlo nižšie odstupujete od zmluvy.</p>
+      <button class="btn btn--pri btn--lg btn--full" id="odst-potvrdit" type="button">Potvrdiť odstúpenie od zmluvy</button>
+      <button class="btn btn--gh btn--full" id="odst-upravit" type="button">Upraviť údaje</button>
+    </div>
+
+    <div class="box box--ok u-login" id="odst-hotovo" hidden>
+      <h3>Odstúpenie je odoslané</h3>
+      <p id="odst-vysledok"></p>
+      <p class="fine">Potvrdenie s obsahom odstúpenia a presným časom sme poslali na váš e-mail. Ak vám vzniká nárok na vrátenie platby, vrátime ju do 14 dní rovnakým spôsobom, akým prišla.</p>
+    </div>
+
+    <div class="two two--top">
+      <div class="box">
+        <h3>Kedy môžete odstúpiť</h3>
+        <p>Spotrebiteľ môže odstúpiť do 14 dní od uzavretia zmluvy. Pri programe, ktorý ste si so svojím výslovným súhlasom stiahli ešte pred uplynutím tejto lehoty, právo na odstúpenie zaniklo — podrobnosti sú v <a href="obchodne-podmienky.html#odstupenie">obchodných podmienkach</a>. Formulár prijmeme v každom prípade a odpovieme vám.</p>
+      </div>
+      <div class="box">
+        <h3>Chcete len zrušiť obnovu?</h3>
+        <p>Automatickú obnovu predplatného vypnete kedykoľvek v programe v Nastaveniach alebo v <a href="ucet.html">Mojom účte</a>. Predplatné potom dobehne do konca zaplateného obdobia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+''' + foot('odstupenie.js')
+
+
+
 NAHRADY = [
     ('PRESUN_SUMA', '%d €' % PRESUN),
+    ('DALSI_ROK_N', '%.2f' % DALSI_PC['rok']),
+    ('DALSI_MESIAC_N', '%.2f' % DALSI_PC['mesiac']),
+    ('CENA_ROK_N', '%.2f' % CENY['rok']),
+    ('CENA_MESIAC_N', '%.2f' % CENY['mesiac']),
+    ('DALSI_ROK', eur(DALSI_PC['rok'])),
+    ('DALSI_MESIAC', eur(DALSI_PC['mesiac'])),
+    ('MAX_PC_N', str(MAX_PC)),
     ('LOGO', LOGO),
     ('ZNACKA', ZNACKA),
     ('ROCNE_MESACNE', eur(ROCNE_MESACNE)),
@@ -1284,6 +1537,7 @@ for name, content in [('index.html', index), ('funkcie.html', funkcie),
                       ('presun.html', presun),
                       ('ochrana-sukromia.html', sukromie), ('cookies.html', cookies),
                       ('obchodne-podmienky.html', vop),
+                      ('ucet.html', ucet), ('odstupenie.html', odstupenie),
                       ('404.html', stranka404)]:
     content = content.replace('</a><a class="btn', '</a>\n        <a class="btn')
     for kluc, hodnota in NAHRADY:
