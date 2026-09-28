@@ -138,17 +138,7 @@
     a.addEventListener('click', function () { zapis('klik_demo'); });
   });
 
-  /* ---------------- pulzujúca mriežka ----------------
-     Keď je mriežka mimo obrazovky, animácia sa zastaví, nech zbytočne
-     nezaťažuje prehliadač pri scrollovaní. */
-  if ('IntersectionObserver' in window) {
-    var pozor = new IntersectionObserver(function (zaznamy) {
-      zaznamy.forEach(function (z) { z.target.classList.toggle('pulz--stoj', !z.isIntersecting); });
-    }, { rootMargin: '200px 0px' });
-    each('.pulz', function (el) { pozor.observe(el); });
-  }
-
-  /* ---------------- počet počítačov v cenníku ----------------
+/* ---------------- počet počítačov v cenníku ----------------
      Prvý počítač za plnú cenu, každý ďalší za príplatok z data-dalsi.
      Počet ide do formulárov ako skryté pole pocitace; server ho overí
      a obmedzí znova (api/_stripe.js, MAX_PC). */
