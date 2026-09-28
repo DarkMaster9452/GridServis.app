@@ -1,33 +1,39 @@
-/* /api/ucet/<akcia> — SKÚŠOBNÁ správa licencie cez web (len preview).
+/* /api/ucet/<akcia> — Môj účet: správa licencie cez web.
 
-   Prihlásenie tromi spôsobmi, všetky vedú k tomu istému: overenému e-mailu.
-   Účet = všetky licencie, ktoré majú tento e-mail ako kontakt (alebo v stĺpci email).
-     * licenčný kód + e-mail → na e-mail príde 6-ciferný kód, platí 15 minút,
-       dá sa použiť raz a po použití (alebo 5 zlých pokusoch) sa z DB zmaže,
-     * Google (OAuth, keď sú nastavené GOOGLE_CLIENT_ID a GOOGLE_CLIENT_SECRET),
-     * Apple (Sign in with Apple, keď sú nastavené APPLE_*).
+   Účet = všetky licencie, ktoré majú prihlásený e-mail v stĺpci kontakt
+   alebo email. Prihlásiť sa dá dvoma spôsobmi:
+     * licenčný kód + e-mail → na e-mail príde 6-ciferný kód. Je náhodný,
+       platí 15 minút, dá sa použiť raz a po použití, 5 zlých pokusoch
+       alebo prepadnutí sa z DB zmaže (v DB je len jeho HMAC odtlačok),
+     * Google — len keď si ho dielňa v účte najprv sama prepojí (po
+       prihlásení kódom). Na jeden účet jeden Google účet a naopak.
+       Kód z e-mailu funguje aj naďalej.
 
    Dáta z programu (zákazky, sklad…) sem nepatria — tie sú len na počítači
-   v dielni. Web k nim ani nemá prístup (pozri _db.js).
+   v dielni. Web k nim ani nemá prístup (pozri _db.js). Program sa aj
+   naďalej aktivuje len licenčným kódom.
 
-   Celé to tvoria len tieto súbory a jedna tabuľka, dajú sa zmazať bez náhrady:
-     api/ucet/[akcia].js, public/ucet.html, public/assets/js/ucet.js,
-     public/assets/css/ucet.css, tools/ucet-kody.sql (DROP TABLE ucet_kody)
+   Tabuľky: ucet_kody, ucet_prepojenia, odstupenia (tools/ucet.sql).
 
    Akcie:
-     GET  nastavenia                         → ktoré prihlásenia sú zapnuté
-     POST poziadat   { licencia, email }     → pošle 6-ciferný kód e-mailom
-     POST overit     { email, kod }          → overí kód, nastaví cookie gs_ucet
-     GET  google / apple                     → presmeruje na prihlásenie
-     GET  google-spat, POST apple-spat       → návrat z Google / Apple
-     GET  ja                                 → licencie, zariadenia, platby
-     POST portal     { kod }                 → odkaz do Stripe portálu
-     POST odhlasit                           → zmaže cookie */
+     GET  nastavenia                          → čo je zapnuté (Google)
+     POST poziadat    { licencia, email }     → pošle 6-ciferný kód e-mailom
+     POST overit      { email, kod }          → overí kód, nastaví cookie gs_ucet
+     GET  google[?prepojit=1]                 → presmeruje na Google
+     GET  google-spat                         → návrat z Google
+     POST odpojit-google                      → zruší prepojenie
+     GET  ja                                  → licencie, zariadenia, platby
+     POST portal      { kod }                 → odkaz do Stripe portálu
+     POST zmazat-ucet                         → zmaže účet (prepojenia, kódy)
+     POST odhlasit                            → zmaže cookie
+     POST odstupenie  { meno, email, zmluva, poznamka }
+                      → odstúpenie od zmluvy (§ 20a zákona č. 108/2024 Z. z.),
+                        bez prihlásenia; potvrdenie príde e-mailom */
 
 var crypto = require('crypto');
 var { sql, riadok } = require('../_db');
 var { stripe, adresaWebu, nastavene } = require('../_stripe');
-var { otpBlok, tlacidlo, obalka, FONT } = require('../_email-vzhlad');
+var { otpBlok, tlacidlo, obalka, odosli, FONT } = require('../_email-vzhlad');
 
 var COOKIE = 'gs_ucet';
 var COOKIE_OAUTH = 'gs_ucet_oauth';
@@ -38,15 +44,12 @@ var KOD_ZNOVA_SEKUND = 60;        // najskôr po tomto čase možno poslať nov�
 
 var ENV = process.env;
 var GOOGLE = Boolean(ENV.GOOGLE_CLIENT_ID && ENV.GOOGLE_CLIENT_SECRET);
-var APPLE = Boolean(ENV.APPLE_CLIENT_ID && ENV.APPLE_TEAM_ID && ENV.APPLE_KEY_ID && ENV.APPLE_PRIVATE_KEY);
 var RESEND = Boolean(ENV.RESEND_API_KEY && ENV.RESEND_FROM);
-/* kontakt v e-mailoch účtu a ostrá adresa webu (logo, odkazy v pätičke) */
 var PODPORA = 'support@gridservis.app';
-var WEB_OSTRY = (ENV.SITE_URL || 'https://www.gridservis.app').replace(/\/+$/, '');
 
 /* ---------- podpisy a cookies ---------- */
 
-/* Podpisový kľúč. Najlepšie vlastný UCET_TAJOMSTVO; na skúšku sa odvodí
+/* Podpisový kľúč. Najlepšie vlastný UCET_TAJOMSTVO; inak sa odvodí
    z DATABASE_URL, ktorá je tak či tak tajná. */
 function kluc() {
   var zaklad = ENV.UCET_TAJOMSTVO || ENV.DATABASE_URL || '';
@@ -99,6 +102,11 @@ function prihlas(email) {
   nastavCookie(COOKIE, zapecat({ e: String(email).toLowerCase() }, PLATNOST), PLATNOST);
 }
 
+function relacia(req) {
+  var o = otvor(cookie(req, COOKIE));
+  return o && o.e ? o.e : null;
+}
+
 /* ---------- pomocníci ---------- */
 
 function telo(req) {
@@ -112,6 +120,12 @@ function telo(req) {
 
 var JE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 function vlastnenaLicencia(kod, email) {
   return riadok(
     `SELECT kod FROM licencie
@@ -119,14 +133,24 @@ function vlastnenaLicencia(kod, email) {
     [kod, email]);
 }
 
-/* návrat z Google/Apple späť na stránku, prípadne s chybou */
-function naStranku(req, res, chyba) {
+async function posliEmail(sprava) {
+  var r = await odosli(Object.assign({ from: ENV.RESEND_FROM, reply_to: PODPORA }, sprava));
+  if (!r.ok) throw new Error('resend ' + r.status + ' ' + (await r.text().catch(function () { return ''; })));
+}
+
+function h1(text) {
+  return '\n      <h1 style="margin:0 0 14px;font-family:' + FONT + ';font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-.01em;color:#0d1117;">' + text + '</h1>';
+}
+
+/* návrat z Google späť na stránku, prípadne so správou */
+function naStranku(req, res, sprava, ok) {
   res.setHeader('Set-Cookie', noveCookies);
-  res.redirect(303, adresaWebu(req) + '/ucet.html' + (chyba ? '?chyba=' + encodeURIComponent(chyba) : ''));
+  var q = sprava ? '?' + (ok ? 'info' : 'chyba') + '=' + encodeURIComponent(sprava) : '';
+  res.redirect(303, adresaWebu(req) + '/ucet.html' + q);
 }
 
 /* payload z id_tokenu. Podpis sa neoveruje zámerne: token prišiel priamo
-   zo servera Google/Apple cez HTTPS ako odpoveď na výmenu kódu, nie od
+   zo servera Google cez HTTPS ako odpoveď na výmenu kódu, nie od
    prehliadača — tak to pripúšťa aj dokumentácia Google. */
 function obsahTokenu(idToken) {
   var casti = String(idToken || '').split('.');
@@ -145,27 +169,22 @@ async function posliKod(email, kod, web) {
      na server ani do logov nikdy neposiela */
   var klik = web + '/ucet.html#prihlasit=' + encodeURIComponent(email) + ':' + kod;
   var obsah =
-    '\n      <h1 style="margin:0 0 14px;font-family:' + FONT + ';font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-.01em;color:#0d1117;">Prihlásenie do účtu</h1>' +
+    h1('Prihlásenie do účtu') +
     '\n      <p style="margin:0 0 4px;color:#0d1117;">Na prihlásenie do správy licencie GridServis zadajte tento kód:</p>' +
     otpBlok(kod, 'KÓD NA PRIHLÁSENIE') +
     '\n      <p style="margin:0;color:#55606e;font-size:14px;">Platí ' + KOD_MINUT + ' minút a dá sa použiť len raz. Kód nemusíte prepisovať — stačí kliknúť:</p>' +
     tlacidlo('Prihlásiť sa jedným klikom →', klik) +
     '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Ak ste o prihlásenie nežiadali, e-mail pokojne ignorujte — bez kódu sa do účtu nikto nedostane.</p>';
-  var r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + ENV.RESEND_API_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: ENV.RESEND_FROM, to: [email], reply_to: PODPORA,
-      subject: kod + ' — kód na prihlásenie do GridServis',
-      html: obalka('Kód na prihlásenie', obsah, WEB_OSTRY, PODPORA),
-      text: 'Kód na prihlásenie do správy licencie GridServis: ' + kod +
-        '\n\nPlatí ' + KOD_MINUT + ' minút a dá sa použiť len raz.' +
-        '\nPrihlásenie jedným klikom: ' + klik +
-        '\n\nAk ste o prihlásenie nežiadali, e-mail ignorujte.' +
-        '\nOtázky: ' + PODPORA
-    })
+  await posliEmail({
+    to: [email],
+    subject: kod + ' — kód na prihlásenie do GridServis',
+    html: obalka('Kód na prihlásenie', obsah, '', PODPORA),
+    text: 'Kód na prihlásenie do správy licencie GridServis: ' + kod +
+      '\n\nPlatí ' + KOD_MINUT + ' minút a dá sa použiť len raz.' +
+      '\nPrihlásenie jedným klikom: ' + klik +
+      '\n\nAk ste o prihlásenie nežiadali, e-mail ignorujte.' +
+      '\nOtázky: ' + PODPORA
   });
-  if (!r.ok) throw new Error('resend ' + r.status + ' ' + (await r.text().catch(function () { return ''; })));
 }
 
 async function poziadat(req, res) {
@@ -178,7 +197,7 @@ async function poziadat(req, res) {
     return;
   }
   if (!RESEND) {
-    res.status(503).json({ ok: false, chyba: 'Odosielanie e-mailov nie je na tomto nasadení nastavené.' });
+    res.status(503).json({ ok: false, chyba: 'Odosielanie e-mailov nie je nastavené.' });
     return;
   }
 
@@ -259,48 +278,34 @@ async function overit(req, res) {
   res.status(200).json({ ok: true });
 }
 
-/* ---------- Google ---------- */
+/* ---------- Google: prepojenie a prihlásenie ---------- */
 
-function spatUrl(req, kto) {
-  return adresaWebu(req) + '/api/ucet/' + kto + '-spat';
+function spatUrl(req) {
+  return adresaWebu(req) + '/api/ucet/google-spat';
 }
 
-function zacniOAuth(req, res, kto) {
+function zacniGoogle(req, res) {
+  var prepojit = String((req.query && req.query.prepojit) || '') === '1';
+  var email = relacia(req);
+  if (prepojit && !email) return naStranku(req, res, 'Najprv sa prihláste kódom z e-mailu.');
+
   var stav = crypto.randomBytes(18).toString('base64url');
   var nonce = crypto.randomBytes(18).toString('base64url');
-  /* Apple sa vracia POSTom z inej domény — cookie musí byť SameSite=None */
-  nastavCookie(COOKIE_OAUTH, zapecat({ s: stav, n: nonce, k: kto }, 600), 600, 'None');
+  /* návrat z Google je presmerovanie z inej domény — SameSite=Lax */
+  nastavCookie(COOKIE_OAUTH, zapecat({ s: stav, n: nonce, p: prepojit ? email : '' }, 600), 600, 'Lax');
   res.setHeader('Set-Cookie', noveCookies);
-
-  var p;
-  if (kto === 'google') {
-    p = new URLSearchParams({
-      client_id: ENV.GOOGLE_CLIENT_ID, redirect_uri: spatUrl(req, 'google'),
-      response_type: 'code', scope: 'openid email', state: stav, nonce: nonce,
-      prompt: 'select_account'
-    });
-    res.redirect(302, 'https://accounts.google.com/o/oauth2/v2/auth?' + p);
-  } else {
-    p = new URLSearchParams({
-      client_id: ENV.APPLE_CLIENT_ID, redirect_uri: spatUrl(req, 'apple'),
-      response_type: 'code', response_mode: 'form_post', scope: 'email',
-      state: stav, nonce: nonce
-    });
-    res.redirect(302, 'https://appleid.apple.com/auth/authorize?' + p);
-  }
-}
-
-function overStav(req, kto, stav) {
-  var o = otvor(cookie(req, COOKIE_OAUTH));
-  nastavCookie(COOKIE_OAUTH, '', 0, 'None');
-  if (!o || o.k !== kto || !stav || !rovnake(o.s, stav)) return null;
-  return o;
+  res.redirect(302, 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({
+    client_id: ENV.GOOGLE_CLIENT_ID, redirect_uri: spatUrl(req),
+    response_type: 'code', scope: 'openid email', state: stav, nonce: nonce,
+    prompt: 'select_account'
+  }));
 }
 
 async function googleSpat(req, res) {
   var q = req.query || {};
-  var o = overStav(req, 'google', q.state);
-  if (!o) return naStranku(req, res, 'Prihlásenie vypršalo, skúste to znova.');
+  var o = otvor(cookie(req, COOKIE_OAUTH));
+  nastavCookie(COOKIE_OAUTH, '', 0, 'Lax');
+  if (!o || !q.state || !rovnake(o.s, q.state)) return naStranku(req, res, 'Prihlásenie vypršalo, skúste to znova.');
   if (!q.code) return naStranku(req, res, 'Prihlásenie cez Google bolo zrušené.');
 
   var r = await fetch('https://oauth2.googleapis.com/token', {
@@ -308,60 +313,44 @@ async function googleSpat(req, res) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       code: q.code, client_id: ENV.GOOGLE_CLIENT_ID, client_secret: ENV.GOOGLE_CLIENT_SECRET,
-      redirect_uri: spatUrl(req, 'google'), grant_type: 'authorization_code'
+      redirect_uri: spatUrl(req), grant_type: 'authorization_code'
     })
   });
   var t = await r.json().catch(function () { return {}; });
   var id = obsahTokenu(t.id_token);
-  if (!r.ok || !id || id.aud !== ENV.GOOGLE_CLIENT_ID || id.nonce !== o.n ||
-      ['accounts.google.com', 'https://accounts.google.com'].indexOf(id.iss) === -1 ||
-      !id.email || id.email_verified !== true) {
+  if (!r.ok || !id || id.aud !== ENV.GOOGLE_CLIENT_ID || id.nonce !== o.n || !id.sub ||
+      ['accounts.google.com', 'https://accounts.google.com'].indexOf(id.iss) === -1) {
     console.error('ucet: google', r.status, t.error || '');
     return naStranku(req, res, 'Google prihlásenie sa nepodarilo overiť.');
   }
-  prihlas(id.email);
-  naStranku(req, res);
-}
+  var gEmail = String(id.email || '').toLowerCase();
 
-/* ---------- Apple ---------- */
-
-/* Apple chce namiesto hesla krátkodobý JWT podpísaný kľúčom .p8 (ES256) */
-function appleTajomstvo() {
-  var teraz = Math.floor(Date.now() / 1000);
-  var hlava = Buffer.from(JSON.stringify({ alg: 'ES256', kid: ENV.APPLE_KEY_ID })).toString('base64url');
-  var telo = Buffer.from(JSON.stringify({
-    iss: ENV.APPLE_TEAM_ID, iat: teraz, exp: teraz + 300,
-    aud: 'https://appleid.apple.com', sub: ENV.APPLE_CLIENT_ID
-  })).toString('base64url');
-  var kluc = String(ENV.APPLE_PRIVATE_KEY).replace(/\\n/g, '\n');
-  var podpis = crypto.sign('sha256', Buffer.from(hlava + '.' + telo),
-    { key: kluc, dsaEncoding: 'ieee-p1363' }).toString('base64url');
-  return hlava + '.' + telo + '.' + podpis;
-}
-
-async function appleSpat(req, res) {
-  var u = telo(req);
-  var o = overStav(req, 'apple', u.state);
-  if (!o) return naStranku(req, res, 'Prihlásenie vypršalo, skúste to znova.');
-  if (!u.code) return naStranku(req, res, 'Prihlásenie cez Apple bolo zrušené.');
-
-  var r = await fetch('https://appleid.apple.com/auth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      code: u.code, client_id: ENV.APPLE_CLIENT_ID, client_secret: appleTajomstvo(),
-      redirect_uri: spatUrl(req, 'apple'), grant_type: 'authorization_code'
-    })
-  });
-  var t = await r.json().catch(function () { return {}; });
-  var id = obsahTokenu(t.id_token);
-  var overeny = id && (id.email_verified === true || id.email_verified === 'true');
-  if (!r.ok || !id || id.aud !== ENV.APPLE_CLIENT_ID || id.iss !== 'https://appleid.apple.com' ||
-      id.nonce !== o.n || !id.email || !overeny) {
-    console.error('ucet: apple', r.status, t.error || '');
-    return naStranku(req, res, 'Apple prihlásenie sa nepodarilo overiť.');
+  /* prepojenie: prihlásený účet si pridáva svoj Google */
+  if (o.p) {
+    var iny = await riadok(
+      `SELECT ucet_email FROM ucet_prepojenia WHERE poskytovatel = 'google' AND sub = $1`, [id.sub]);
+    if (iny && iny.ucet_email !== o.p) {
+      return naStranku(req, res, 'Tento Google účet je už prepojený s iným účtom GridServis.');
+    }
+    /* jeden Google na účet — nové prepojenie nahradí staré */
+    await sql(
+      `INSERT INTO ucet_prepojenia (ucet_email, poskytovatel, sub, email_poskytovatela, vytvorene)
+       VALUES ($1, 'google', $2, $3, now())
+       ON CONFLICT (ucet_email, poskytovatel) DO UPDATE
+          SET sub = EXCLUDED.sub, email_poskytovatela = EXCLUDED.email_poskytovatela, vytvorene = now()`,
+      [o.p, id.sub, gEmail]);
+    prihlas(o.p);
+    return naStranku(req, res, 'Google účet ' + gEmail + ' je prepojený. Odteraz sa môžete prihlásiť aj cez Google.', true);
   }
-  prihlas(id.email);
+
+  /* prihlásenie: len prepojený Google účet */
+  var p = await riadok(
+    `SELECT ucet_email FROM ucet_prepojenia WHERE poskytovatel = 'google' AND sub = $1`, [id.sub]);
+  if (!p) {
+    return naStranku(req, res, 'Tento Google účet nie je prepojený so žiadnou licenciou. Prihláste sa kódom z e-mailu a v účte kliknite na „Prepojiť s Google“.');
+  }
+  await sql(`UPDATE ucet_prepojenia SET naposledy = now() WHERE poskytovatel = 'google' AND sub = $1`, [id.sub]);
+  prihlas(p.ucet_email);
   naStranku(req, res);
 }
 
@@ -388,10 +377,13 @@ async function ja(req, res, email) {
          FROM platby WHERE kod = ANY($1::text[])
         ORDER BY cas DESC LIMIT 30`, [pole]);
   }
+  var google = await riadok(
+    `SELECT email_poskytovatela FROM ucet_prepojenia WHERE ucet_email = $1 AND poskytovatel = 'google'`, [email]);
 
   res.status(200).json({
     ok: true,
     email: email,
+    google: { zapnute: GOOGLE, prepojene: google ? google.email_poskytovatela || 'prepojené' : '' },
     licencie: licencie.map(function (l) {
       return {
         kod: l.kod,
@@ -430,12 +422,96 @@ async function portal(req, res, email) {
     res.status(404).json({ ok: false, chyba: 'K tejto licencii nie je predplatné cez web.' });
     return;
   }
-  var relacia = await stripe('/billing_portal/sessions', {
+  var r = await stripe('/billing_portal/sessions', {
     customer: platba.stripe_zakaznik,
     return_url: adresaWebu(req) + '/ucet.html',
     locale: 'sk'
   });
-  res.status(200).json({ ok: true, url: relacia.url });
+  res.status(200).json({ ok: true, url: r.url });
+}
+
+/* Zmazanie účtu na webe: prepojenie s Google, rozpracované kódy a prihlásenie.
+   Licencia sama sa nemaže — je to zmluva, na ktorej beží program v dielni,
+   a doklady o platbách treba podľa zákona uchovať. O výmaz ostatných
+   osobných údajov sa dá požiadať e-mailom (pozri ochrana-sukromia.html). */
+async function zmazatUcet(req, res, email) {
+  await sql('DELETE FROM ucet_prepojenia WHERE ucet_email = $1', [email]);
+  await sql('DELETE FROM ucet_kody WHERE email = $1', [email]);
+  nastavCookie(COOKIE, '', 0);
+  res.setHeader('Set-Cookie', noveCookies);
+  res.status(200).json({ ok: true });
+}
+
+/* ---------- odstúpenie od zmluvy (§ 20a zákona č. 108/2024 Z. z.) ---------- */
+
+async function odstupenie(req, res) {
+  var u = telo(req);
+  var meno = String(u.meno || '').trim().slice(0, 120);
+  var email = String(u.email || '').trim().toLowerCase().slice(0, 200);
+  var zmluva = String(u.zmluva || '').trim().slice(0, 200);
+  var poznamka = String(u.poznamka || '').trim().slice(0, 2000);
+
+  /* pasca na roboty — skryté pole vyplní len robot */
+  if (u.web) { res.status(200).json({ ok: true }); return; }
+
+  if (!meno || !JE_EMAIL.test(email) || !zmluva) {
+    res.status(400).json({ ok: false, chyba: 'Vyplňte meno, e-mail a údaje o zmluve.' });
+    return;
+  }
+  if (!RESEND) {
+    res.status(503).json({ ok: false, chyba: 'Odoslanie teraz nefunguje. Odstúpte prosím e-mailom na ' + PODPORA + '.' });
+    return;
+  }
+
+  var zaznam = await riadok(
+    `INSERT INTO odstupenia (meno, email, zmluva, poznamka) VALUES ($1, $2, $3, $4)
+     RETURNING id, cas`, [meno, email, zmluva, poznamka]);
+  var kedy = new Date(zaznam.cas).toLocaleString('sk-SK', { timeZone: 'Europe/Bratislava' });
+  var cislo = 'O' + String(zaznam.id).padStart(5, '0');
+
+  var riadky = [
+    ['Číslo odstúpenia', cislo],
+    ['Dátum a čas', kedy],
+    ['Meno a priezvisko', meno],
+    ['E-mail', email],
+    ['Zmluva (licenčný kód / objednávka)', zmluva],
+    ['Poznámka', poznamka || '—']
+  ];
+  var tabulka = '\n      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0;border:1px solid #e8ebf0;border-radius:12px;">' +
+    riadky.map(function (r) {
+      return '<tr><td style="padding:10px 14px;border-bottom:1px solid #e8ebf0;color:#55606e;font-size:13px;">' + esc(r[0]) +
+        '</td><td style="padding:10px 14px;border-bottom:1px solid #e8ebf0;font-size:14px;color:#0d1117;"><b>' + esc(r[1]) + '</b></td></tr>';
+    }).join('') + '</table>';
+  var text = riadky.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+
+  try {
+    /* potvrdenie spotrebiteľovi na trvanlivom médiu */
+    await posliEmail({
+      to: [email],
+      subject: 'Potvrdenie odstúpenia od zmluvy ' + cislo + ' — GridServis',
+      html: obalka('Potvrdenie odstúpenia od zmluvy',
+        h1('Odstúpenie od zmluvy sme prijali') +
+        '\n      <p style="margin:0;color:#0d1117;">Potvrdzujeme, že sme prijali vaše odstúpenie od zmluvy s týmto obsahom:</p>' +
+        tabulka +
+        '\n      <p style="margin:0;color:#55606e;font-size:14px;">Ak vám vzniká nárok na vrátenie platby, vrátime ju rovnakým spôsobom, akým prišla, najneskôr do 14 dní. Ozveme sa vám e-mailom.</p>',
+        '', PODPORA),
+      text: 'Potvrdzujeme prijatie odstúpenia od zmluvy.\n\n' + text +
+        '\n\nAk vám vzniká nárok na vrátenie platby, vrátime ju do 14 dní.\nOtázky: ' + PODPORA
+    });
+    /* kópia predávajúcemu */
+    await posliEmail({
+      to: [PODPORA],
+      reply_to: email,
+      subject: 'Odstúpenie od zmluvy ' + cislo + ' — ' + zmluva,
+      html: obalka('Odstúpenie od zmluvy', h1('Nové odstúpenie od zmluvy') + tabulka, '', PODPORA),
+      text: text
+    });
+  } catch (e) {
+    console.error('odstupenie: email', cislo, e.message);
+    res.status(502).json({ ok: false, cislo: cislo, chyba: 'Odstúpenie je zapísané (' + cislo + '), ale potvrdenie sa nepodarilo odoslať. Napíšte prosím na ' + PODPORA + '.' });
+    return;
+  }
+  res.status(200).json({ ok: true, cislo: cislo, cas: kedy });
 }
 
 module.exports = async function (req, res) {
@@ -453,7 +529,7 @@ module.exports = async function (req, res) {
 
   try {
     if (akcia === 'nastavenia') {
-      res.status(200).json({ ok: true, google: GOOGLE, apple: APPLE, email: RESEND });
+      res.status(200).json({ ok: true, google: GOOGLE, email: RESEND });
       return;
     }
     if (akcia === 'odhlasit' && post) {
@@ -462,25 +538,30 @@ module.exports = async function (req, res) {
       res.status(200).json({ ok: true });
       return;
     }
+    if (akcia === 'odstupenie' && post) { await odstupenie(req, res); return; }
     if (akcia === 'poziadat' && post) { await poziadat(req, res); return; }
     if (akcia === 'overit' && post) { await overit(req, res); return; }
-    if (akcia === 'google' && GOOGLE) { zacniOAuth(req, res, 'google'); return; }
-    if (akcia === 'apple' && APPLE) { zacniOAuth(req, res, 'apple'); return; }
+    if (akcia === 'google' && GOOGLE) { zacniGoogle(req, res); return; }
     if (akcia === 'google-spat' && GOOGLE) { await googleSpat(req, res); return; }
-    if (akcia === 'apple-spat' && APPLE && post) { await appleSpat(req, res); return; }
 
-    var relacia = otvor(cookie(req, COOKIE));
-    if (!relacia || !relacia.e) {
+    var email = relacia(req);
+    if (!email) {
       res.status(401).json({ ok: false, chyba: 'Nie ste prihlásený.' });
       return;
     }
-    if (akcia === 'ja') { await ja(req, res, relacia.e); return; }
-    if (akcia === 'portal' && post) { await portal(req, res, relacia.e); return; }
+    if (akcia === 'ja') { await ja(req, res, email); return; }
+    if (akcia === 'portal' && post) { await portal(req, res, email); return; }
+    if (akcia === 'odpojit-google' && post) {
+      await sql(`DELETE FROM ucet_prepojenia WHERE ucet_email = $1 AND poskytovatel = 'google'`, [email]);
+      res.status(200).json({ ok: true });
+      return;
+    }
+    if (akcia === 'zmazat-ucet' && post) { await zmazatUcet(req, res, email); return; }
 
     res.status(404).json({ ok: false, chyba: 'Neznáma akcia.' });
   } catch (e) {
     console.error('ucet:', akcia, e.message);
-    if (/-spat$/.test(akcia)) { naStranku(req, res, 'Prihlásenie sa nepodarilo.'); return; }
+    if (akcia === 'google-spat') { naStranku(req, res, 'Prihlásenie sa nepodarilo.'); return; }
     res.status(e.stav || 502).json({ ok: false, chyba: 'Niečo sa pokazilo, skúste to o chvíľu.' });
   }
 };

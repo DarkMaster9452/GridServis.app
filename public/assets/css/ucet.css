@@ -45,7 +45,7 @@
 .u-pc__nic{color:var(--mut);font-size:.9rem;margin:0}
 
 /* platby */
-.u-tab-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+.u-tab-wrap{margin-bottom:44px;overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
 .u-tab{font-size:.92rem;min-width:560px}
 .u-tab th,.u-tab td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 .u-tab th{background:var(--bg-2);color:var(--mut);font-size:.78rem;font-weight:620;letter-spacing:.06em;text-transform:uppercase}
@@ -70,3 +70,14 @@
 .u-cas{margin:0}
 .u-link{font:inherit;padding:0;border:0;background:none;color:var(--acc);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .u-link:disabled{color:var(--mut);cursor:default;text-decoration:none}
+
+/* sekcia Účet */
+.u-lic h3{margin:0}
+.u-zmazat{color:#b42318;border-color:#f1c4bf}
+.u-zmazat:hover{background:#fdf1f0;border-color:#b42318}
+
+/* odstúpenie od zmluvy */
+.u-pole textarea{font:inherit;padding:.7em .9em;border:1px solid var(--line-2);border-radius:11px;background:var(--bg);color:var(--ink);width:100%;resize:vertical}
+.u-pole textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.u-skryte{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+#odst-kontrola .specs dd{word-break:break-word}

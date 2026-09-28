@@ -161,6 +161,15 @@
       ? riadky.join('')
       : '<tr><td class="u-prazdne" colspan="5">Zatiaľ žiadne platby cez web.</td></tr>';
 
+    var g = d.google || {};
+    $('google-box').hidden = !g.zapnute && !g.prepojene;
+    $('google-stav').textContent = g.prepojene
+      ? 'Prepojené s účtom ' + g.prepojene + '. Prihlásiť sa môžete cez Google aj kódom z e-mailu.'
+      : 'Po prepojení sa môžete prihlasovať jedným klikom cez Google. Kód z e-mailu bude fungovať aj naďalej.';
+    $('google-akcie').innerHTML = g.prepojene
+      ? '<button class="btn btn--gh btn--sm" type="button" id="odpojit">Odpojiť Google</button>'
+      : '<a class="btn btn--pri btn--sm" href="/api/ucet/google?prepojit=1">Prepojiť s Google</a>';
+
     $('nadpis').textContent = 'Môj účet';
     $('uvod').textContent = 'Licencie, počítače a platby k vášmu e-mailu. Zákazky ani iné dáta z programu tu nie sú — tie zostávajú na počítači v dielni.';
     formular.hidden = true;
@@ -200,13 +209,20 @@
   async function nastavenia() {
     var n = await api('nastavenia');
     $('google').hidden = !n.google;
-    $('apple').hidden = !n.apple;
-    $('socialne').hidden = !(n.google || n.apple);
+    $('socialne').hidden = !n.google;
   }
 
   async function nacitaj() {
     var d = await api('ja');
-    if (d.ok) { vykresli(d); return true; }
+    if (d.ok) {
+      vykresli(d);
+      var q = new URLSearchParams(location.search);
+      if (q.get('info') || q.get('chyba')) {
+        hlas(q.get('info') || q.get('chyba'));
+        history.replaceState(null, '', location.pathname);
+      }
+      return true;
+    }
     prehlad.hidden = true;
     formular.hidden = false;
     ukazKrok(1);
@@ -215,7 +231,7 @@
     var q = new URLSearchParams(location.search);
     /* licenčný kód z odkazu (napr. z programu) sa predvyplní */
     if (q.get('kod') && !krok1.licencia.value) krok1.licencia.value = q.get('kod');
-    /* chyba po návrate z Google / Apple */
+    /* chyba po návrate z Google */
     if (q.get('chyba')) hlas(q.get('chyba'));
   }
 
@@ -301,6 +317,26 @@
       if (!confirm('Uvoľniť tento počítač? Po zaplatení 5 € sa odhlási a licenciu aktivujete na inom počítači tým istým kódom.')) return;
       presmeruj('/api/presun', { kod: t.dataset.presun, pc: t.dataset.pc }, t);
     }
+  });
+
+  $('google-akcie').addEventListener('click', async function (e) {
+    if (!e.target.closest('#odpojit')) return;
+    if (!confirm('Odpojiť Google? Prihlásiť sa potom dá kódom z e-mailu.')) return;
+    await api('odpojit-google', {});
+    hlas('Google je odpojený.');
+    nacitaj();
+  });
+
+  $('zmazat').addEventListener('click', async function () {
+    if (!confirm('Naozaj zmazať účet?\n\nZmaže sa prihlásenie na webe a prepojenie s Google. Licencia v programe funguje ďalej. Kedykoľvek sa môžete znova prihlásiť kódom z e-mailu.')) return;
+    this.disabled = true;
+    var d = await api('zmazat-ucet', {});
+    this.disabled = false;
+    if (!d.ok) { hlas(d.chyba || 'Účet sa nepodarilo zmazať.'); return; }
+    krok1.reset();
+    $('nadpis').textContent = 'Správa licencie';
+    await nacitaj();
+    hlas('Účet je zmazaný. Prepojenie s Google aj prihlásenie sú preč.');
   });
 
   /* prihlásenie jedným klikom z e-mailu: #prihlasit=<email>:<kód> */

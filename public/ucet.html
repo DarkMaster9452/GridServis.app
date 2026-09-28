@@ -23,8 +23,8 @@
 <link rel="icon" type="image/png" sizes="512x512" href="assets/img/favicon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="stylesheet" href="assets/css/styles.css">
-<link rel="stylesheet" href="assets/css/ucet.css">
 <meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="assets/css/ucet.css">
 </head>
 <body>
 <a class="skip" href="#obsah">Preskočiť na obsah</a>
@@ -42,7 +42,7 @@
       <a href="faq.html">FAQ</a>
       <a href="kontakt.html">Kontakt</a>
     </nav>
-    <a class="btn btn--gh btn--sm hdr__cta hdr__ucet" href="ucet.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Prihlásiť</a>
+    <a class="btn btn--gh btn--sm hdr__cta hdr__ucet" href="ucet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Prihlásiť</a>
     <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
     <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
   </div>
@@ -63,7 +63,7 @@
   <div class="wrap wrap--mid">
     <p class="tagline">Môj účet</p>
     <h1 id="nadpis">Správa licencie</h1>
-    <p class="lead" id="uvod">Prihláste sa cez Google, Apple alebo licenčným kódom s e-mailom, na ktorý prišiel. Uvidíte platnosť licencie, aktivované počítače a platby. Zákazky ani iné dáta z programu tu nie sú &mdash; tie zostávajú na počítači v dielni.</p>
+    <p class="lead" id="uvod">Prihláste sa licenčným kódom a e-mailom, na ktorý prišiel — pošleme vám jednorazový kód. Uvidíte platnosť licencie, aktivované počítače a platby. Zákazky ani iné dáta z programu tu nie sú &mdash; tie zostávajú na počítači v dielni.</p>
   </div>
 </section>
 
@@ -78,11 +78,7 @@
       <div class="u-soc" id="socialne" hidden>
         <a class="btn btn--gh btn--lg btn--full u-soc__btn" id="google" href="/api/ucet/google" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.56-5.17 3.56-8.73Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.28a12 12 0 0 0 0 10.8l4.01-3.1Z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.8l3.44-3.44A11.97 11.97 0 0 0 1.28 6.6l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75Z"/></svg>
-          Pokračovať cez Google
-        </a>
-        <a class="btn btn--pri btn--lg btn--full u-soc__btn" id="apple" href="/api/ucet/apple" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.37 12.73c-.02-2.3 1.88-3.4 1.96-3.46a4.22 4.22 0 0 0-3.32-1.8c-1.4-.14-2.75.83-3.46.83-.72 0-1.82-.81-2.99-.79a4.43 4.43 0 0 0-3.74 2.27c-1.6 2.77-.41 6.87 1.14 9.12.77 1.1 1.67 2.33 2.85 2.29 1.15-.05 1.58-.74 2.96-.74s1.77.74 2.98.71c1.23-.02 2.01-1.12 2.76-2.23a9.8 9.8 0 0 0 1.25-2.57 3.99 3.99 0 0 1-2.39-3.63ZM14.1 5.98a3.97 3.97 0 0 0 .92-2.88 4.05 4.05 0 0 0-2.63 1.36 3.8 3.8 0 0 0-.94 2.77 3.36 3.36 0 0 0 2.65-1.25Z"/></svg>
-          Pokračovať cez Apple
+          Prihlásiť sa cez Google
         </a>
         <p class="u-deli"><span>alebo licenčným kódom</span></p>
       </div>
@@ -111,7 +107,7 @@
         <p class="fine u-cas">Kód platí ešte <b id="odpocet">15:00</b>. <button class="u-link" type="button" id="znova">Poslať nový</button> · <button class="u-link" type="button" id="spat">Zmeniť údaje</button></p>
       </form>
 
-      <p class="fine">Cez Google a Apple sa prihlásite e-mailom, na ktorý je licencia vedená. Prihlásenie platí 8 hodín.</p>
+      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili. Kód z e-mailu funguje vždy. Prihlásenie platí 8 hodín.</p>
     </div>
 
     <!-- prehľad po prihlásení -->
@@ -132,6 +128,25 @@
           <thead><tr><th>Dátum</th><th>Druh</th><th>Licencia</th><th>Suma</th><th>Stav</th></tr></thead>
           <tbody></tbody>
         </table>
+      </div>
+
+      <h2 class="u-h2">Účet</h2>
+      <div class="u-grid u-grid--ucet">
+        <article class="u-lic" id="google-box" hidden>
+          <h3>Prihlásenie cez Google</h3>
+          <p class="u-pc__nic" id="google-stav"></p>
+          <div class="u-lic__akcie" id="google-akcie"></div>
+        </article>
+        <article class="u-lic">
+          <h3>Odstúpenie od zmluvy</h3>
+          <p class="u-pc__nic">Ak ste spotrebiteľ a máte právo odstúpiť od zmluvy, urobíte to cez formulár — potvrdenie príde e-mailom.</p>
+          <div class="u-lic__akcie"><a class="btn btn--gh btn--sm" href="odstupenie.html">Odstúpiť od zmluvy tu</a></div>
+        </article>
+        <article class="u-lic u-lic--zmazat">
+          <h3>Zmazať účet</h3>
+          <p class="u-pc__nic">Zmaže prihlásenie na webe a prepojenie s Google. Licencia v programe funguje ďalej a doklady o platbách musíme podľa zákona uchovať. O výmaz ďalších údajov môžete požiadať na <a href="mailto:support@gridservis.app">support@gridservis.app</a>.</p>
+          <div class="u-lic__akcie"><button class="btn btn--gh btn--sm u-zmazat" id="zmazat" type="button">Zmazať účet</button></div>
+        </article>
       </div>
     </div>
   </div>
@@ -157,11 +172,12 @@
       <a href="faq.html">Časté otázky</a>
       <a href="kontakt.html">Kontakt</a>
       <a href="kontakt.html" data-mail="podpora">Nahlásiť chybu</a>
+      <a href="ucet.html">Môj účet</a>
     </div>
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="obchodne-podmienky.html#odstupenie">Zrušenie a vrátenie peňazí</a>
+      <a href="odstupenie.html"><b>Odstúpiť od zmluvy tu</b></a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
