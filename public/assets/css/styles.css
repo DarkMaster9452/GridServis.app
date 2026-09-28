@@ -346,3 +346,7 @@ b,strong{font-weight:640;color:var(--ink)}
   .box{padding:24px 22px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* ---------- tlačidlo Prihlásiť v hlavičke ---------- */
+.hdr__ucet{margin-right:-12px}
+.hdr__ucet svg{width:1.05em;height:1.05em}
