@@ -54,7 +54,7 @@ module.exports = async function (req, res) {
     var p = PLANY[plan];
 
     /* obnoví sa na toľko počítačov, koľko licencia mala */
-    var pocitace = pocetPc(licencia.max_zariadeni);
+    var pocitace = pocetPc(licencia.max_zariadeni, true);
 
     var web = adresaWebu(req);
     var relacia = await stripe('/checkout/sessions', {

@@ -383,3 +383,6 @@ b,strong{font-weight:640;color:var(--ink)}
 .pc-volba__krok button:hover:not(:disabled){background:var(--bg-2)}
 .pc-volba__krok button:disabled{color:var(--line-2);cursor:default}
 .pc-volba__krok output{min-width:48px;text-align:center;font-weight:680;font-size:1.15rem;font-variant-numeric:tabular-nums;border-inline:1px solid var(--line-2);line-height:44px}
+.pc-volba--coskoro{background:var(--bg-2);border-color:var(--line)}
+.pc-volba--coskoro .pc-volba__krok{opacity:.45}
+.coskoro{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;background:var(--acc);color:#fff!important;font-size:.7rem;font-weight:640;letter-spacing:.06em;text-transform:uppercase;vertical-align:2px}

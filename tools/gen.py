@@ -24,6 +24,10 @@ CENY = {'rok': 199.99, 'mesiac': 19.99}
 # a v assets/js/main.js (DALSI_PC). Cez web sa dá objednať najviac MAX_PC.
 DALSI_PC = {'rok': 99.99, 'mesiac': 9.99}
 MAX_PC = 10
+# Predplatné na viac počítačov je zatiaľ „čoskoro“ — na webe sa ukazuje len
+# ako pripravované a server ho nepustí, kým nie je VIAC_PC=1 (api/_stripe.js).
+# Po spustení: VIAC_PC = True tu aj na Verceli, texty nižšie sa prepnú samé.
+VIAC_PC = False
 
 ROCNE_MESACNE = CENY['mesiac'] * 12          # 239,88 € — rok platený po mesiacoch
 USPORA = ROCNE_MESACNE - CENY['rok']         # 39,89 € — zľava pri ročnom predplatnom
@@ -388,7 +392,7 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
   <div class="wrap wrap--mid">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
-      <p>Cena za prvý počítač, ďalšie za príplatok. Obnovuje sa samo, zrušiť ho viete v programe.</p>
+      <p>Predplatné na jeden počítač, viac počítačov čoskoro. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
     <div class="pricebig">
       <p class="pricebig__lbl">Ročné predplatné</p>
@@ -517,20 +521,8 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 
 
 # ============================================================ CENNÍK
-cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
-              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne za prvý počítač, ďalšie za príplatok. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
-              extra=PROGRAM_LD) + '''
-<section class="phead mriezka">
-  <div class="wrap">
-    <h1>Ročne ROK, mesačne MESIAC</h1>
-    <p class="lead">Cena je za prvý počítač, každý ďalší stojí menej. Predplatné sprístupní celý program bez obmedzení a ročné je o USPORA lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
-  </div>
-</section>
-
-<section class="sec">
-  <div class="wrap wrap--mid">
-    ''' + OZNAM + '''
-    <div class="pc-volba" data-pc-volba data-max="MAX_PC_N">
+# Výber počtu počítačov (keď bude VIAC_PC zapnuté) a jeho „čoskoro“ verzia.
+PC_VOLBA = '''<div class="pc-volba" data-pc-volba data-max="MAX_PC_N">
       <div class="pc-volba__txt">
         <b>Na koľko počítačov?</b>
         <span>Prvý za plnú cenu, každý ďalší za DALSI_ROK ročne alebo DALSI_MESIAC mesačne.</span>
@@ -540,7 +532,35 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         <output data-pc-pocet aria-live="polite">1</output>
         <button type="button" data-pc="1" aria-label="Viac počítačov">+</button>
       </div>
-    </div>
+    </div>'''
+
+PC_COSKORO = '''<div class="pc-volba pc-volba--coskoro">
+      <div class="pc-volba__txt">
+        <b>Na viac počítačov <span class="coskoro">Čoskoro</span></b>
+        <span>Pripravujeme predplatné, v ktorom si zvolíte počet počítačov a každý ďalší bude lacnejší. Dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</span>
+      </div>
+      <div class="pc-volba__krok" aria-hidden="true">
+        <button type="button" disabled tabindex="-1">−</button>
+        <output>1</output>
+        <button type="button" disabled tabindex="-1">+</button>
+      </div>
+    </div>'''
+
+
+cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
+              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
+              extra=PROGRAM_LD) + '''
+<section class="phead mriezka">
+  <div class="wrap">
+    <h1>Ročne ROK, mesačne MESIAC</h1>
+    <p class="lead">Predplatné platí na jeden počítač a sprístupní celý program bez obmedzení. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    ''' + OZNAM + '''
+    ''' + (PC_VOLBA if VIAC_PC else PC_COSKORO) + '''
     <div class="plans pulz">
       <article class="plan plan--best">
         <div class="plan__head">
@@ -573,7 +593,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         </ul>
       </article>
     </div>
-    <p class="fine center">Ceny sú konečné. Každý počítač má vlastnú aktiváciu tým istým licenčným kódom. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete viac ako MAX_PC_N počítačov? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Predplatné na viac počítačov pripravujeme — dovtedy mi <a data-mail="viac" href="kontakt.html">napíšte</a> a dohodneme cenu.</p>
 
     ''' + VAROVANIE + '''
 
@@ -752,7 +772,7 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
       <details><summary>Čo potrebujem, aby to bežalo?</summary><p>Windows 10 alebo 11 a bežný počítač. Na Macu ani v mobile program nebeží. Je stavaný na jeden počítač s vlastnou databázou — zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
       <details><summary>Vystavuje program faktúry? Zvládne DPH?</summary><p>Áno, faktúru aj zákazkový list vytlačíte priamo z detailu zákazky, v PDF a s rozpisom prác a každého dielu zvlášť. Ak ste platiteľ DPH, zapnete to v nastaveniach a faktúry sa počítajú s DPH.</p></details>
       <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže pri každej ďalšej návšteve vidíte všetky predchádzajúce zákazky aj s cenou.</p></details>
-      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — za prvý počítač. Každý ďalší stojí DALSI_ROK ročne alebo DALSI_MESIAC mesačne. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
+      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — na jeden počítač. Predplatné na viac počítačov čoskoro pribudne. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
       <details><summary>Dá sa program najprv vyskúšať?</summary><p>Áno, na to je demo. Nič nestojí, stiahnete si ho hneď a zapíšete doň vlastné zákazky. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p></details>
       <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne, ale dáta vám zostanú na počítači a viete si ich vyexportovať aj v tomto stave. Po zaplatení pokračuje tá istá licencia tam, kde ste skončili. Obnovu vypnete v programe v Nastaveniach.</p></details>
       <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Nie je to vírus ani chyba programu. Inštalácia pokračuje cez <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>.</p></details>
@@ -1241,13 +1261,13 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 
     <h2 id="predmet">2. Čo sa predáva</h2>
     <p>Predmetom je predplatné na používanie počítačového programu ZNACKA, ktorý slúži na vedenie zákaziek, zákazníkov, skladu a fakturácie v autoservise. Program sa dodáva elektronicky a inštaluje sa na počítač kupujúceho.</p>
-    <p>Predplatné sa kupuje na zvolený počet počítačov, na ktorých bude program spustený; cez web najviac MAX_PC_N. Pri väčšom počte sa cena dohodne e-mailom.</p>
+    <p>Predplatné sa kupuje na jeden počítač, na ktorom bude program spustený. Predplatné na viac počítačov sa pripravuje; dovtedy sa počet predplatných pri viacerých staniciach dohodne e-mailom.</p>
 
     <h2 id="objednavka">3. Objednávka a uzavretie zmluvy</h2>
     <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
 
     <h2 id="cena">4. Cena a platba</h2>
-    <p>Ročné predplatné stojí ROK, mesačné MESIAC za prvý počítač; každý ďalší počítač stojí DALSI_ROK ročne, resp. DALSI_MESIAC mesačne. Ceny sú konečné a v rovnakej výške sa účtujú aj pri automatickej obnove. Presun licencie na iný počítač stojí jednorazovo PRESUN_SUMA. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
+    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné, platia za jeden počítač a v rovnakej výške sa účtujú aj pri automatickej obnove. Presun licencie na iný počítač stojí jednorazovo PRESUN_SUMA. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
 
     <h2 id="trvanie">5. Trvanie, automatická obnova a ukončenie</h2>
     <p>Predplatné začína plynúť dňom sprístupnenia plnej verzie a trvá zvolené obdobie, teda dvanásť mesiacov pri ročnom a jeden mesiac pri mesačnom predplatnom.</p>
@@ -1268,7 +1288,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Inštalačný súbor programu nie je podpísaný certifikátom pre podpisovanie kódu. Windows preto pri jeho spustení zobrazí upozornenie SmartScreen o neznámom vydavateľovi a o možnom riziku. Ide o dôsledok chýbajúceho certifikátu, nie o vlastnosť programu. Kupujúci berie túto skutočnosť na vedomie pred zaplatením; upozornenie je uvedené v <a href="cennik.html#upozornenie">cenníku</a> aj na stránke <a href="stiahnut.html">demo</a>.</p>
 
     <h2 id="licencia">8. Licenčné podmienky</h2>
-    <p>Kupujúci získava nevýhradné právo používať program na zaplatenom počte počítačov počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
+    <p>Kupujúci získava nevýhradné právo používať program na jednom počítači počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
     <p>Kupujúci nesmie program ani licenčný kľúč ďalej predávať, prenajímať, sprístupňovať tretím osobám ani rozmnožovať nad rámec zaplateného počtu počítačov. Nesmie program spätne prekladať, dekompilovať ani inak zisťovať jeho zdrojový kód, s výnimkou prípadov, ktoré výslovne pripúšťa zákon.</p>
     <p>Licencia sa pri aktivácii naviaže na konkrétny počítač a sama sa z neho neuvoľní. Presun na iný počítač si kupujúci spustí priamo z programu. Po zaplatení jednorazového poplatku PRESUN_SUMA sa pôvodný počítač uvoľní a na novom sa kupujúci prihlási tým istým licenčným kódom; licencia ani jej platnosť sa nemenia.</p>
 

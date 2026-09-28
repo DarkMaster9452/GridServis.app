@@ -73,7 +73,13 @@ var PLANY = {
    Rovnaké číslo je v tools/gen.py (MAX_PC). */
 var MAX_PC = 10;
 
-function pocetPc(hodnota) {
+/* Predplatné na viac počítačov je zatiaľ „čoskoro“ — kým nie je VIAC_PC=1,
+   každá objednávka je na jeden počítač, nech sa nedá obísť cez formulár.
+   (Obnova existujúcej licencie s viacerými PC funguje stále.) */
+var VIAC_PC = process.env.VIAC_PC === '1';
+
+function pocetPc(hodnota, aj_bez_zapnutia) {
+  if (!VIAC_PC && !aj_bez_zapnutia) return 1;
   var n = parseInt(hodnota, 10);
   if (!(n >= 1)) return 1;
   return Math.min(n, MAX_PC);
