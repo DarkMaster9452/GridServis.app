@@ -343,7 +343,6 @@
     } else if (t.dataset.obnova) {
       presmeruj('/api/obnova', { kod: t.dataset.obnova }, t);
     } else if (t.dataset.presun) {
-      if (!confirm('Uvoľniť tento počítač? Po zaplatení 5 € sa odhlási a licenciu aktivujete na inom počítači tým istým kódom.')) return;
       presmeruj('/api/presun', { kod: t.dataset.presun, pc: t.dataset.pc }, t);
     }
   });

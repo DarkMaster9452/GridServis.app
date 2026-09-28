@@ -365,12 +365,21 @@ b,strong{font-weight:640;color:var(--ink)}
   background-position:center;
   -webkit-mask-image:radial-gradient(closest-side,#000 60%,transparent 100%);
   mask-image:radial-gradient(closest-side,#000 60%,transparent 100%);
+  /* Animuje sa len priehľadnosť na vlastnej vrstve — tú skladá grafická
+     karta bez prekresľovania. Zmena veľkosti (scale) by pri takej veľkej
+     maskovanej ploche nútila prehliadač kresliť ju v každom snímku a
+     scrollovanie by sekalo. */
+  will-change:opacity;
+  transform:translateZ(0);
+  backface-visibility:hidden;
   animation:pulz 4.5s ease-in-out infinite;
 }
 @keyframes pulz{
-  0%,100%{opacity:.45;transform:scale(.985)}
-  50%{opacity:1;transform:scale(1.015)}
+  0%,100%{opacity:.45}
+  50%{opacity:1}
 }
+/* mimo obrazovky sa animácia zastaví (assets/js/main.js) */
+.pulz.pulz--stoj::before{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.pulz::before{animation:none;opacity:.6}}
 @media (max-width:520px){.pulz::before{inset:-32px -16px}}
 
