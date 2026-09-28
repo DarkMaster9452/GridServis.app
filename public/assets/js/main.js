@@ -9,7 +9,10 @@
      platbu zakladá Stripe. Texty s cenami na stránkach vychádzajú
      z premennej CENY v tools/gen.py; obe musia sedieť.
      ------------------------------------------------------------------ */
-  var EMAIL = 'strananekm@gmail.com';    // kontakt na objednávky a podporu
+  var EMAIL = 'support@gridservis.app';  // kontakt na objednávky a podporu
+
+  /* Príplatok za každý ďalší počítač — musí sedieť s DALSI_PC v tools/gen.py
+     a PLANY.*.dalsi v api/_stripe.js. Na stránke ho nesú aj data-dalsi. */
 
 
   function each(sel, fn) {
@@ -134,6 +137,46 @@
   each('a[href$="stiahnut.html"]', function (a) {
     a.addEventListener('click', function () { zapis('klik_demo'); });
   });
+
+  /* ---------------- počet počítačov v cenníku ----------------
+     Prvý počítač za plnú cenu, každý ďalší za príplatok z data-dalsi.
+     Počet ide do formulárov ako skryté pole pocitace; server ho overí
+     a obmedzí znova (api/_stripe.js, MAX_PC). */
+  var volba = document.querySelector('[data-pc-volba]');
+  if (volba) {
+    var maxPc = parseInt(volba.getAttribute('data-max'), 10) || 10;
+    var pocet = 1;
+    var eur = function (n) {
+      return n.toLocaleString('sk-SK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0€';
+    };
+    var slovo = function (n) { return n === 1 ? 'počítač' : (n < 5 ? 'počítače' : 'počítačov'); };
+    var povodne = {};
+    each('[data-per]', function (el) { povodne[el.getAttribute('data-per')] = el.textContent; });
+
+    var prepocitaj = function () {
+      volba.querySelector('[data-pc-pocet]').textContent = String(pocet);
+      volba.querySelector('[data-pc="-1"]').disabled = pocet <= 1;
+      volba.querySelector('[data-pc="1"]').disabled = pocet >= maxPc;
+      each('[data-pocitace]', function (pole) { pole.value = String(pocet); });
+      each('[data-cena]', function (el) {
+        var zaklad = parseFloat(el.getAttribute('data-zaklad'));
+        var dalsi = parseFloat(el.getAttribute('data-dalsi'));
+        el.textContent = eur(zaklad + dalsi * (pocet - 1));
+        var per = document.querySelector('[data-per="' + el.getAttribute('data-cena') + '"]');
+        if (per) {
+          per.textContent = pocet === 1 ? povodne[el.getAttribute('data-cena')]
+            : 'Za ' + pocet + ' ' + slovo(pocet) + ': prvý ' + eur(zaklad) + ' + ' + (pocet - 1) + ' × ' + eur(dalsi) + '.';
+        }
+      });
+    };
+    volba.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pc]');
+      if (!b) return;
+      pocet = Math.max(1, Math.min(maxPc, pocet + parseInt(b.getAttribute('data-pc'), 10)));
+      prepocitaj();
+    });
+    prepocitaj();
+  }
 
   /* ---------------- odkaz na pokladňu ----------------
      Tlačidlá Predplatiť a Získať demo sú formuláre na /api/checkout,

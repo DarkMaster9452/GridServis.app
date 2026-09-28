@@ -98,7 +98,7 @@ sledovanie, žiadna IP adresa.
 
 ## Kontakt
 
-strananekm@gmail.com
+support@gridservis.app
 
 ---
 

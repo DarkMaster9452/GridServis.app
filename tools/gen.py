@@ -14,11 +14,16 @@ WEB = 'https://www.gridservis.app'
 # Predávajúci. Program predáva fyzická osoba, nie firma, preto tu nie sú
 # IČO, DIČ ani zápis v registri — kontakt prebieha e-mailom.
 PREDAJCA = {
-    'email': 'strananekm@gmail.com',
+    'email': 'support@gridservis.app',
 }
 
 # Ceny predplatného. Rovnaké hodnoty sú v assets/js/main.js (premenná CENY).
 CENY = {'rok': 199.99, 'mesiac': 19.99}
+
+# Každý ďalší počítač nad prvý. Rovnaké sumy sú v api/_stripe.js (PLANY.*.dalsi)
+# a v assets/js/main.js (DALSI_PC). Cez web sa dá objednať najviac MAX_PC.
+DALSI_PC = {'rok': 99.99, 'mesiac': 9.99}
+MAX_PC = 10
 
 ROCNE_MESACNE = CENY['mesiac'] * 12          # 239,88 € — rok platený po mesiacoch
 USPORA = ROCNE_MESACNE - CENY['rok']         # 39,89 € — zľava pri ročnom predplatnom
@@ -164,7 +169,7 @@ FOOT = '''</main>
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="odstupenie.html"><b>Odstúpiť od zmluvy tu</b></a>
+      <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
@@ -224,6 +229,7 @@ def platba_btn(plan, text, cls='btn--pri btn--lg'):
     na odstúpenie; demo za 0 € ho nepotrebuje, nič sa pri ňom neplatí."""
     return ('<form class="pay" method="post" action="/api/checkout">\n'
             '  <input type="hidden" name="plan" value="%s">\n'
+            + ('  <input type="hidden" name="pocitace" value="1" data-pocitace>\n' if plan != 'demo' else '') +
             '%s'
             '  <button class="btn %s" type="submit">%s</button>\n'
             '</form>') % (plan, SUHLAS if plan != 'demo' else '', cls, text)
@@ -382,7 +388,7 @@ index = head('index.html', 'ZNACKA — program na správu autoservisu',
   <div class="wrap wrap--mid">
     <header class="shead">
       <h2>Jedna cena za celý program</h2>
-      <p>Predplatné na jeden počítač. Obnovuje sa samo, zrušiť ho viete v programe.</p>
+      <p>Cena za prvý počítač, ďalšie za príplatok. Obnovuje sa samo, zrušiť ho viete v programe.</p>
     </header>
     <div class="pricebig">
       <p class="pricebig__lbl">Ročné predplatné</p>
@@ -512,26 +518,37 @@ funkcie = head('funkcie.html', 'Funkcie — ZNACKA',
 
 # ============================================================ CENNÍK
 cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
-              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne na jeden počítač. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
+              'Predplatné programu ZNACKA: ROK ročne alebo MESIAC mesačne za prvý počítač, ďalšie za príplatok. Ročné je o USPORA lacnejšie. Demo je zadarmo.',
               extra=PROGRAM_LD) + '''
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Ročne ROK, mesačne MESIAC</h1>
-    <p class="lead">Predplatné platí na jeden počítač a sprístupní celý program bez obmedzení. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
+    <p class="lead">Cena je za prvý počítač, každý ďalší stojí menej. Predplatné sprístupní celý program bez obmedzení a ročné je o USPORA lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
     ''' + OZNAM + '''
-    <div class="plans">
+    <div class="pc-volba" data-pc-volba data-max="MAX_PC_N">
+      <div class="pc-volba__txt">
+        <b>Na koľko počítačov?</b>
+        <span>Prvý za plnú cenu, každý ďalší za DALSI_ROK ročne alebo DALSI_MESIAC mesačne.</span>
+      </div>
+      <div class="pc-volba__krok" role="group" aria-label="Počet počítačov">
+        <button type="button" data-pc="-1" aria-label="Menej počítačov">−</button>
+        <output data-pc-pocet aria-live="polite">1</output>
+        <button type="button" data-pc="1" aria-label="Viac počítačov">+</button>
+      </div>
+    </div>
+    <div class="plans pulz">
       <article class="plan plan--best">
         <div class="plan__head">
           <h2>Ročne</h2>
           <span class="plan__badge">Ušetríte USPORA</span>
         </div>
-        <p class="plan__price"><b>ROK</b><span>/ rok</span></p>
-        <p class="plan__per">Vychádza na MESACNE_Z_ROCNEHO mesačne. Dvanásť mesačných platieb by stálo ROCNE_MESACNE.</p>
+        <p class="plan__price"><b data-cena="rok" data-zaklad="CENA_ROK_N" data-dalsi="DALSI_ROK_N">ROK</b><span>/ rok</span></p>
+        <p class="plan__per" data-per="rok">Vychádza na MESACNE_Z_ROCNEHO mesačne. Dvanásť mesačných platieb by stálo ROCNE_MESACNE.</p>
 ''' + platba_btn('rok', 'Predplatiť na rok', 'btn--pri btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na dvanásť mesiacov</li>
@@ -545,8 +562,8 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
           <h2>Mesačne</h2>
           <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
         </div>
-        <p class="plan__price"><b>MESIAC</b><span>/ mesiac</span></p>
-        <p class="plan__per">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
+        <p class="plan__price"><b data-cena="mesiac" data-zaklad="CENA_MESIAC_N" data-dalsi="DALSI_MESIAC_N">MESIAC</b><span>/ mesiac</span></p>
+        <p class="plan__per" data-per="mesiac">Za rok to je ROCNE_MESACNE, teda o USPORA viac ako ročné predplatné.</p>
 ''' + platba_btn('mesiac', 'Predplatiť na mesiac', 'btn--gh btn--lg btn--full') + '''
         <ul class="ticks">
           <li>Celý program bez obmedzení na jeden mesiac</li>
@@ -556,7 +573,7 @@ cennik = head('cennik.html', 'Cenník a predplatné — ZNACKA',
         </ul>
       </article>
     </div>
-    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+    <p class="fine center">Ceny sú konečné. Každý počítač má vlastnú aktiváciu tým istým licenčným kódom. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete viac ako MAX_PC_N počítačov? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
 
     ''' + VAROVANIE + '''
 
@@ -735,7 +752,7 @@ faq = head('faq.html', 'Časté otázky — ZNACKA',
       <details><summary>Čo potrebujem, aby to bežalo?</summary><p>Windows 10 alebo 11 a bežný počítač. Na Macu ani v mobile program nebeží. Je stavaný na jeden počítač s vlastnou databázou — zdieľanú databázu medzi viacerými stanicami zatiaľ nerieši.</p></details>
       <details><summary>Vystavuje program faktúry? Zvládne DPH?</summary><p>Áno, faktúru aj zákazkový list vytlačíte priamo z detailu zákazky, v PDF a s rozpisom prác a každého dielu zvlášť. Ak ste platiteľ DPH, zapnete to v nastaveniach a faktúry sa počítajú s DPH.</p></details>
       <details><summary>Vidím, čo sa na aute robilo minule?</summary><p>Áno, na záložke História vozidla. Auto sa páruje podľa ŠPZ a VIN, takže pri každej ďalšej návšteve vidíte všetky predchádzajúce zákazky aj s cenou.</p></details>
-      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — na jeden počítač. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
+      <details><summary>Koľko to stojí?</summary><p>ROK za rok, alebo MESIAC za mesiac bez viazanosti — za prvý počítač. Každý ďalší stojí DALSI_ROK ročne alebo DALSI_MESIAC mesačne. Ročné predplatné je o USPORA lacnejšie ako dvanásť mesačných platieb. Podrobnosti sú v <a href="cennik.html">cenníku</a>.</p></details>
       <details><summary>Dá sa program najprv vyskúšať?</summary><p>Áno, na to je demo. Nič nestojí, stiahnete si ho hneď a zapíšete doň vlastné zákazky. Predplatné riešite až vtedy, keď viete, že vám program sadol.</p></details>
       <details><summary>Čo sa stane, keď predplatné skončí?</summary><p>Program sa uzamkne, ale dáta vám zostanú na počítači a viete si ich vyexportovať aj v tomto stave. Po zaplatení pokračuje tá istá licencia tam, kde ste skončili. Obnovu vypnete v programe v Nastaveniach.</p></details>
       <details><summary>Prečo Windows hlási, že inštalačka nie je bezpečná?</summary><p>Nemá zakúpený podpisový certifikát, takže SmartScreen ju označí za súbor od neznámeho vydavateľa. Nie je to vírus ani chyba programu. Inštalácia pokračuje cez <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>. Píšem to aj <a href="cennik.html#upozornenie">v cenníku ešte pred platbou</a>.</p></details>
@@ -1224,13 +1241,13 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
 
     <h2 id="predmet">2. Čo sa predáva</h2>
     <p>Predmetom je predplatné na používanie počítačového programu ZNACKA, ktorý slúži na vedenie zákaziek, zákazníkov, skladu a fakturácie v autoservise. Program sa dodáva elektronicky a inštaluje sa na počítač kupujúceho.</p>
-    <p>Predplatné sa kupuje na jeden počítač, na ktorom bude program spustený. Pri viacerých staniciach sa počet predplatných dohodne e-mailom.</p>
+    <p>Predplatné sa kupuje na zvolený počet počítačov, na ktorých bude program spustený; cez web najviac MAX_PC_N. Pri väčšom počte sa cena dohodne e-mailom.</p>
 
     <h2 id="objednavka">3. Objednávka a uzavretie zmluvy</h2>
     <p>Kupujúci si v cenníku zvolí ročné alebo mesačné predplatné a objednávku odošle cez pokladňu Stripe alebo e-mailom. Zmluva je uzavretá potvrdením objednávky zo strany predávajúceho. Pred odoslaním objednávky je kupujúci oboznámený s cenou, rozsahom predplatného, upozornením na nepodpísanú inštalačku a týmito podmienkami.</p>
 
     <h2 id="cena">4. Cena a platba</h2>
-    <p>Ročné predplatné stojí ROK, mesačné MESIAC. Ceny sú konečné, platia za jeden počítač a v rovnakej výške sa účtujú aj pri automatickej obnove. Presun licencie na iný počítač stojí jednorazovo PRESUN_SUMA. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
+    <p>Ročné predplatné stojí ROK, mesačné MESIAC za prvý počítač; každý ďalší počítač stojí DALSI_ROK ročne, resp. DALSI_MESIAC mesačne. Ceny sú konečné a v rovnakej výške sa účtujú aj pri automatickej obnove. Presun licencie na iný počítač stojí jednorazovo PRESUN_SUMA. Platba prebieha kartou cez poskytovateľa platobnej brány Stripe Payments Europe, Ltd.; predávajúci sa k údajom o karte nedostane. Doklad o zaplatení posiela predávajúci elektronicky na e-mail kupujúceho.</p>
 
     <h2 id="trvanie">5. Trvanie, automatická obnova a ukončenie</h2>
     <p>Predplatné začína plynúť dňom sprístupnenia plnej verzie a trvá zvolené obdobie, teda dvanásť mesiacov pri ročnom a jeden mesiac pri mesačnom predplatnom.</p>
@@ -1251,7 +1268,7 @@ vop = head('obchodne-podmienky.html', 'Obchodné podmienky — ZNACKA',
     <p>Inštalačný súbor programu nie je podpísaný certifikátom pre podpisovanie kódu. Windows preto pri jeho spustení zobrazí upozornenie SmartScreen o neznámom vydavateľovi a o možnom riziku. Ide o dôsledok chýbajúceho certifikátu, nie o vlastnosť programu. Kupujúci berie túto skutočnosť na vedomie pred zaplatením; upozornenie je uvedené v <a href="cennik.html#upozornenie">cenníku</a> aj na stránke <a href="stiahnut.html">demo</a>.</p>
 
     <h2 id="licencia">8. Licenčné podmienky</h2>
-    <p>Kupujúci získava nevýhradné právo používať program na jednom počítači počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
+    <p>Kupujúci získava nevýhradné právo používať program na zaplatenom počte počítačov počas trvania predplatného. Program zostáva duševným vlastníctvom predávajúceho.</p>
     <p>Kupujúci nesmie program ani licenčný kľúč ďalej predávať, prenajímať, sprístupňovať tretím osobám ani rozmnožovať nad rámec zaplateného počtu počítačov. Nesmie program spätne prekladať, dekompilovať ani inak zisťovať jeho zdrojový kód, s výnimkou prípadov, ktoré výslovne pripúšťa zákon.</p>
     <p>Licencia sa pri aktivácii naviaže na konkrétny počítač a sama sa z neho neuvoľní. Presun na iný počítač si kupujúci spustí priamo z programu. Po zaplatení jednorazového poplatku PRESUN_SUMA sa pôvodný počítač uvoľní a na novom sa kupujúci prihlási tým istým licenčným kódom; licencia ani jej platnosť sa nemenia.</p>
 
@@ -1323,8 +1340,9 @@ ucet = head('ucet.html', 'Môj účet — ZNACKA',
     <p class="oznam" id="oznam" hidden></p>
 
     <!-- prihlásenie -->
-    <div class="box u-login" id="prihlasenie" hidden>
-      <h3>Prihlásenie</h3>
+    <div class="pulz u-login-obal" id="prihlasenie" hidden>
+    <div class="box u-login u-login--velke">
+      <h2 class="u-login__nadpis">Prihlásenie</h2>
 
       <div class="u-soc" id="socialne" hidden>
         <a class="btn btn--gh btn--lg btn--full u-soc__btn" id="google" href="/api/ucet/google" hidden>
@@ -1338,7 +1356,7 @@ ucet = head('ucet.html', 'Môj účet — ZNACKA',
       <form class="u-krok" id="krok1" novalidate>
         <label class="u-pole">
           <span>Licenčný kód</span>
-          <input name="licencia" autocomplete="off" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" required>
+          <input name="licencia" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" maxlength="19" required data-licencia>
         </label>
         <label class="u-pole">
           <span>E-mail</span>
@@ -1358,7 +1376,8 @@ ucet = head('ucet.html', 'Môj účet — ZNACKA',
         <p class="fine u-cas">Kód platí ešte <b id="odpocet">15:00</b>. <button class="u-link" type="button" id="znova">Poslať nový</button> · <button class="u-link" type="button" id="spat">Zmeniť údaje</button></p>
       </form>
 
-      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili. Kód z e-mailu funguje vždy. Prihlásenie platí 8 hodín.</p>
+      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili.</p>
+    </div>
     </div>
 
     <!-- prehľad po prihlásení -->
@@ -1469,6 +1488,13 @@ odstupenie = head('odstupenie.html', 'Odstúpenie od zmluvy — ZNACKA',
 
 NAHRADY = [
     ('PRESUN_SUMA', '%d €' % PRESUN),
+    ('DALSI_ROK_N', '%.2f' % DALSI_PC['rok']),
+    ('DALSI_MESIAC_N', '%.2f' % DALSI_PC['mesiac']),
+    ('CENA_ROK_N', '%.2f' % CENY['rok']),
+    ('CENA_MESIAC_N', '%.2f' % CENY['mesiac']),
+    ('DALSI_ROK', eur(DALSI_PC['rok'])),
+    ('DALSI_MESIAC', eur(DALSI_PC['mesiac'])),
+    ('MAX_PC_N', str(MAX_PC)),
     ('LOGO', LOGO),
     ('ZNACKA', ZNACKA),
     ('ROCNE_MESACNE', eur(ROCNE_MESACNE)),

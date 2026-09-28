@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cenník a predplatné — GridServis</title>
-<meta name="description" content="Predplatné programu GridServis: 199,99 € ročne alebo 19,99 € mesačne na jeden počítač. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
+<meta name="description" content="Predplatné programu GridServis: 199,99 € ročne alebo 19,99 € mesačne za prvý počítač, ďalšie za príplatok. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
 <meta property="og:title" content="Cenník a predplatné — GridServis">
-<meta property="og:description" content="Predplatné programu GridServis: 199,99 € ročne alebo 19,99 € mesačne na jeden počítač. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
+<meta property="og:description" content="Predplatné programu GridServis: 199,99 € ročne alebo 19,99 € mesačne za prvý počítač, ďalšie za príplatok. Ročné je o 39,89 € lacnejšie. Demo je zadarmo.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="sk_SK">
 <meta property="og:site_name" content="GridServis">
@@ -91,23 +91,35 @@
 <section class="phead mriezka">
   <div class="wrap">
     <h1>Ročne 199,99 €, mesačne 19,99 €</h1>
-    <p class="lead">Predplatné platí na jeden počítač a sprístupní celý program bez obmedzení. Ročné predplatné je o 39,89 € lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
+    <p class="lead">Cena je za prvý počítač, každý ďalší stojí menej. Predplatné sprístupní celý program bez obmedzení a ročné je o 39,89 € lacnejšie ako dvanásť mesačných platieb. Demo si vyskúšate zadarmo ešte pred platbou.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap wrap--mid">
     <p class="oznam" id="oznam" hidden></p>
-    <div class="plans">
+    <div class="pc-volba" data-pc-volba data-max="10">
+      <div class="pc-volba__txt">
+        <b>Na koľko počítačov?</b>
+        <span>Prvý za plnú cenu, každý ďalší za 99,99 € ročne alebo 9,99 € mesačne.</span>
+      </div>
+      <div class="pc-volba__krok" role="group" aria-label="Počet počítačov">
+        <button type="button" data-pc="-1" aria-label="Menej počítačov">−</button>
+        <output data-pc-pocet aria-live="polite">1</output>
+        <button type="button" data-pc="1" aria-label="Viac počítačov">+</button>
+      </div>
+    </div>
+    <div class="plans pulz">
       <article class="plan plan--best">
         <div class="plan__head">
           <h2>Ročne</h2>
           <span class="plan__badge">Ušetríte 39,89 €</span>
         </div>
-        <p class="plan__price"><b>199,99 €</b><span>/ rok</span></p>
-        <p class="plan__per">Vychádza na 16,67 € mesačne. Dvanásť mesačných platieb by stálo 239,88 €.</p>
+        <p class="plan__price"><b data-cena="rok" data-zaklad="199.99" data-dalsi="99.99">199,99 €</b><span>/ rok</span></p>
+        <p class="plan__per" data-per="rok">Vychádza na 16,67 € mesačne. Dvanásť mesačných platieb by stálo 239,88 €.</p>
 <form class="pay" method="post" action="/api/checkout">
   <input type="hidden" name="plan" value="rok">
+  <input type="hidden" name="pocitace" value="1" data-pocitace>
   <label class="suhlas">
     <input type="checkbox" name="suhlas" value="1" required>
     <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem na vedomie, že tým <b>strácam právo na odstúpenie od zmluvy do 14 dní</b>. <a href="obchodne-podmienky.html#odstupenie">Prečítať poučenie</a></span>
@@ -126,10 +138,11 @@
           <h2>Mesačne</h2>
           <span class="plan__badge plan__badge--mut">Zrušíte kedykoľvek</span>
         </div>
-        <p class="plan__price"><b>19,99 €</b><span>/ mesiac</span></p>
-        <p class="plan__per">Za rok to je 239,88 €, teda o 39,89 € viac ako ročné predplatné.</p>
+        <p class="plan__price"><b data-cena="mesiac" data-zaklad="19.99" data-dalsi="9.99">19,99 €</b><span>/ mesiac</span></p>
+        <p class="plan__per" data-per="mesiac">Za rok to je 239,88 €, teda o 39,89 € viac ako ročné predplatné.</p>
 <form class="pay" method="post" action="/api/checkout">
   <input type="hidden" name="plan" value="mesiac">
+  <input type="hidden" name="pocitace" value="1" data-pocitace>
   <label class="suhlas">
     <input type="checkbox" name="suhlas" value="1" required>
     <span>Súhlasím so začatím sťahovania programu ihneď po zaplatení a beriem na vedomie, že tým <b>strácam právo na odstúpenie od zmluvy do 14 dní</b>. <a href="obchodne-podmienky.html#odstupenie">Prečítať poučenie</a></span>
@@ -144,7 +157,7 @@
         </ul>
       </article>
     </div>
-    <p class="fine center">Ceny sú konečné, za jeden počítač. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete program na viacerých staniciach? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
+    <p class="fine center">Ceny sú konečné. Každý počítač má vlastnú aktiváciu tým istým licenčným kódom. Predplatné sa po skončení obdobia obnoví samo, kým ho nezrušíte v programe v Nastaveniach. Potrebujete viac ako 10 počítačov? <a data-mail="viac" href="kontakt.html">Napíšte mi</a> a dohodneme cenu.</p>
 
     <div class="warn" id="upozornenie">
       <h3>Skôr než zaplatíte: Windows bude hlásiť, že súbor nie je bezpečný</h3>
@@ -247,7 +260,7 @@
     <div class="foot__col">
       <h3>Právne</h3>
       <a href="obchodne-podmienky.html">Obchodné podmienky</a>
-      <a href="odstupenie.html"><b>Odstúpiť od zmluvy tu</b></a>
+      <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>
       <a href="ochrana-sukromia.html">Ochrana súkromia</a>
       <a href="cookies.html">Cookies</a>
     </div>
