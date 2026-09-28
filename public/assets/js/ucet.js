@@ -39,7 +39,7 @@
   }
 
   async function api(akcia, data) {
-    var r = await fetch('/api/ucet?akcia=' + akcia, {
+    var r = await fetch('/api/ucet/' + akcia, {
       method: data === undefined ? 'GET' : 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -135,6 +135,7 @@
   var PLAN = { rok: 'ročné', mesiac: 'mesačné', presun: '' };
 
   function vykresli(d) {
+    hlas('');
     $('kto').textContent = d.email;
     var lic = d.licencie || [];
 
@@ -171,30 +172,110 @@
     prehlad.hidden = false;
   }
 
-  async function nacitaj() {
-    var d = await api('ja');
-    if (d.ok) { hlas(''); vykresli(d); return; }
-    prehlad.hidden = true;
-    formular.hidden = false;
-    if (d.stav === 503) hlas('Správa účtu zatiaľ nie je na tomto nasadení zapnutá.');
-    /* kód z odkazu (napr. z programu) sa predvyplní */
-    var kod = new URLSearchParams(location.search).get('kod');
-    if (kod && !formular.kod.value) formular.kod.value = kod;
+  var krok1 = $('krok1');
+  var krok2 = $('krok2');
+  var odpocet = null;
+
+  function ukazKrok(n) {
+    krok1.hidden = n !== 1;
+    krok2.hidden = n !== 2;
+    clearInterval(odpocet);
   }
 
-  /* ---------- udalosti ---------- */
+  /* 15 minút na zadanie kódu; potom treba požiadať o nový */
+  function spustOdpocet(minut) {
+    var koniec = Date.now() + minut * 60000;
+    function tik() {
+      var zostava = Math.max(0, Math.round((koniec - Date.now()) / 1000));
+      $('odpocet').textContent = Math.floor(zostava / 60) + ':' + String(zostava % 60).padStart(2, '0');
+      if (!zostava) {
+        clearInterval(odpocet);
+        krok2.kod.disabled = true;
+        krok2.querySelector('[type=submit]').disabled = true;
+        hlas('Kód vypršal. Požiadajte o nový.');
+      }
+    }
+    clearInterval(odpocet);
+    krok2.kod.disabled = false;
+    krok2.querySelector('[type=submit]').disabled = false;
+    tik();
+    odpocet = setInterval(tik, 1000);
+  }
 
-  formular.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var tl = formular.querySelector('button');
+  async function nastavenia() {
+    var n = await api('nastavenia');
+    $('google').hidden = !n.google;
+    $('apple').hidden = !n.apple;
+    $('socialne').hidden = !(n.google || n.apple);
+  }
+
+  async function nacitaj() {
+    var d = await api('ja');
+    if (d.ok) { vykresli(d); return; }
+    prehlad.hidden = true;
+    formular.hidden = false;
+    ukazKrok(1);
+    if (d.stav === 503) { hlas('Správa účtu zatiaľ nie je na tomto nasadení zapnutá.'); return; }
+    nastavenia();
+    var q = new URLSearchParams(location.search);
+    /* licenčný kód z odkazu (napr. z programu) sa predvyplní */
+    if (q.get('kod') && !krok1.licencia.value) krok1.licencia.value = q.get('kod');
+    /* chyba po návrate z Google / Apple */
+    if (q.get('chyba')) hlas(q.get('chyba'));
+  }
+
+  async function poziadat(tl) {
     tl.disabled = true;
     hlas('');
     try {
-      var d = await api('prihlasit', {
-        kod: formular.kod.value.trim(),
-        email: formular.email.value.trim()
+      var d = await api('poziadat', {
+        licencia: krok1.licencia.value.trim(),
+        email: krok1.email.value.trim()
       });
-      if (d.ok) { await nacitaj(); } else { hlas(d.chyba || 'Prihlásenie zlyhalo.'); }
+      if (d.ok) {
+        $('kam').textContent = krok1.email.value.trim();
+        krok2.reset();
+        ukazKrok(2);
+        spustOdpocet(d.minut || 15);
+        krok2.kod.focus();
+      } else {
+        hlas(d.chyba || 'Kód sa nepodarilo poslať.');
+      }
+    } catch (err) {
+      hlas('Spojenie zlyhalo, skúste to znova.');
+    }
+    tl.disabled = false;
+  }
+
+  krok1.addEventListener('submit', function (e) {
+    e.preventDefault();
+    poziadat(krok1.querySelector('button'));
+  });
+
+  $('znova').addEventListener('click', function () { poziadat(this); });
+  $('spat').addEventListener('click', function () { hlas(''); ukazKrok(1); });
+
+  krok2.kod.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    if (this.value.length === 6) krok2.requestSubmit();
+  });
+
+  krok2.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var tl = krok2.querySelector('[type=submit]');
+    if (tl.disabled) return;
+    tl.disabled = true;
+    hlas('');
+    try {
+      var d = await api('overit', { email: krok1.email.value.trim(), kod: krok2.kod.value });
+      if (d.ok) {
+        clearInterval(odpocet);
+        history.replaceState(null, '', location.pathname);
+        await nacitaj();
+      } else {
+        hlas(d.chyba || 'Prihlásenie zlyhalo.');
+        if (d.znova) { ukazKrok(1); } else { krok2.kod.select(); }
+      }
     } catch (err) {
       hlas('Spojenie zlyhalo, skúste to znova.');
     }
@@ -203,7 +284,7 @@
 
   $('odhlasit').addEventListener('click', async function () {
     await api('odhlasit', {});
-    formular.reset();
+    krok1.reset();
     $('nadpis').textContent = 'Správa licencie';
     nacitaj();
   });
