@@ -30,8 +30,9 @@ function text(kod, plan, platnaDo, adresaWebu) {
     'pred uplynutím lehoty na odstúpenie a vyhlásili ste, že ste boli poučený,',
     'že tým strácate právo na odstúpenie od zmluvy (§ 19 ods. 1 zákona č. 108/2024 Z. z.).',
     '',
-    'Predplatné sa obnovuje automaticky. Zrušiť ho viete v programe',
-    'v Nastaveniach, alebo mi napíšte na ' + ODPOVED + '.',
+    'Predplatné sa obnovuje automaticky. Zrušiť ho, obnoviť alebo presunúť',
+    'licenciu na iný počítač viete v Mojom účte na ' + adresaWebu + '/ucet.html,',
+    'alebo mi napíšte na ' + ODPOVED + '.',
     '',
     'Pekný deň'
   ].join('\n');
@@ -45,7 +46,7 @@ function html(meno, kod, plan, platnaDo, adresaWebu) {
     '\n      <p style="margin:0 0 4px;color:#0d1117;">Ďakujem za ' + obdobie + ' predplatné — licencia je aktívna a program je pripravený na prvú zákazku.</p>' +
     kodBlok(kod, 'TVOJ LICENČNÝ KÓD') +
     '\n      <p style="margin:0;color:#55606e;font-size:14px;">Odlož si ho — budeš ho potrebovať pri prvom spustení aj pri prípadnom prenose na iný počítač.</p>' +
-    '\n      <p style="margin:22px 0 0;color:#0d1117;">Predplatné platí do <b>' + platnaDo + '</b>, potom sa samo obnoví (dá sa kedykoľvek zrušiť priamo v programe, v Nastaveniach).</p>' +
+    '\n      <p style="margin:22px 0 0;color:#0d1117;">Predplatné platí do <b>' + platnaDo + '</b>, potom sa samo obnoví (dá sa kedykoľvek zrušiť v <a href="' + adresaWebu + '/ucet.html" style="color:#2563eb;">Mojom účte</a> na webe).</p>' +
     tlacidlo('Stiahnuť program →', adresaWebu + '/stiahnut.html') +
     '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Windows pri inštalácii ukáže upozornenie SmartScreen, lebo súbor nemá podpisový certifikát — kliknite na <b>Ďalšie informácie</b> a <b>Spustiť tak či tak</b>, nie je to vírus.</p>' +
     '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Niečo nesedí alebo máš otázku? Napíš na <a href="mailto:' + ODPOVED + '" style="color:#2563eb;">' + ODPOVED + '</a>.</p>' +
