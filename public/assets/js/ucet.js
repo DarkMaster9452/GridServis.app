@@ -32,6 +32,19 @@
     });
   }
 
+  /* stavy z databázy sú bez diakritiky — na stránku ide ich slovenský tvar */
+  var STAVY = {
+    zaplatena: 'Zaplatená', neuspesna: 'Neúspešná', vratena: 'Vrátená',
+    zrusena: 'Zrušená', caka: 'Čaká na platbu', otvorena: 'Otvorená',
+    aktivna: 'aktívna', zastavena: 'zastavená', zrusena_l: 'zrušená', neaktivna: 'neaktívna',
+    aktivne: 'aktívne', odhlasene: 'odhlásené', uvolnene: 'uvoľnené', zablokovane: 'zablokované'
+  };
+  function stavText(x, licencia) {
+    var k = String(x || '').toLowerCase();
+    if (licencia && k === 'zrusena') k = 'zrusena_l';
+    return STAVY[k] || String(x || '');
+  }
+
   function dniDo(d) {
     if (!d) return null;
     var koniec = new Date(d + 'T23:59:59');
@@ -73,7 +86,7 @@
 
   function stavLicencie(l) {
     var dni = dniDo(l.platna_do);
-    if (l.stav !== 'aktivna') return { text: l.stav || 'neaktívna', cls: '' };
+    if (l.stav !== 'aktivna') return { text: stavText(l.stav, true) || 'neaktívna', cls: '' };
     if (dni !== null && dni < 0) return { text: 'vypršala', cls: 'u-stav--warn' };
     if (dni !== null && dni <= 14) return { text: 'končí o ' + dni + ' d', cls: 'u-stav--warn' };
     return { text: 'aktívna', cls: 'u-stav--ok' };
@@ -81,7 +94,7 @@
 
   function zariadenie(z, l, moznoPresun) {
     var odtlacok = String(z.odtlacok || '');
-    var detail = [z.os, z.verzia_appky ? 'v' + z.verzia_appky : '', z.stav,
+    var detail = [z.os, z.verzia_appky ? 'v' + z.verzia_appky : '', stavText(z.stav),
       z.aktivovane ? 'od ' + datum(z.aktivovane) : '',
       z.posledna_kontrola ? 'naposledy ' + datum(z.posledna_kontrola) : ''].filter(Boolean).join(' · ');
     return '<li><div>' +
@@ -155,7 +168,7 @@
         '<td>' + esc((DRUH[p.druh] || p.druh || '') + (PLAN[p.plan] ? ' · ' + PLAN[p.plan] : '')) + '</td>' +
         '<td><code>' + esc(p.kod || '') + '</code></td>' +
         '<td>' + esc(suma(p.suma, p.mena)) + '</td>' +
-        '<td>' + esc(p.stav || '') + '</td></tr>';
+        '<td>' + esc(stavText(p.stav)) + '</td></tr>';
     });
     $('platby').tBodies[0].innerHTML = riadky.length
       ? riadky.join('')
