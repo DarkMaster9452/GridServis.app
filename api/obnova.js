@@ -4,7 +4,7 @@
    obnova alebo predplatné skončilo). Po zaplatení sa tá istá licencia
    predĺži — dielňa nezadáva nový kód a o dáta nepríde. */
 
-var { PLANY, DANOVY_KOD, stripe, adresaWebu, nastavene } = require('./_stripe');
+var { PLANY, stripe, adresaWebu, nastavene, pocetPc, polozky } = require('./_stripe');
 var { riadok } = require('./_db');
 
 function telo(req) {
@@ -38,7 +38,7 @@ module.exports = async function (req, res) {
 
   try {
     var licencia = await riadok(
-      'SELECT kod, dielna, kontakt FROM licencie WHERE kod = $1', [kod]);
+      'SELECT kod, dielna, kontakt, max_zariadeni FROM licencie WHERE kod = $1', [kod]);
     if (!licencia) {
       res.status(404).json({ ok: false, chyba: 'Takýto licenčný kód neexistuje.' });
       return;
@@ -53,17 +53,8 @@ module.exports = async function (req, res) {
     }
     var p = PLANY[plan];
 
-    var polozka = { quantity: 1 };
-    if (p.cena) {
-      polozka.price = p.cena;
-    } else {
-      polozka.price_data = {
-        currency: 'eur',
-        unit_amount: p.suma,
-        recurring: { interval: p.obdobie },
-        product_data: { name: p.nazov, description: p.popis, tax_code: DANOVY_KOD }
-      };
-    }
+    /* obnoví sa na toľko počítačov, koľko licencia mala */
+    var pocitace = pocetPc(licencia.max_zariadeni, true);
 
     var web = adresaWebu(req);
     var relacia = await stripe('/checkout/sessions', {
@@ -74,9 +65,9 @@ module.exports = async function (req, res) {
       customer_email: licencia.kontakt || undefined,
       success_url: web + '/hotovo.html?relacia={CHECKOUT_SESSION_ID}',
       cancel_url: web + '/obnova.html?kod=' + encodeURIComponent(kod) + '&zrusene=1',
-      metadata: { plan: plan, kod: kod },
-      subscription_data: { metadata: { plan: plan, kod: kod } },
-      line_items: [polozka]
+      metadata: { plan: plan, kod: kod, pocitace: String(pocitace) },
+      subscription_data: { metadata: { plan: plan, kod: kod, pocitace: String(pocitace) } },
+      line_items: polozky(p, pocitace)
     });
 
     if (chceJson(req)) { res.status(200).json({ ok: true, url: relacia.url }); return; }

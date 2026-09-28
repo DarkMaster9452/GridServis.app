@@ -37,7 +37,13 @@ var PLANY = {
     nazov: 'GridServis — mesačné predplatné',
     popis: 'Predplatné programu GridServis na jeden počítač, obnovuje sa každý mesiac.',
     cena: process.env.STRIPE_PRICE_MESIAC || '',
-    spat: '/cennik.html'
+    spat: '/cennik.html',
+    dalsi: {
+      suma: 999,
+      nazov: 'GridServis — ďalší počítač (mesačne)',
+      popis: 'Každý ďalší počítač k mesačnému predplatnému GridServis.',
+      cena: process.env.STRIPE_PRICE_MESIAC_PC || ''
+    }
   },
   rok: {
     suma: 19999,
@@ -45,7 +51,13 @@ var PLANY = {
     nazov: 'GridServis — ročné predplatné',
     popis: 'Predplatné programu GridServis na jeden počítač, obnovuje sa každý rok.',
     cena: process.env.STRIPE_PRICE_ROK || '',
-    spat: '/cennik.html'
+    spat: '/cennik.html',
+    dalsi: {
+      suma: 9999,
+      nazov: 'GridServis — ďalší počítač (ročne)',
+      popis: 'Každý ďalší počítač k ročnému predplatnému GridServis.',
+      cena: process.env.STRIPE_PRICE_ROK_PC || ''
+    }
   },
   presun: {
     suma: 500,
@@ -56,6 +68,45 @@ var PLANY = {
     spat: '/presun.html'
   }
 };
+
+/* Koľko počítačov sa dá objednať cez web; viac sa dohodne e-mailom.
+   Rovnaké číslo je v tools/gen.py (MAX_PC). */
+var MAX_PC = 10;
+
+/* Predplatné na viac počítačov je zatiaľ „čoskoro“ — kým nie je VIAC_PC=1,
+   každá objednávka je na jeden počítač, nech sa nedá obísť cez formulár.
+   (Obnova existujúcej licencie s viacerými PC funguje stále.) */
+var VIAC_PC = process.env.VIAC_PC === '1';
+
+function pocetPc(hodnota, aj_bez_zapnutia) {
+  if (!VIAC_PC && !aj_bez_zapnutia) return 1;
+  var n = parseInt(hodnota, 10);
+  if (!(n >= 1)) return 1;
+  return Math.min(n, MAX_PC);
+}
+
+/* Položky do pokladne: prvý počítač za plnú cenu, každý ďalší za cenu
+   z `dalsi`. Pri predplatnom sa obe položky obnovujú spolu. */
+function polozky(p, pocitace) {
+  function polozka(zdroj, kusov) {
+    var x = { quantity: kusov };
+    if (zdroj.cena) {
+      x.price = zdroj.cena;
+    } else {
+      x.price_data = {
+        currency: 'eur',
+        unit_amount: zdroj.suma,
+        product_data: { name: zdroj.nazov, description: zdroj.popis, tax_code: DANOVY_KOD }
+      };
+      if (p.obdobie) x.price_data.recurring = { interval: p.obdobie };
+    }
+    return x;
+  }
+  var vysledok = [polozka(p, 1)];
+  var navyse = pocetPc(pocitace) - 1;
+  if (navyse > 0 && p.dalsi) vysledok.push(polozka(p.dalsi, navyse));
+  return vysledok;
+}
 
 function chyba(stav, sprava) {
   var e = new Error(sprava);
@@ -155,6 +206,9 @@ function adresaWebu(req) {
 module.exports = {
   PLANY: PLANY,
   DANOVY_KOD: DANOVY_KOD,
+  MAX_PC: MAX_PC,
+  pocetPc: pocetPc,
+  polozky: polozky,
   stripe: stripe,
   chyba: chyba,
   jeRelacia: jeRelacia,

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Môj účet — GridServis</title>
+<meta name="description" content="Správa licencie programu GridServis — platnosť, počítače a predplatné.">
+<meta property="og:title" content="Môj účet — GridServis">
+<meta property="og:description" content="Správa licencie programu GridServis — platnosť, počítače a predplatné.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:site_name" content="GridServis">
+<meta property="og:url" content="https://www.gridservis.app/ucet.html">
+<meta property="og:image" content="https://www.gridservis.app/assets/img/og-gridservis.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GridServis — celý servis v jednom programe">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.gridservis.app/ucet.html">
+<meta name="theme-color" content="#101722">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/img/favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
+<link rel="stylesheet" href="assets/css/styles.css">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="assets/css/ucet.css">
+</head>
+<body>
+<a class="skip" href="#obsah">Preskočiť na obsah</a>
+
+<header class="hdr" id="hdr">
+  <div class="wrap hdr__in">
+    <a class="logo" href="index.html">
+      <img src="assets/img/gridservis-logo.png" width="838" height="168" alt="GridServis">
+    </a>
+    <nav class="hdr__nav" aria-label="Hlavná navigácia">
+      <a href="index.html">Domov</a>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník</a>
+      <a href="stiahnut.html">Inštalácia</a>
+      <a href="faq.html">FAQ</a>
+      <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <a class="btn btn--gh btn--sm hdr__cta hdr__ucet" href="ucet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Prihlásiť</a>
+    <a class="btn btn--pri btn--sm hdr__cta" href="cennik.html" data-buy>Predplatiť</a>
+    <button class="hdr__burger" id="burger" aria-expanded="false" aria-controls="mnav" aria-label="Otvoriť menu"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="hdr__mobile" id="mnav" hidden aria-label="Mobilná navigácia">
+    <a href="index.html">Domov</a>
+    <a href="funkcie.html">Funkcie</a>
+    <a href="cennik.html">Cenník</a>
+    <a href="stiahnut.html">Inštalácia</a>
+    <a href="faq.html">FAQ</a>
+    <a href="kontakt.html">Kontakt</a>
+    <a href="ucet.html" class="on">Môj účet</a>
+  </nav>
+</header>
+
+<main id="obsah">
+
+<section class="phead mriezka">
+  <div class="wrap wrap--mid">
+    <p class="tagline">Môj účet</p>
+    <h1 id="nadpis">Správa licencie</h1>
+    <p class="lead" id="uvod">Prihláste sa licenčným kódom a e-mailom, na ktorý prišiel — pošleme vám jednorazový kód. Uvidíte platnosť licencie, aktivované počítače a platby. Zákazky ani iné dáta z programu tu nie sú &mdash; tie zostávajú na počítači v dielni.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap wrap--mid">
+    <p class="oznam" id="oznam" hidden></p>
+
+    <!-- prihlásenie -->
+    <div class="pulz u-login-obal" id="prihlasenie" hidden>
+    <div class="box u-login u-login--velke">
+      <h2 class="u-login__nadpis">Prihlásenie</h2>
+
+      <div class="u-soc" id="socialne" hidden>
+        <a class="btn btn--gh btn--lg btn--full u-soc__btn" id="google" href="/api/ucet/google" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.82-.07-1.6-.2-2.36H12v4.47h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.56-5.17 3.56-8.73Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.28a12 12 0 0 0 0 10.8l4.01-3.1Z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.8l3.44-3.44A11.97 11.97 0 0 0 1.28 6.6l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75Z"/></svg>
+          Prihlásiť sa cez Google
+        </a>
+        <p class="u-deli"><span>alebo licenčným kódom</span></p>
+      </div>
+
+      <!-- krok 1: licencia + e-mail -->
+      <form class="u-krok" id="krok1" novalidate>
+        <label class="u-pole">
+          <span>Licenčný kód</span>
+          <input name="licencia" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MECH-XXXX-XXXX-XXXX" maxlength="19" required data-licencia>
+        </label>
+        <label class="u-pole">
+          <span>E-mail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="dielna@priklad.sk" required>
+        </label>
+        <button class="btn btn--gh btn--lg btn--full" type="submit">Poslať kód na e-mail</button>
+      </form>
+
+      <!-- krok 2: 6-ciferný kód -->
+      <form class="u-krok" id="krok2" novalidate hidden>
+        <p class="u-info">Na <b id="kam"></b> sme poslali 6-ciferný kód.</p>
+        <label class="u-pole">
+          <span>Kód z e-mailu</span>
+          <input class="u-otp" name="kod" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" placeholder="000000" required>
+        </label>
+        <button class="btn btn--pri btn--lg btn--full" type="submit">Prihlásiť sa</button>
+        <p class="fine u-cas">Kód platí ešte <b id="odpocet">15:00</b>. <button class="u-link" type="button" id="znova">Poslať nový</button> · <button class="u-link" type="button" id="spat">Zmeniť údaje</button></p>
+      </form>
+
+      <p class="fine">Cez Google sa prihlásite, len ak ste si ho v účte najprv prepojili.</p>
+    </div>
+    </div>
+
+    <!-- prehľad po prihlásení -->
+    <div id="prehlad" hidden>
+      <div class="u-lista">
+        <span>Prihlásený ako <b id="kto"></b></span>
+        <button class="btn btn--gh btn--sm" id="odhlasit" type="button">Odhlásiť</button>
+      </div>
+
+      <div class="u-stat" id="stat"></div>
+
+      <h2 class="u-h2">Licencie</h2>
+      <div class="u-grid" id="licencie"></div>
+
+      <h2 class="u-h2">Platby</h2>
+      <div class="u-tab-wrap">
+        <table class="u-tab" id="platby">
+          <thead><tr><th>Dátum</th><th>Druh</th><th>Licencia</th><th>Suma</th><th>Stav</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 class="u-h2">Účet</h2>
+      <div class="u-grid u-grid--ucet">
+        <article class="u-lic" id="google-box" hidden>
+          <h3>Prihlásenie cez Google</h3>
+          <p class="u-pc__nic" id="google-stav"></p>
+          <div class="u-lic__akcie" id="google-akcie"></div>
+        </article>
+        <article class="u-lic">
+          <h3>Odstúpenie od zmluvy</h3>
+          <p class="u-pc__nic">Ak ste spotrebiteľ a máte právo odstúpiť od zmluvy, urobíte to cez formulár — potvrdenie príde e-mailom.</p>
+          <div class="u-lic__akcie"><a class="btn btn--gh btn--sm" href="odstupenie.html">Odstúpiť od zmluvy tu</a></div>
+        </article>
+        <article class="u-lic u-lic--zmazat">
+          <h3>Zmazať účet</h3>
+          <p class="u-pc__nic">Zmaže prihlásenie na webe a prepojenie s Google. Licencia v programe funguje ďalej a doklady o platbách musíme podľa zákona uchovať. O výmaz ďalších údajov môžete požiadať na <a href="mailto:support@gridservis.app">support@gridservis.app</a>.</p>
+          <div class="u-lic__akcie"><button class="btn btn--gh btn--sm u-zmazat" id="zmazat" type="button">Zmazať účet</button></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <a class="logo logo--foot" href="index.html">
+        <img src="assets/img/gridservis-logo.png" width="838" height="168" alt="GridServis">
+      </a>
+      <p>Program na vedenie zákaziek, skladu a fakturácie v autoservise. Beží na Windows, dáta zostávajú na vašom počítači.</p>
+    </div>
+    <div class="foot__col">
+      <h3>Program</h3>
+      <a href="funkcie.html">Funkcie</a>
+      <a href="cennik.html">Cenník a predplatné</a>
+      <a href="stiahnut.html">Inštalácia programu</a>
+    </div>
+    <div class="foot__col">
+      <h3>Podpora</h3>
+      <a href="faq.html">Časté otázky</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="kontakt.html" data-mail="podpora">Nahlásiť chybu</a>
+      <a href="ucet.html">Môj účet</a>
+    </div>
+    <div class="foot__col">
+      <h3>Právne</h3>
+      <a href="obchodne-podmienky.html">Obchodné podmienky</a>
+      <a href="odstupenie.html">Odstúpiť od zmluvy tu</a>
+      <a href="ochrana-sukromia.html">Ochrana súkromia</a>
+      <a href="cookies.html">Cookies</a>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>&copy; <span data-rok>2026</span> GridServis</span>
+    <span><span data-rel hidden>Verzia <span data-tag></span> &middot; </span>pre Windows 10 a 11</span>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/ucet.js"></script>
+</body>
+</html>
