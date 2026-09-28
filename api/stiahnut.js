@@ -23,7 +23,7 @@ function odmietni(res, stav, sprava) {
     '<!DOCTYPE html><html lang="sk"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<title>Stiahnutie nie je sprístupnené — GridServis</title>' +
-    '<link rel="icon" href="/assets/img/favicon.svg">' +
+    '<link rel="icon" href="/assets/img/favicon-32.png">' +
     '<link rel="stylesheet" href="/assets/css/styles.css"></head><body>' +
     '<section class="phead"><div class="wrap wrap--nar">' +
     '<h1>Stiahnutie nie je sprístupnené</h1>' +
