@@ -394,7 +394,7 @@ b,strong{font-weight:640;color:var(--ink)}
 .plan__coskoro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:28px;text-align:center;background:rgba(247,248,250,.35)}
 .plan__coskoro h2{margin:0;font-size:1.4rem}
 .plan__coskoro p{margin:0;max-width:30ch;font-size:.95rem}
-.plan__coskoro .coskoro{margin:0;font-size:.78rem;padding:4px 12px}
+.coskoro{display:inline-block;padding:5px 11px;border-radius:999px;background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc)!important;font-size:.8rem;font-weight:600;letter-spacing:-.005em;white-space:nowrap}
 @media (max-width:980px){.plans--tri{grid-template-columns:1fr 1fr}.plan--coskoro{grid-column:1/-1;min-height:260px}}
 
 /* ---------- porovnanie: čo je v predplatnom ---------- */
@@ -423,7 +423,6 @@ b,strong{font-weight:640;color:var(--ink)}
 .pc-volba__krok button:hover:not(:disabled){background:var(--bg-2)}
 .pc-volba__krok button:disabled{color:var(--line-2);cursor:default}
 .pc-volba__krok output{min-width:48px;text-align:center;font-weight:680;font-size:1.15rem;font-variant-numeric:tabular-nums;border-inline:1px solid var(--line-2);line-height:44px}
-.coskoro{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;background:var(--acc);color:#fff!important;font-size:.7rem;font-weight:640;letter-spacing:.06em;text-transform:uppercase;vertical-align:2px}
 .plans--tri .plan__price{flex-wrap:nowrap;white-space:nowrap}
 .plans--tri .plan__price b{font-size:clamp(2.3rem,3.6vw,3.1rem)}
 @media (max-width:520px){.pulz--velky::before{inset:-70px 0}}

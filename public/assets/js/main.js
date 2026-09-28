@@ -369,7 +369,7 @@
 
       var poznamka = document.getElementById('poznamka');
       poznamka.textContent = platene
-        ? 'Potvrdenie o platbe pošle Stripe e-mailom. Predplatné sa obnovuje automaticky, zrušiť sa dá v programe v Nastaveniach.'
+        ? 'Potvrdenie o platbe pošle Stripe e-mailom. Predplatné sa obnovuje automaticky, zrušiť sa dá v Mojom účte na webe.'
         : 'Demo slúži na vyskúšanie a nič nevyžaduje. Plnú verziu bez obmedzení odomkne licenčný kód po zaplatení predplatného.';
       poznamka.hidden = false;
 
