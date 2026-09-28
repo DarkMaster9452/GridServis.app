@@ -1,7 +1,7 @@
 /* /api/ucet/<akcia> — SKÚŠOBNÁ správa licencie cez web (len preview).
 
    Prihlásenie tromi spôsobmi, všetky vedú k tomu istému: overenému e-mailu.
-   Účet = všetky licencie, ktoré majú tento e-mail ako kontakt.
+   Účet = všetky licencie, ktoré majú tento e-mail ako kontakt (alebo v stĺpci email).
      * licenčný kód + e-mail → na e-mail príde 6-ciferný kód, platí 15 minút,
        dá sa použiť raz a po použití (alebo 5 zlých pokusoch) sa z DB zmaže,
      * Google (OAuth, keď sú nastavené GOOGLE_CLIENT_ID a GOOGLE_CLIENT_SECRET),
@@ -112,7 +112,8 @@ var JE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function vlastnenaLicencia(kod, email) {
   return riadok(
-    `SELECT kod FROM licencie WHERE kod = $1 AND lower(kontakt) = lower($2)`,
+    `SELECT kod FROM licencie
+      WHERE kod = $1 AND (lower(kontakt) = lower($2) OR lower(email) = lower($2))`,
     [kod, email]);
 }
 
@@ -360,7 +361,7 @@ async function appleSpat(req, res) {
 async function ja(req, res, email) {
   var licencie = await sql(
     `SELECT kod, dielna, max_zariadeni, platna_do, stav
-       FROM licencie WHERE lower(kontakt) = lower($1)
+       FROM licencie WHERE lower(kontakt) = lower($1) OR lower(email) = lower($1)
       ORDER BY platna_do DESC NULLS LAST`, [email]);
 
   var kody = licencie.map(function (l) { return l.kod; });
@@ -370,7 +371,8 @@ async function ja(req, res, email) {
     /* kódy majú len [A-Z0-9-], takže ich možno bezpečne poslať ako pole */
     var pole = '{' + kody.join(',') + '}';
     zariadenia = await sql(
-      `SELECT * FROM zariadenia WHERE kod = ANY($1::text[])`, [pole]);
+      `SELECT kod, odtlacok, nazov_pc, os, verzia_appky, stav, aktivovane, posledna_kontrola
+         FROM zariadenia WHERE kod = ANY($1::text[]) ORDER BY aktivovane`, [pole]);
     platby = await sql(
       `SELECT cas, druh, plan, suma, mena, stav, kod,
               (stripe_zakaznik IS NOT NULL) AS cez_stripe
