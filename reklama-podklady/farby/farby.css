@@ -1,0 +1,18 @@
+/* GridServis – farby a písmo (zdroj: public/assets/css/styles.css, appka = z screenshotov) */
+:root{
+  /* web */
+  --ink:#0d1117; --ink-2:#3f4a59; --mut:#55606e; --mut-2:#5f6b7a;
+  --line:#e8ebf0; --line-2:#d5dae2; --grid:#e4e8ef;
+  --bg:#ffffff; --bg-2:#f7f8fa; --bg-3:#f1f3f7;
+  --acc:#2563eb; --acc-d:#1b4ed1; --acc-soft:#eef3ff; --acc-line:#cfdefe;
+  --dark:#101722;
+  --ok:#16713f; --ok-soft:#e6f6ed;
+  --warn-ink:#7a4a06; --warn-bg:#fff8e8; --warn-line:#f3d9a4;
+  /* appka (Windows program) */
+  --app-modra:#3b7df0; --app-modra-graf:#528cf2; --app-bocny-panel:#f5f8fd;
+  --app-hlavicka-tabulky:#eef1f7; --app-okraj:#e6ebf3; --app-text:#1e2637;
+  --app-zelena:#17a06b; --app-zelena-bg:#e3f3ed; --app-oranzova-bg:#fdf3e3; --app-cervena-bg:#fcedeb;
+  /* písmo */
+  --font-web:-apple-system,BlinkMacSystemFont,"Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}

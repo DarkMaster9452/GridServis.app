@@ -1,0 +1,8 @@
+GridServis – podklady pre reklamy
+=================================
+UI-PRIRUCKA.html   -> otvor v prehliadaci: uplny zoznam UI prvkov webu a appky, farby, pismo, styl, texty, pravidla reklam
+logo/              -> vsetky logá (PNG): logo, znak, napis, ikony, OG banner
+screenshoty/       -> aplikacia/ (9 obrazoviek programu) + web/ (domov, cennik)
+farby/             -> farby.css, farby.json (hex kody + pismo)
+Dolezite: napis GridServis je vlastne pismo – pouzivaj PNG, nepis ho fontom.
+Kontakt: support@gridservis.app · https://www.gridservis.app
