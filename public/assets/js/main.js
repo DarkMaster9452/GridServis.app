@@ -100,14 +100,39 @@
     }
   }
 
-  function zapis(typ, plan) {
-    var udaje = JSON.stringify({
+  /* Vlastné návštevy majiteľa: odkaz ?vylucit=1 si v tomto prehliadači
+     zapamätá, že sa nemá nič merať (?vylucit=0 to zruší). Ukladá sa len
+     príznak v localStorage, nikam sa neposiela. */
+  var vylucene = false;
+  try {
+    var q = /[?&]vylucit=([01])/.exec(location.search);
+    if (q) {
+      if (q[1] === '1') localStorage.setItem('aa_vylucit', '1');
+      else localStorage.removeItem('aa_vylucit');
+    }
+    vylucene = localStorage.getItem('aa_vylucit') === '1';
+  } catch (e) { /* bez úložiska sa meria normálne */ }
+  if (navigator.webdriver) vylucene = true;
+
+  function zariadenie() {
+    var w = window.innerWidth || 1024;
+    return w < 700 ? 'mobil' : (w < 1100 ? 'tablet' : 'pocitac');
+  }
+
+  function zapis(typ, plan, extra) {
+    if (vylucene) return;
+    var udaje = {
       typ: typ,
       plan: plan || '',
       stranka: location.pathname.replace(/^.*\//, '') || 'index.html',
       relacia: navsteva(),
-      zdroj: zdroj()
-    });
+      zdroj: zdroj(),
+      zariadenie: zariadenie(),
+      sirka: window.innerWidth || '',
+      jazyk: (navigator.language || '').slice(0, 2)
+    };
+    for (var k in (extra || {})) udaje[k] = extra[k];
+    udaje = JSON.stringify(udaje);
     try {
       if (navigator.sendBeacon) {
         navigator.sendBeacon('/api/udalost', new Blob([udaje], { type: 'application/json' }));
@@ -123,6 +148,46 @@
   }
 
   zapis('zobrazenie');
+
+  /* každé kliknutie na odkaz alebo tlačidlo: na čo, v ktorej časti a kde na stránke */
+  document.addEventListener('click', function (e) {
+    var el = e.target && e.target.closest ? e.target.closest('a, button, summary, [role="button"]') : null;
+    if (!el) return;
+    var ciel = (el.getAttribute('data-track') || el.textContent || el.getAttribute('aria-label') || '')
+      .replace(/\s+/g, ' ').trim().slice(0, 60);
+    var href = el.getAttribute('href') || '';
+    if (href && href.charAt(0) !== '#') ciel += ' → ' + href.replace(/^https?:\/\/(www\.)?/, '').slice(0, 50);
+    var sekcia = el.closest('header, nav, footer, section[id], [id]');
+    var vyska = Math.max(document.documentElement.scrollHeight, 1);
+    zapis('klik', '', {
+      ciel: ciel || el.tagName.toLowerCase(),
+      sekcia: sekcia ? (sekcia.id || sekcia.tagName.toLowerCase()) : '',
+      x: Math.round(100 * e.pageX / Math.max(document.documentElement.clientWidth, 1)),
+      y: Math.round(100 * e.pageY / vyska)
+    });
+  }, true);
+
+  /* hĺbka scrollu (25 / 50 / 75 / 100 %) a čas strávený na stránke */
+  var hotove = {};
+  window.addEventListener('scroll', function () {
+    var doc = document.documentElement;
+    var zostava = doc.scrollHeight - window.innerHeight;
+    var pct = zostava <= 0 ? 100 : 100 * (window.scrollY || doc.scrollTop) / zostava;
+    [25, 50, 75, 100].forEach(function (prah) {
+      if (pct >= prah - 1 && !hotove[prah]) { hotove[prah] = true; zapis('scroll', '', { hodnota: prah }); }
+    });
+  }, { passive: true });
+
+  var zaciatok = Date.now(), odoslanyCas = false;
+  function odosliCas() {
+    if (odoslanyCas) return;
+    odoslanyCas = true;
+    zapis('cas', '', { hodnota: Math.round((Date.now() - zaciatok) / 1000) });
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') odosliCas();
+  });
+  window.addEventListener('pagehide', odosliCas);
 
   /* kliky na tlačidlá — vidno, kde ľudia odpadnú */
   each('form.pay', function (f) {
