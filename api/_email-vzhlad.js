@@ -22,7 +22,22 @@ var path = require('path');
 var LOGO_CID = 'gridservis-logo';
 var logoBase64 = null;
 
-function prilohy() {
+var HERO_CID = 'gridservis-hlavicka';
+var heroBase64 = null;
+
+function prilohy(html) {
+  var vysledok = logoPriloha();
+  if (html && String(html).indexOf('cid:' + HERO_CID) !== -1) {
+    if (heroBase64 === null) {
+      try { heroBase64 = fs.readFileSync(path.join(__dirname, '_hlavicka.png')).toString('base64'); }
+      catch (e) { heroBase64 = ''; console.error('email: hlavička', e.message); }
+    }
+    if (heroBase64) vysledok.push({ filename: 'gridservis-hlavicka.png', content: heroBase64, content_type: 'image/png', content_id: HERO_CID });
+  }
+  return vysledok;
+}
+
+function logoPriloha() {
   if (logoBase64 === null) {
     try { logoBase64 = fs.readFileSync(path.join(__dirname, '_logo.png')).toString('base64'); }
     catch (e) { logoBase64 = ''; console.error('email: logo', e.message); }
@@ -55,7 +70,15 @@ function kodBlok(hodnota, popis) {
 
 /* Hlavička e-mailu — biela, so skutočným logom, rovnako ako .hdr na webe
    (ten je tiež svetlý s tmavým logom, nie tmavý pruh). */
-function znacka() {
+function znacka(hero) {
+  if (hero) {
+    /* modrá hlavička s mriežkou a bielym logom — jeden obrázok, preto vyzerá
+       rovnako vo všetkých e-mailových klientoch; bgcolor je záloha, keby sa
+       obrázok neurobil */
+    return '\n  <tr><td bgcolor="' + FARBY.acc + '" style="background:' + FARBY.acc + ';line-height:0;font-size:0;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;">' +
+      '\n    <img src="cid:' + HERO_CID + '" width="560" height="150" alt="GridServis" style="display:block;width:100%;max-width:560px;height:auto;border:0;">' +
+      '\n  </td></tr>';
+  }
   return '\n  <tr><td style="background:' + FARBY.bg + ';padding:22px 32px;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;border-bottom:1px solid ' + FARBY.linka + ';">' +
     '\n    <img src="cid:' + LOGO_CID + '" width="160" height="32" alt="GridServis" style="display:block;width:160px;height:32px;border:0;">' +
     '\n  </td></tr>';
@@ -71,7 +94,7 @@ function paticka(odpoved) {
 }
 
 /* Zabalí telo e-mailu do jednotného vizuálu. */
-function obalka(predmet, obsahHtml, webUrl, odpoved) {   // webUrl sa už nepoužíva, ostáva kvôli volaniam
+function obalka(predmet, obsahHtml, webUrl, odpoved, hero) {   // webUrl sa už nepoužíva, ostáva kvôli volaniam
   return '<!doctype html>' +
     '\n<html lang="sk">' +
     '\n<head>' +
@@ -82,7 +105,7 @@ function obalka(predmet, obsahHtml, webUrl, odpoved) {   // webUrl sa už nepou�
     '\n</head>' +
     '\n<body style="margin:0;padding:32px 16px;background:' + FARBY.bg2 + ';font-family:' + FONT + ';font-size:15px;line-height:1.65;color:' + FARBY.ink + ';">' +
     '\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:' + FARBY.bg + ';border-radius:' + RADIUS + ';overflow:hidden;box-shadow:0 2px 6px rgba(13,17,23,.05),0 18px 40px -28px rgba(13,17,23,.28);">' +
-    znacka() +
+    znacka(hero) +
     '\n    <tr><td style="padding:34px 32px 12px;">' +
     obsahHtml +
     '\n    </td></tr>' +
@@ -107,12 +130,13 @@ function otpBlok(hodnota, popis) {
    odmietol (4xx), pošle sa e-mail znova bez nej a logo sa načíta z webu —
    radšej logo z internetu než žiadny e-mail. */
 var LOGO_WEB = 'https://www.gridservis.app/assets/img/gridservis-logo.png';
+var HERO_WEB = 'https://www.gridservis.app/assets/img/email-hlavicka.png';
 
 async function odosli(sprava) {
   var hlavicky = { Authorization: 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' };
   var r = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: hlavicky,
-    body: JSON.stringify(Object.assign({ attachments: prilohy() }, sprava))
+    body: JSON.stringify(Object.assign({ attachments: prilohy(sprava.html) }, sprava))
   });
   if (!r.ok && r.status >= 400 && r.status < 500 && r.status !== 401 && r.status !== 403 && r.status !== 429) {
     console.error('email: bez prílohy', r.status, await r.text().catch(function () { return ''; }));
@@ -120,6 +144,7 @@ async function odosli(sprava) {
       method: 'POST', headers: hlavicky,
       body: JSON.stringify(Object.assign({}, sprava, {
         html: String(sprava.html || '').split('cid:' + LOGO_CID).join(LOGO_WEB)
+          .split('cid:' + HERO_CID).join(HERO_WEB)
       }))
     });
   }
