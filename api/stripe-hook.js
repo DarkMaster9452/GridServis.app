@@ -163,6 +163,14 @@ module.exports = async function (req, res) {
         });
         console.log('stripe-hook: obnova', subFaktury,
           o ? 'licencia ' + o.kod + ' do ' + o.platna_do : 'licencia sa nenašla');
+        if (o && faktura.customer_email && faktura.amount_paid > 0) {
+          await require('./_email').posliObnovaZaplatena(faktura.customer_email, {
+            meno: faktura.customer_name || '', kod: o.kod, platnaDo: o.platna_do,
+            suma: faktura.amount_paid, mena: faktura.currency,
+            faktura: faktura.invoice_pdf || faktura.hosted_invoice_url || '',
+            kluc: 'obnova-' + faktura.id
+          }, web);
+        }
       }
 
     } else if (typ === 'invoice.payment_failed') {
@@ -179,8 +187,18 @@ module.exports = async function (req, res) {
           stripe_zakaznik: id(neuspesna.customer),
           stripe_predplatne: subNeuspesnej
         });
-        await poznamka(subNeuspesnej,
+        var kodNeuspesnej = await poznamka(subNeuspesnej,
           'platba neprešla ' + new Date().toISOString().slice(0, 10));
+        /* e-mail len pri prvom neúspechu — Stripe potom skúša znova a každý
+           ďalší pokus by poslal ďalší e-mail */
+        if (neuspesna.customer_email && (neuspesna.attempt_count || 1) <= 1) {
+          await require('./_email').posliPlatbaNepresla(neuspesna.customer_email, {
+            meno: neuspesna.customer_name || '', kod: kodNeuspesnej || '',
+            suma: neuspesna.amount_due, mena: neuspesna.currency,
+            faktura: neuspesna.hosted_invoice_url || '',
+            kluc: 'platba-' + neuspesna.id
+          }, web);
+        }
       }
 
     } else if (typ === 'customer.subscription.deleted') {
@@ -189,6 +207,14 @@ module.exports = async function (req, res) {
         'predplatné skončilo ' + new Date().toISOString().slice(0, 10));
       if (kod) {
         await sql("UPDATE licencie SET platna_do = current_date WHERE kod = $1", [kod]);
+        var lic = await require('./_db').riadok(
+          "SELECT COALESCE(NULLIF(email, ''), kontakt) AS email, dielna FROM licencie WHERE kod = $1", [kod]);
+        if (lic && /@/.test(lic.email || '')) {
+          await require('./_email').posliKoniecPredplatneho(lic.email, {
+            meno: lic.dielna && lic.dielna !== lic.email ? lic.dielna : '', kod: kod,
+            kluc: 'koniec-' + objekt.id
+          }, web);
+        }
       }
       console.log('stripe-hook: koniec predplatného', objekt.id, kod || '');
     }
