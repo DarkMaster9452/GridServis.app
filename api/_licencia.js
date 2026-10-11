@@ -158,5 +158,6 @@ module.exports = {
   predlz: predlz,
   zapisPlatbu: zapisPlatbu,
   poznamka: poznamka,
-  platnaDo: platnaDo
+  platnaDo: platnaDo,
+  volnyKod: volnyKod
 };

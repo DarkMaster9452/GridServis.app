@@ -32,16 +32,20 @@ var VLASTNE_EMAILY = ['strananekm@gmail.com', 'support@gridservis.app']
   .map(function (e) { return e.trim().toLowerCase(); })
   .filter(Boolean);
 
+function jeVlastnyEmail(adresa) {
+  return VLASTNE_EMAILY.indexOf(String(adresa || '').trim().toLowerCase()) !== -1;
+}
+
 /* poradie zákazníka medzi rôznymi zákazníkmi dema (1 = prvý), alebo null,
    keď ide o vlastnú adresu alebo zákazníka, ktorý už demo mal.
    Volá sa pred zápisom novej objednávky. */
 async function poradieDema(adresa) {
   adresa = String(adresa || '').trim().toLowerCase();
-  if (!adresa || VLASTNE_EMAILY.indexOf(adresa) !== -1) return null;
+  if (!adresa || jeVlastnyEmail(adresa)) return null;
   var riadky = await sql(
     "SELECT DISTINCT lower(email) AS email FROM platby WHERE plan = 'demo' AND email <> ''");
   var ini = riadky.map(function (r) { return r.email; })
-    .filter(function (e) { return VLASTNE_EMAILY.indexOf(e) === -1; });
+    .filter(function (e) { return !jeVlastnyEmail(e); });
   if (ini.indexOf(adresa) !== -1) return null;
   return ini.length + 1;
 }
@@ -115,4 +119,4 @@ async function spracuj(relacia, adresaWebu) {
   };
 }
 
-module.exports = { spracuj: spracuj, koniecObdobia: koniecObdobia, poradieDema: poradieDema };
+module.exports = { spracuj: spracuj, koniecObdobia: koniecObdobia, poradieDema: poradieDema, jeVlastnyEmail: jeVlastnyEmail };

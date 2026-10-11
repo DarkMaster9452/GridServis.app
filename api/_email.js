@@ -10,8 +10,29 @@ var KLUC = process.env.RESEND_API_KEY || '';
 var ODOSIELATEL = process.env.RESEND_FROM || '';
 var ODPOVED = process.env.RESEND_REPLY_TO || 'support@gridservis.app';
 
+/* vysoká priorita — v Outlooku, Apple Mail a Thunderbirde červený výkričník;
+   Gmail ju ignoruje. Len pre e-maily, na ktorých zákazníkovi naozaj záleží. */
+var DOLEZITE = { 'X-Priority': '1', Importance: 'high' };
+
+function suma(centy, mena) {
+  var n = (Number(centy) || 0) / 100;
+  return n.toFixed(2).replace('.', ',') + ' ' + (String(mena || 'eur').toLowerCase() === 'eur' ? '€' : String(mena).toUpperCase());
+}
+
+function datum(iso) {
+  var d = String(iso || '').slice(0, 10).split('-');
+  return d.length === 3 ? Number(d[2]) + '. ' + Number(d[1]) + '. ' + d[0] : String(iso || '');
+}
+
+function esc(t) {
+  return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 async function posliSpravu(sprava, moznosti) {
   if (!sprava.to[0] || !KLUC || !ODOSIELATEL) return false;
+  if (moznosti && moznosti.dolezite) sprava.headers = Object.assign({}, sprava.headers, DOLEZITE);
   try {
     var r = await V.odosli(Object.assign({ from: ODOSIELATEL, reply_to: ODPOVED }, sprava), moznosti);
     if (!r.ok) {
@@ -86,7 +107,7 @@ async function posli(email, kod, plan, platnaDo, adresaWebu, meno) {
     subject: 'Licencia GridServis je aktívna — váš kód',
     html: licenciaHtml(meno, kod, plan, platnaDo, adresaWebu),
     text: licenciaText(meno, kod, plan, platnaDo, adresaWebu)
-  });
+  }, { dolezite: true });
 }
 
 /* ---------- presun licencie na iný počítač ---------- */
@@ -230,12 +251,327 @@ async function posliRecenziu(email, adresaWebu, meno, za) {
   }, { naplanovat: kedy, kluc: 'recenzia-' + String(email).toLowerCase() });
 }
 
+
+/* ---------- platba za obnovu neprešla ---------- */
+
+function platbaHtml(m, web) {
+  var zaplatit = m.faktura || (web + '/ucet.html');
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Platba za predplatné', 'neprešla') +
+    V.odsek('pri obnove predplatného GridServis sa nepodarilo strhnúť platbu <b>' + suma(m.suma, m.mena) + '</b>. Najčastejšie ide o kartu, ktorej skončila platnosť, alebo o nedostatok prostriedkov na účte.') +
+    V.kroky([
+      ['Zaplaťte faktúru', 'Kliknite na tlačidlo nižšie a zaplaťte hoci aj inou kartou.'],
+      ['Alebo zmeňte kartu', 'V <a href="' + web + '/ucet.html" style="color:#2563eb;">Mojom účte</a> → Spravovať predplatné. Ďalšia obnova už pôjde z novej karty.']
+    ]) +
+    V.tlacidlo('Zaplatiť faktúru &rarr;', zaplatit) +
+    V.odsek('Platbu sa automaticky pokúsime strhnúť znova o pár dní. Licencia ' + (m.kod ? '<b>' + m.kod + '</b> ' : '') + 'zatiaľ funguje. Ak sa platbu nepodarí uhradiť, program sa po skončení zaplateného obdobia zastaví — vaše dáta v počítači zostanú.', true) +
+    V.kontaktKarta('Potrebujete pomôcť?') +
+    V.podpis();
+  return V.obalka('Platba neprešla', obsah, web, ODPOVED,
+    { hlavicka: 'mriezka', predhlavicka: 'Obnova predplatného GridServis sa nepodarila — stačí zaplatiť faktúru alebo zmeniť kartu.' });
+}
+
+async function posliPlatbaNepresla(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Platba za GridServis neprešla — zaplaťte, prosím, faktúru',
+    html: platbaHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'pri obnove predplatného GridServis sa nepodarilo strhnúť platbu ' + suma(m.suma, m.mena) + '.', '',
+      'Zaplatiť faktúru: ' + (m.faktura || adresaWebu + '/ucet.html'),
+      'Zmeniť kartu: ' + adresaWebu + '/ucet.html (Spravovať predplatné)', '',
+      'Platbu sa pokúsime strhnúť znova o pár dní. Licencia zatiaľ funguje; ak sa platbu',
+      'nepodarí uhradiť, program sa po skončení obdobia zastaví — dáta v počítači zostanú.', '',
+      'Otázky: ' + ODPOVED + ' · ' + V.TELEFON, '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { dolezite: true, kluc: m.kluc });
+}
+
+/* ---------- predplatné skončilo ---------- */
+
+function koniecHtml(m, web) {
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Predplatné', 'skončilo') +
+    V.odsek('vaše predplatné programu GridServis skončilo a licencia <b>' + m.kod + '</b> sa zastavila. Vaše dáta — zákazky, zákazníci aj sklad — zostávajú uložené v počítači.') +
+    V.kroky([
+      ['Obnovte predplatné', 'Na ten istý licenčný kód — nič nové nezadávate.'],
+      ['Pokračujte tam, kde ste skončili', 'Program sa odomkne a uvidíte všetky svoje dáta.']
+    ]) +
+    V.tlacidlo('Obnoviť predplatné &rarr;', web + '/obnova.html?kod=' + encodeURIComponent(m.kod)) +
+    V.odsek('Ak ste predplatné zrušili zámerne, budeme radi, keď nám odpíšete, čo vám chýbalo. Pomôže nám to GridServis zlepšiť.', true) +
+    V.kontaktKarta() +
+    V.podpis('Ďakujeme, že ste s nami boli.');
+  return V.obalka('Predplatné skončilo', obsah, web, ODPOVED,
+    { hlavicka: 'mriezka', predhlavicka: 'Licencia sa zastavila, dáta zostávajú v počítači. Obnoviť ju môžete na ten istý kód.' });
+}
+
+async function posliKoniecPredplatneho(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Predplatné GridServis skončilo — vaše dáta zostávajú',
+    html: koniecHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'vaše predplatné programu GridServis skončilo a licencia ' + m.kod + ' sa zastavila.',
+      'Dáta (zákazky, zákazníci, sklad) zostávajú uložené v počítači.', '',
+      'Obnoviť predplatné na ten istý kód: ' + adresaWebu + '/obnova.html?kod=' + encodeURIComponent(m.kod), '',
+      'Ak ste predplatné zrušili zámerne, odpíšte nám, prosím, čo vám chýbalo.', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: m.kluc });
+}
+
+/* ---------- obnova predplatného zaplatená ---------- */
+
+function obnovaHtml(m, web) {
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Licencia je', 'predĺžená') +
+    V.odsek('ďakujeme, platba <b>' + suma(m.suma, m.mena) + '</b> za predplatné GridServis prešla. Licencia <b>' + m.kod + '</b> platí do <b>' + datum(m.platnaDo) + '</b>.') +
+    (m.faktura ? V.tlacidlo('Stiahnuť faktúru &rarr;', m.faktura, true) : '') +
+    V.odsek('Nemusíte nič robiť — program beží ďalej. Predplatné spravujete v <a href="' + web + '/ucet.html" style="color:#2563eb;">Mojom účte</a>.', true) +
+    V.podpis();
+  return V.obalka('Licencia je predĺžená', obsah, web, ODPOVED,
+    { hlavicka: 'mriezka', predhlavicka: 'Platba prešla, licencia GridServis platí ďalej.' });
+}
+
+async function posliObnovaZaplatena(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Licencia GridServis je predĺžená do ' + datum(m.platnaDo),
+    html: obnovaHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'platba ' + suma(m.suma, m.mena) + ' za predplatné GridServis prešla.',
+      'Licencia ' + m.kod + ' platí do ' + datum(m.platnaDo) + '.', '',
+      (m.faktura ? 'Faktúra: ' + m.faktura + '\n' : '') +
+      'Predplatné spravujete v Mojom účte: ' + adresaWebu + '/ucet.html', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: m.kluc });
+}
+
+/* ---------- skúšobná licencia (3 mesiace zadarmo za spätnú väzbu) ---------- */
+
+function skusobnaHtml(m, web) {
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Vaše ' + m.mesiace + ' mesiace', 'zadarmo') +
+    V.odsek('ďakujeme, že nám pomôžete GridServis zlepšovať. Tu je licencia na plnú verziu — bez platby a bez záväzkov.') +
+    V.kodBlok(m.kod, 'VÁŠ LICENČNÝ KÓD') +
+    V.odsek('Licencia platí do <b>' + datum(m.platnaDo) + '</b>. Nič sa automaticky neplatí, pred koncom vám pripomenieme, ako pokračovať.', true) +
+    V.podnadpis('Ako začať') +
+    V.kroky([
+      ['Stiahnite plnú verziu', 'Inštalačka je na stránke <a href="' + web + '/stiahnut.html" style="color:#2563eb;">gridservis.app/stiahnut</a>.'],
+      ['Spustite inštaláciu', SMARTSCREEN],
+      ['Zadajte licenčný kód', 'Pri prvom spustení vložte kód vyššie.']
+    ]) +
+    V.tlacidlo('Stiahnuť plnú verziu &rarr;', web + '/stiahnut.html') +
+    V.modraKarta({
+      stitok: 'VAŠA SPÄTNÁ VÄZBA',
+      titulok: 'Píšte nám, čo funguje a čo nie',
+      text: 'Kedykoľvek odpovedzte na tento e-mail — čo vám chýba, čo vás zdržuje, čo by ste zmenili. Každú správu čítame a podľa nich GridServis upravujeme.'
+    }) +
+    V.kontaktKarta() +
+    V.podpis('Ďakujeme, že ste do toho išli s nami.');
+  return V.obalka('Vaše ' + m.mesiace + ' mesiace zadarmo', obsah, web, ODPOVED,
+    { hlavicka: 'app', predhlavicka: 'Licencia na plnú verziu GridServis na ' + m.mesiace + ' mesiace zadarmo.' });
+}
+
+async function posliSkusobnu(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Vaša licencia GridServis na ' + m.mesiace + ' mesiace zadarmo',
+    html: skusobnaHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'ďakujeme, že nám pomôžete GridServis zlepšovať. Tu je licencia na plnú verziu na ' + m.mesiace + ' mesiace zadarmo.', '',
+      'Licenčný kód: ' + m.kod,
+      'Platí do: ' + datum(m.platnaDo), '',
+      'Ako začať:',
+      '1. Stiahnite plnú verziu na ' + adresaWebu + '/stiahnut.html',
+      '2. Spustite inštaláciu (pri upozornení SmartScreen: Ďalšie informácie → Spustiť tak či tak).',
+      '3. Pri prvom spustení zadajte kód vyššie.', '',
+      'Kedykoľvek nám odpíšte, čo funguje a čo nie. Nič sa automaticky neplatí.', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { dolezite: true, kluc: m.kluc });
+}
+
+/* ---------- skúšobná licencia končí o 7 dní ---------- */
+
+function koniecSkusobnejHtml(m, web) {
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Skúšobné obdobie končí', 'o&nbsp;7&nbsp;dní') +
+    V.odsek('vaša skúšobná licencia <b>' + m.kod + '</b> platí do <b>' + datum(m.platnaDo) + '</b>. Ak chcete GridServis používať aj ďalej, stačí si vybrať predplatné — licenčný kód aj všetky dáta zostanú.') +
+    V.kroky([
+      ['Ročné predplatné', '<b>199,99 €</b> ročne — ušetríte 39,89 € oproti mesačnému.'],
+      ['Mesačné predplatné', '<b>19,99 €</b> mesačne, zrušíte kedykoľvek.']
+    ]) +
+    V.tlacidlo('Pokračovať s predplatným &rarr;', web + '/obnova.html?kod=' + encodeURIComponent(m.kod)) +
+    V.odsek('Ak sa rozhodnete nepokračovať, program sa po skončení zastaví a dáta zostanú v počítači. Budeme radi, keď nám napíšete, prečo — pomôže nám to.', true) +
+    V.kontaktKarta() +
+    V.podpis();
+  return V.obalka('Skúšobné obdobie končí o 7 dní', obsah, web, ODPOVED,
+    { hlavicka: 'app', predhlavicka: 'Licencia GridServis platí ešte 7 dní. Pokračovať môžete na ten istý kód.' });
+}
+
+async function posliKoniecSkusobnej(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Skúšobné obdobie GridServis končí o 7 dní',
+    html: koniecSkusobnejHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'vaša skúšobná licencia ' + m.kod + ' platí do ' + datum(m.platnaDo) + '.',
+      'Ak chcete pokračovať, vyberte si predplatné — kód aj dáta zostanú:',
+      '- ročne 199,99 € (ušetríte 39,89 €)',
+      '- mesačne 19,99 €, zrušíte kedykoľvek', '',
+      'Pokračovať: ' + adresaWebu + '/obnova.html?kod=' + encodeURIComponent(m.kod), '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: m.kluc });
+}
+
+/* ---------- týždeň po deme: plná verzia ---------- */
+
+function demoPlnaHtml(meno, web) {
+  var obsah =
+    V.pozdrav(meno) +
+    V.nadpis('Ako vám sedí', 'GridServis?') +
+    V.odsek('pred týždňom ste si stiahli demo programu GridServis. Dúfame, že ste si ho stihli vyskúšať na pár skutočných zákazkách.') +
+    V.podnadpis('S plnou verziou máte') +
+    V.kroky([
+      ['Prehľad o zákazkách', 'Stav opráv, termíny a detaily zákaziek v reálnom čase.'],
+      ['Správu zákazníkov', 'Všetky kontakty a história servisu na jednom mieste.'],
+      ['Rýchle štatistiky', 'Prehľad o výkonnosti a využití kapacít vášho servisu.']
+    ]) +
+    V.modraKarta({
+      stitok: 'PLNÁ VERZIA',
+      titulok: 'Od 19,99 € mesačne',
+      text: 'Bez viazanosti, zrušiť môžete kedykoľvek. Pri ročnom predplatnom ušetríte 39,89 €.',
+      tlacidlo: ['Pozrieť cenník &rarr;', web + '/cennik.html']
+    }) +
+    V.odsek('Niečo vám v deme chýbalo alebo nefungovalo? Odpíšte nám — čítame každú správu.', true) +
+    V.tmavyPruh('Menej chaosu, viac času na autá.', 'GridServis vám šetrí čas a znižuje administratívu.') +
+    V.kontaktKarta() +
+    V.podpis();
+  return V.obalka('Ako vám sedí GridServis?', obsah, web, ODPOVED,
+    { hlavicka: 'app', predhlavicka: 'Týždeň po deme: čo vám GridServis dá v plnej verzii.' });
+}
+
+async function posliDemoPlnaVerzia(email, adresaWebu, meno, kluc) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Ako vám sedí GridServis?',
+    html: demoPlnaHtml(meno, adresaWebu),
+    text: [
+      'Dobrý deň' + (meno ? ', ' + meno : '') + ',', '',
+      'pred týždňom ste si stiahli demo programu GridServis. Dúfame, že ste si ho stihli vyskúšať.', '',
+      'Plná verzia je od 19,99 € mesačne, bez viazanosti. Pri ročnom predplatnom ušetríte 39,89 €.',
+      'Cenník: ' + adresaWebu + '/cennik.html', '',
+      'Niečo vám v deme chýbalo? Odpíšte nám, čítame každú správu.', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: kluc });
+}
+
+/* ---------- mesiac po kúpe: hodnotenie 1–10 ---------- */
+
+function dotaznikHtml(meno, web) {
+  var cisla = '';
+  for (var i = 1; i <= 10; i++) {
+    cisla += '<td align="center" style="padding:0 2px;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr>' +
+      '<td align="center" height="40" bgcolor="' + (i >= 9 ? '#2563eb' : '#e6eeff') + '" style="height:40px;background-color:' + (i >= 9 ? '#2563eb' : '#e6eeff') + ';border-radius:9px;">' +
+      '<a href="mailto:' + ODPOVED + '?subject=' + encodeURIComponent('Hodnotenie GridServis: ' + i + '/10') + '" style="display:block;line-height:40px;font-size:15px;font-weight:800;color:' + (i >= 9 ? '#ffffff' : '#2563eb') + ';text-decoration:none;">' + i + '</a>' +
+      '</td></tr></table></td>';
+  }
+  var obsah =
+    V.pozdrav(meno) +
+    V.nadpis('Ako ste spokojní', 's GridServisom?') +
+    V.odsek('používate GridServis už mesiac. Ako pravdepodobne by ste ho odporučili inému autoservisu? Kliknite na číslo od 1 do 10 — otvorí sa krátky e-mail, ktorý nám odošlete.') +
+    '\n      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0 6px;"><tr>' + cisla + '</tr></table>' +
+    '\n      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;"><tr><td style="font-size:12px;color:#8a93a1;">vôbec nie</td><td align="right" style="font-size:12px;color:#8a93a1;">určite áno</td></tr></table>' +
+    V.odsek('A ak nám k tomu pripíšete jednu vec, ktorú by sme mali zlepšiť, budete mať zásluhu na ďalšej verzii.', true) +
+    V.podpis('Ďakujeme!');
+  return V.obalka('Ako ste spokojní s GridServisom?', obsah, web, ODPOVED,
+    { hlavicka: 'mriezka', predhlavicka: 'Jedno kliknutie: ohodnoťte GridServis od 1 do 10.' });
+}
+
+async function posliDotaznik(email, adresaWebu, meno, kluc) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Ako ste spokojní s GridServisom? (1 kliknutie)',
+    html: dotaznikHtml(meno, adresaWebu),
+    text: [
+      'Dobrý deň' + (meno ? ', ' + meno : '') + ',', '',
+      'používate GridServis už mesiac. Ako pravdepodobne by ste ho odporučili inému autoservisu',
+      'na stupnici od 1 do 10? Stačí odpovedať na tento e-mail jedným číslom.', '',
+      'A ak pripíšete jednu vec, ktorú zlepšiť, budeme radi.', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: kluc });
+}
+
+/* ---------- nová verzia programu ---------- */
+
+/* poznámky k vydaniu z GitHubu (markdown) → jednoduchý zoznam */
+function poznamkyHtml(text) {
+  var riadky = String(text || '').split(/\r?\n/).map(function (r) { return r.trim(); }).filter(Boolean).slice(0, 15);
+  var body = riadky.filter(function (r) { return /^[-*•]\s+/.test(r); });
+  var zoznam = (body.length ? body : riadky).map(function (r) {
+    var t = esc(r.replace(/^[-*•#]+\s*/, '')).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    return '<li style="margin:0 0 6px;">' + t + '</li>';
+  }).join('');
+  return zoznam ? '\n      <ul style="margin:0 0 14px;padding-left:20px;font-size:15px;line-height:1.6;color:#0d1117;">' + zoznam + '</ul>' : '';
+}
+
+function verziaHtml(m, web) {
+  var obsah =
+    V.pozdrav(m.meno) +
+    V.nadpis('Nová verzia', esc(m.verzia)) +
+    V.odsek('vyšla nová verzia programu GridServis <b>' + esc(m.verzia) + '</b>.') +
+    (m.poznamky ? V.podnadpis('Čo je nové') + poznamkyHtml(m.poznamky) : '') +
+    V.tlacidlo('Stiahnuť novú verziu &rarr;', web + '/stiahnut.html') +
+    V.odsek('Nainštalujte ju cez pôvodný program — licencia aj dáta zostanú.', true) +
+    V.podpis();
+  return V.obalka('Nová verzia GridServis ' + esc(m.verzia), obsah, web, ODPOVED,
+    { hlavicka: 'mriezka', predhlavicka: 'Vyšla nová verzia GridServis ' + esc(m.verzia) + '.' });
+}
+
+async function posliNovaVerzia(email, m, adresaWebu) {
+  return posliSpravu({
+    to: [email],
+    subject: 'Nová verzia GridServis ' + m.verzia,
+    html: verziaHtml(m, adresaWebu),
+    text: [
+      'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
+      'vyšla nová verzia programu GridServis ' + m.verzia + '.', '',
+      String(m.poznamky || '').slice(0, 1500), '',
+      'Stiahnuť: ' + adresaWebu + '/stiahnut.html',
+      'Nainštalujte ju cez pôvodný program — licencia aj dáta zostanú.', '',
+      'Tím GridServis'
+    ].join('\n')
+  }, { kluc: m.kluc });
+}
+
 module.exports = {
   posli: posli,
   posliPresun: posliPresun,
   posliDemo: posliDemo,
   posliRecenziu: posliRecenziu,
-  /* pre náhľady */
-  licenciaHtml: licenciaHtml, presunHtml: presunHtml, demoHtml: demoHtml, recenziaHtml: recenziaHtml,
+  posliPlatbaNepresla: posliPlatbaNepresla,
+  posliKoniecPredplatneho: posliKoniecPredplatneho,
+  posliObnovaZaplatena: posliObnovaZaplatena,
+  posliSkusobnu: posliSkusobnu,
+  posliKoniecSkusobnej: posliKoniecSkusobnej,
+  posliDemoPlnaVerzia: posliDemoPlnaVerzia,
+  posliDotaznik: posliDotaznik,
+  posliNovaVerzia: posliNovaVerzia,
   nastavene: function () { return Boolean(KLUC && ODOSIELATEL); }
 };
