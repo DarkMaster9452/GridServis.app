@@ -7,7 +7,7 @@
 
 var { stripe } = require('./_stripe');
 var { vydaj, obnov, zapisPlatbu } = require('./_licencia');
-var { riadok } = require('./_db');
+var { riadok, sql } = require('./_db');
 var email = require('./_email');
 
 function id(hodnota) {
@@ -20,6 +20,34 @@ function koniecObdobia(predplatne) {
   if (predplatne.current_period_end) return predplatne.current_period_end;
   var polozky = (predplatne.items && predplatne.items.data) || [];
   return polozky.length ? polozky[0].current_period_end : null;
+}
+
+/* Spätnú väzbu s ponukou 3 mesiacov zadarmo dostane len prvých pár rôznych
+   zákazníkov dema; potom už len bežné privítanie. Vlastné adresy sa
+   nepočítajú a e-mail nedostanú. */
+var MAX_RECENZII = parseInt(process.env.GRIDSERVIS_RECENZIE_MAX || '5', 10);
+var RECENZIA_ZA_DNI = 2;
+var VLASTNE_EMAILY = ['strananekm@gmail.com', 'support@gridservis.app']
+  .concat(String(process.env.GRIDSERVIS_VLASTNE_EMAILY || '').split(','))
+  .map(function (e) { return e.trim().toLowerCase(); })
+  .filter(Boolean);
+
+function jeVlastnyEmail(adresa) {
+  return VLASTNE_EMAILY.indexOf(String(adresa || '').trim().toLowerCase()) !== -1;
+}
+
+/* poradie zákazníka medzi rôznymi zákazníkmi dema (1 = prvý), alebo null,
+   keď ide o vlastnú adresu alebo zákazníka, ktorý už demo mal.
+   Volá sa pred zápisom novej objednávky. */
+async function poradieDema(adresa) {
+  adresa = String(adresa || '').trim().toLowerCase();
+  if (!adresa || jeVlastnyEmail(adresa)) return null;
+  var riadky = await sql(
+    "SELECT DISTINCT lower(email) AS email FROM platby WHERE plan = 'demo' AND email <> ''");
+  var ini = riadky.map(function (r) { return r.email; })
+    .filter(function (e) { return !jeVlastnyEmail(e); });
+  if (ini.indexOf(adresa) !== -1) return null;
+  return ini.length + 1;
 }
 
 async function spracuj(relacia, adresaWebu) {
@@ -46,12 +74,17 @@ async function spracuj(relacia, adresaWebu) {
   if (!udaje.stripe_predplatne) {
     /* e-mail len pri prvom spracovaní — webhook aj stránka môžu prísť viackrát */
     var uzZapisana = await riadok('SELECT 1 AS x FROM platby WHERE stripe_id = $1', [udaje.stripe_id]);
+    var poradie = !uzZapisana && plan === 'demo' ? await poradieDema(udaje.email) : null;
     await zapisPlatbu(udaje);
-    /* privítanie len k čerstvej objednávke — nie keď Stripe po dňoch
+    /* e-maily len k čerstvej objednávke — nie keď Stripe po dňoch
        doručí starú udalosť (napr. po oprave webhooku) */
     var cerstva = !relacia.created || (Date.now() / 1000 - relacia.created) < 2 * 86400;
     if (!uzZapisana && plan === 'demo' && cerstva) {
       await email.posliDemo(udaje.email, adresaWebu, udaje.meno);
+      if (poradie && poradie <= MAX_RECENZII) {
+        var naplanovana = await email.posliRecenziu(udaje.email, adresaWebu, udaje.meno, RECENZIA_ZA_DNI);
+        console.log('demo: zákazník č. ' + poradie + ', spätná väzba ' + (naplanovana ? 'naplánovaná' : 'sa nenaplánovala'));
+      }
     }
     return { plan: plan, kod: '', email: udaje.email };
   }
@@ -86,4 +119,4 @@ async function spracuj(relacia, adresaWebu) {
   };
 }
 
-module.exports = { spracuj: spracuj, koniecObdobia: koniecObdobia };
+module.exports = { spracuj: spracuj, koniecObdobia: koniecObdobia, poradieDema: poradieDema, jeVlastnyEmail: jeVlastnyEmail };

@@ -33,7 +33,7 @@
 var crypto = require('crypto');
 var { sql, riadok } = require('../_db');
 var { stripe, adresaWebu, nastavene } = require('../_stripe');
-var { otpBlok, tlacidlo, obalka, odosli, FONT } = require('../_email-vzhlad');
+var { otpBlok, tlacidlo, obalka, odosli, nadpis, kontaktKarta } = require('../_email-vzhlad');
 
 var COOKIE = 'gs_ucet';
 var COOKIE_OAUTH = 'gs_ucet_oauth';
@@ -138,8 +138,8 @@ async function posliEmail(sprava) {
   if (!r.ok) throw new Error('resend ' + r.status + ' ' + (await r.text().catch(function () { return ''; })));
 }
 
-function h1(text) {
-  return '\n      <h1 style="margin:0 0 14px;font-family:' + FONT + ';font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-.01em;color:#0d1117;">' + text + '</h1>';
+function h1(text, modraCast) {
+  return nadpis(text, modraCast);
 }
 
 /* návrat z Google späť na stránku, prípadne so správou */
@@ -169,7 +169,7 @@ async function posliKod(email, kod, web) {
      na server ani do logov nikdy neposiela */
   var klik = web + '/ucet.html#prihlasit=' + encodeURIComponent(email) + ':' + kod;
   var obsah =
-    h1('Prihlásenie do účtu') +
+    h1('Prihlásenie do', 'účtu') +
     '\n      <p style="margin:0 0 4px;color:#0d1117;">Na prihlásenie do správy licencie GridServis zadajte tento kód:</p>' +
     otpBlok(kod, 'KÓD NA PRIHLÁSENIE') +
     '\n      <p style="margin:0;color:#55606e;font-size:14px;">Platí ' + KOD_MINUT + ' minút a dá sa použiť len raz. Kód nemusíte prepisovať — stačí kliknúť:</p>' +
@@ -178,6 +178,7 @@ async function posliKod(email, kod, web) {
   await posliEmail({
     to: [email],
     subject: kod + ' — kód na prihlásenie do GridServis',
+    headers: { 'X-Priority': '1', Importance: 'high' },
     html: obalka('Kód na prihlásenie', obsah, '', PODPORA),
     text: 'Kód na prihlásenie do správy licencie GridServis: ' + kod +
       '\n\nPlatí ' + KOD_MINUT + ' minút a dá sa použiť len raz.' +
@@ -516,11 +517,13 @@ async function odstupenie(req, res) {
     await posliEmail({
       to: [email],
       subject: 'Potvrdenie odstúpenia od zmluvy ' + cislo + ' — GridServis',
+      headers: { 'X-Priority': '1', Importance: 'high' },
       html: obalka('Potvrdenie odstúpenia od zmluvy',
-        h1('Odstúpenie od zmluvy sme prijali') +
+        h1('Odstúpenie od zmluvy sme', 'prijali') +
         '\n      <p style="margin:0;color:#0d1117;">Potvrdzujeme, že sme prijali vaše odstúpenie od zmluvy s týmto obsahom:</p>' +
         tabulka +
-        '\n      <p style="margin:0;color:#55606e;font-size:14px;">Ak vám vzniká nárok na vrátenie platby, vrátime ju rovnakým spôsobom, akým prišla, najneskôr do 14 dní. Ozveme sa vám e-mailom.</p>',
+        '\n      <p style="margin:0 0 18px;color:#55606e;font-size:14px;">Ak vám vzniká nárok na vrátenie platby, vrátime ju rovnakým spôsobom, akým prišla, najneskôr do 14 dní. Ozveme sa vám e-mailom.</p>' +
+        kontaktKarta('Otázky k odstúpeniu?'),
         '', PODPORA),
       text: 'Potvrdzujeme prijatie odstúpenia od zmluvy.\n\n' + text +
         '\n\nAk vám vzniká nárok na vrátenie platby, vrátime ju do 14 dní.\nOtázky: ' + PODPORA
@@ -530,7 +533,7 @@ async function odstupenie(req, res) {
       to: [PODPORA],
       reply_to: email,
       subject: 'Odstúpenie od zmluvy ' + cislo + ' — ' + zmluva,
-      html: obalka('Odstúpenie od zmluvy', h1('Nové odstúpenie od zmluvy') + tabulka, '', PODPORA),
+      html: obalka('Odstúpenie od zmluvy', h1('Nové odstúpenie', 'od zmluvy') + tabulka, '', PODPORA),
       text: text
     });
   } catch (e) {
