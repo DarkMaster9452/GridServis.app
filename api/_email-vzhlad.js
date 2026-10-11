@@ -40,6 +40,13 @@ var HLAVICKY = {
 };
 var MRIEZKA = WEB + '/assets/img/email-mriezka.png';
 var MRIEZKA_MODRA = WEB + '/assets/img/email-mriezka-modra.png';
+/* Cesty k súborom musia byť v kóde doslovne — Vercel do funkcie pribalí len
+   súbory, ktorých cestu vidí pri nasadení (premenná v ceste nestačí). */
+function nacitaj(subor) {
+  if (subor === '_hlavicka-app.png') return fs.readFileSync(path.join(__dirname, '_hlavicka-app.png'));
+  if (subor === '_hlavicka.png') return fs.readFileSync(path.join(__dirname, '_hlavicka.png'));
+  throw new Error('neznámy súbor ' + subor);
+}
 var obsahSuborov = {};
 
 function prilohy(html) {
@@ -49,7 +56,7 @@ function prilohy(html) {
     var h = HLAVICKY[k];
     if (html.indexOf('cid:' + h.cid) === -1) return;
     if (!(h.subor in obsahSuborov)) {
-      try { obsahSuborov[h.subor] = fs.readFileSync(path.join(__dirname, h.subor)).toString('base64'); }
+      try { obsahSuborov[h.subor] = nacitaj(h.subor).toString('base64'); }
       catch (e) { obsahSuborov[h.subor] = ''; console.error('email: hlavička', e.message); }
     }
     if (obsahSuborov[h.subor]) {
@@ -57,6 +64,17 @@ function prilohy(html) {
     }
   });
   return vysledok;
+}
+
+/* cid:, ku ktorému sa nepodarilo pripojiť súbor → odkaz na web, nech
+   obrázok nikdy nechýba */
+function doplnChybajuce(html, priloh) {
+  var s = String(html || '');
+  var mame = priloh.map(function (p) { return p.content_id; });
+  Object.keys(HLAVICKY).forEach(function (k) {
+    if (mame.indexOf(HLAVICKY[k].cid) === -1) s = s.split('cid:' + HLAVICKY[k].cid).join(HLAVICKY[k].web);
+  });
+  return s;
 }
 
 /* cid: → odkaz na web (pre naplánované e-maily a ako záloha) */
@@ -254,9 +272,10 @@ async function odosli(sprava, moznosti) {
     });
   }
 
+  var priloh = prilohy(sprava.html);
   var r = await fetch('https://api.resend.com/emails', {
     method: 'POST', headers: hlavicky,
-    body: JSON.stringify(Object.assign({ attachments: prilohy(sprava.html) }, sprava))
+    body: JSON.stringify(Object.assign({}, sprava, { attachments: priloh, html: doplnChybajuce(sprava.html, priloh) }))
   });
   if (!r.ok && r.status >= 400 && r.status < 500 && r.status !== 401 && r.status !== 403 && r.status !== 429) {
     console.error('email: bez prílohy', r.status, await r.text().catch(function () { return ''; }));
