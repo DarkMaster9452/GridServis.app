@@ -133,7 +133,7 @@ async function posliDemo(email, adresaWebu, meno) {
     '\n      <ul style="margin:0 0 10px;padding-left:20px;color:#0d1117;">' + zoznam + '</ul>' +
     '\n      <p style="margin:0;color:#0d1117;">Stačí odpovedať priamo na tento e-mail. Čítam každú odpoveď a rád sa k nej vrátim.</p>' +
     '\n      <p style="margin:18px 0 0;color:#55606e;font-size:14px;">Niečo nesedí alebo máš otázku? Napíš na <a href="mailto:' + ODPOVED + '" style="color:#2563eb;">' + ODPOVED + '</a>.</p>';
-  var telo = obalka('Vitaj v GridServise — demo je pripravené', obsah, adresaWebu, ODPOVED);
+  var telo = obalka('Vitaj v GridServise — demo je pripravené', obsah, adresaWebu, ODPOVED, true);
   var text = [
     'Vitaj v GridServise' + pozdrav + '!', '',
     'Ďakujem, že si si objednal demo programu GridServis.',
