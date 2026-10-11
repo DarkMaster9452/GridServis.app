@@ -7,6 +7,7 @@
 
 var { stripe } = require('./_stripe');
 var { vydaj, obnov, zapisPlatbu } = require('./_licencia');
+var { riadok } = require('./_db');
 var email = require('./_email');
 
 function id(hodnota) {
@@ -43,7 +44,15 @@ async function spracuj(relacia, adresaWebu) {
 
   /* demo je objednávka za 0 € bez licencie — program má vlastnú demo edíciu */
   if (!udaje.stripe_predplatne) {
+    /* e-mail len pri prvom spracovaní — webhook aj stránka môžu prísť viackrát */
+    var uzZapisana = await riadok('SELECT 1 AS x FROM platby WHERE stripe_id = $1', [udaje.stripe_id]);
     await zapisPlatbu(udaje);
+    /* privítanie len k čerstvej objednávke — nie keď Stripe po dňoch
+       doručí starú udalosť (napr. po oprave webhooku) */
+    var cerstva = !relacia.created || (Date.now() / 1000 - relacia.created) < 2 * 86400;
+    if (!uzZapisana && plan === 'demo' && cerstva) {
+      await email.posliDemo(udaje.email, adresaWebu, udaje.meno);
+    }
     return { plan: plan, kod: '', email: udaje.email };
   }
 
