@@ -6,8 +6,10 @@
      invoice.payment_failed       neúspešná platba → poznámka, Stripe skúša znova
      customer.subscription.deleted predplatné skončilo → licencia sa zastaví
 
-   Bezpečnosť: podpis sa overuje podľa STRIPE_WEBHOOK_SECRET a navyše sa každý
-   objekt načíta priamo zo Stripe, takže na podvrhnutú správu sa nedá nachytať. */
+   Bezpečnosť: podpis sa overuje podľa STRIPE_WEBHOOK_SECRET; keď sa overiť
+   nedá (Vercel telo rozparsuje), udalosť sa načíta zo Stripe podľa id. Navyše
+   sa každý objekt načíta priamo zo Stripe, takže na podvrhnutú správu sa nedá
+   nachytať. */
 
 var crypto = require('crypto');
 var { stripe, adresaWebu } = require('./_stripe');
@@ -53,6 +55,12 @@ function id(hodnota) {
   return typeof hodnota === 'string' ? hodnota : String(hodnota.id || '');
 }
 
+/* predplatné faktúry; od API 2025-03-31.basil je v parent.subscription_details */
+function predplatneFaktury(f) {
+  return id(f.subscription) ||
+    id(f.parent && f.parent.subscription_details && f.parent.subscription_details.subscription);
+}
+
 module.exports = async function (req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -61,27 +69,49 @@ module.exports = async function (req, res) {
     return;
   }
 
-  var telo;
+  /* Vercel telo s hlavičkou application/json prečíta a rozparsuje sám
+     (bodyParser: false platí len v Next.js), takže surové bajty, z ktorých
+     Stripe počítal podpis, často nemáme. JSON.stringify ich nevráti — Stripe
+     posiela telo s odsadením. Preto: keď surové telo máme, overí sa podpis;
+     keď nie, udalosť sa načíta priamo zo Stripe podľa id. */
+  var surovyText = null;
+  var udalost;
   try {
-    telo = typeof req.body === 'string' ? req.body
-      : (req.body ? JSON.stringify(req.body) : await surove(req));
+    if (Buffer.isBuffer(req.body)) surovyText = req.body.toString('utf8');
+    else if (typeof req.body === 'string') surovyText = req.body;
+    else if (req.body && typeof req.body === 'object') udalost = req.body;
+    else surovyText = await surove(req);
+    if (surovyText !== null) udalost = JSON.parse(surovyText);
   } catch (e) {
     res.status(400).json({ chyba: 'Telo sa nepodarilo prečítať.' });
     return;
   }
 
-  if (TAJOMSTVO && !podpisSedi(telo, req.headers['stripe-signature'])) {
-    console.error('stripe-hook: nesedí podpis');
-    res.status(400).json({ chyba: 'Neplatný podpis.' });
-    return;
-  }
+  var overena = Boolean(TAJOMSTVO && surovyText !== null &&
+    podpisSedi(surovyText, req.headers['stripe-signature']));
 
-  var udalost;
-  try {
-    udalost = JSON.parse(telo);
-  } catch (e) {
-    res.status(400).json({ chyba: 'Telo nie je JSON.' });
-    return;
+  if (!overena) {
+    var idUdalosti = String((udalost && udalost.id) || '');
+    if (!/^evt_[A-Za-z0-9]{8,100}$/.test(idUdalosti)) {
+      console.error('stripe-hook: nesedí podpis a chýba id udalosti');
+      res.status(400).json({ chyba: 'Neplatný podpis.' });
+      return;
+    }
+    try {
+      /* udalosť, ktorá nie je v našom Stripe účte, tu skončí na 404 */
+      udalost = await stripe('/events/' + idUdalosti);
+      console.log('stripe-hook: podpis sa nedal overiť (' +
+        (surovyText === null ? 'telo prišlo rozparsované' : 'nesedí') + '), udalosť overená cez API', idUdalosti);
+    } catch (e) {
+      if (e.stav === 404) {
+        console.error('stripe-hook: neznáma udalosť', idUdalosti);
+        res.status(400).json({ chyba: 'Neplatný podpis.' });
+        return;
+      }
+      console.error('stripe-hook: overenie cez API zlyhalo', e.message);
+      res.status(500).json({ chyba: 'Overenie zlyhalo.' });
+      return;
+    }
   }
 
   var typ = String(udalost.type || '');
@@ -122,21 +152,23 @@ module.exports = async function (req, res) {
     } else if (typ === 'invoice.paid' || typ === 'invoice.payment_succeeded') {
       var faktura = await stripe('/invoices/' + objekt.id);
       /* prvú faktúru predplatného už vybavil checkout — nezapisujeme ju dvakrát */
-      if (faktura.billing_reason !== 'subscription_create' && id(faktura.subscription)) {
-        var predplatne = await stripe('/subscriptions/' + id(faktura.subscription));
-        var o = await predlz(id(faktura.subscription), koniecObdobia(predplatne), {
+      var subFaktury = predplatneFaktury(faktura);
+      if (faktura.billing_reason !== 'subscription_create' && subFaktury) {
+        var predplatne = await stripe('/subscriptions/' + subFaktury);
+        var o = await predlz(subFaktury, koniecObdobia(predplatne), {
           stripe_id: faktura.id,
           email: faktura.customer_email || '',
           suma: faktura.amount_paid,
           mena: faktura.currency
         });
-        console.log('stripe-hook: obnova', id(faktura.subscription),
+        console.log('stripe-hook: obnova', subFaktury,
           o ? 'licencia ' + o.kod + ' do ' + o.platna_do : 'licencia sa nenašla');
       }
 
     } else if (typ === 'invoice.payment_failed') {
       var neuspesna = await stripe('/invoices/' + objekt.id);
-      if (id(neuspesna.subscription)) {
+      var subNeuspesnej = predplatneFaktury(neuspesna);
+      if (subNeuspesnej) {
         await zapisPlatbu({
           stripe_id: neuspesna.id,
           druh: 'obnova',
@@ -145,9 +177,9 @@ module.exports = async function (req, res) {
           suma: neuspesna.amount_due,
           mena: neuspesna.currency,
           stripe_zakaznik: id(neuspesna.customer),
-          stripe_predplatne: id(neuspesna.subscription)
+          stripe_predplatne: subNeuspesnej
         });
-        await poznamka(id(neuspesna.subscription),
+        await poznamka(subNeuspesnej,
           'platba neprešla ' + new Date().toISOString().slice(0, 10));
       }
 
