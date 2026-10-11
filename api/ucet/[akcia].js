@@ -178,6 +178,7 @@ async function posliKod(email, kod, web) {
   await posliEmail({
     to: [email],
     subject: kod + ' — kód na prihlásenie do GridServis',
+    headers: { 'X-Priority': '1', Importance: 'high' },
     html: obalka('Kód na prihlásenie', obsah, '', PODPORA),
     text: 'Kód na prihlásenie do správy licencie GridServis: ' + kod +
       '\n\nPlatí ' + KOD_MINUT + ' minút a dá sa použiť len raz.' +
@@ -516,6 +517,7 @@ async function odstupenie(req, res) {
     await posliEmail({
       to: [email],
       subject: 'Potvrdenie odstúpenia od zmluvy ' + cislo + ' — GridServis',
+      headers: { 'X-Priority': '1', Importance: 'high' },
       html: obalka('Potvrdenie odstúpenia od zmluvy',
         h1('Odstúpenie od zmluvy sme', 'prijali') +
         '\n      <p style="margin:0;color:#0d1117;">Potvrdzujeme, že sme prijali vaše odstúpenie od zmluvy s týmto obsahom:</p>' +
