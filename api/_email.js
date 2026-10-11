@@ -357,10 +357,16 @@ async function posliObnovaZaplatena(email, m, adresaWebu) {
 
 /* ---------- skúšobná licencia (3 mesiace zadarmo za spätnú väzbu) ---------- */
 
+/* 1 mesiac, 2–4 mesiace, 5+ mesiacov */
+function mesiaceText(n) {
+  n = Number(n) || 0;
+  return n + (n === 1 ? ' mesiac' : n >= 2 && n <= 4 ? ' mesiace' : ' mesiacov');
+}
+
 function skusobnaHtml(m, web) {
   var obsah =
     V.pozdrav(m.meno) +
-    V.nadpis('Vaše ' + m.mesiace + ' mesiace', 'zadarmo') +
+    V.nadpis(mesiaceText(m.mesiace) + ' plnej verzie', 'zadarmo') +
     V.odsek('ďakujeme, že nám pomôžete GridServis zlepšovať. Tu je licencia na plnú verziu — bez platby a bez záväzkov.') +
     V.kodBlok(m.kod, 'VÁŠ LICENČNÝ KÓD') +
     V.odsek('Licencia platí do <b>' + datum(m.platnaDo) + '</b>. Nič sa automaticky neplatí, pred koncom vám pripomenieme, ako pokračovať.', true) +
@@ -378,18 +384,18 @@ function skusobnaHtml(m, web) {
     }) +
     V.kontaktKarta() +
     V.podpis('Ďakujeme, že ste do toho išli s nami.');
-  return V.obalka('Vaše ' + m.mesiace + ' mesiace zadarmo', obsah, web, ODPOVED,
-    { hlavicka: 'app', predhlavicka: 'Licencia na plnú verziu GridServis na ' + m.mesiace + ' mesiace zadarmo.' });
+  return V.obalka(mesiaceText(m.mesiace) + ' plnej verzie zadarmo', obsah, web, ODPOVED,
+    { hlavicka: 'app', predhlavicka: 'Licencia na plnú verziu GridServis na ' + mesiaceText(m.mesiace) + ' zadarmo.' });
 }
 
 async function posliSkusobnu(email, m, adresaWebu) {
   return posliSpravu({
     to: [email],
-    subject: 'Vaša licencia GridServis na ' + m.mesiace + ' mesiace zadarmo',
+    subject: 'Vaša licencia GridServis na ' + mesiaceText(m.mesiace) + ' zadarmo',
     html: skusobnaHtml(m, adresaWebu),
     text: [
       'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
-      'ďakujeme, že nám pomôžete GridServis zlepšovať. Tu je licencia na plnú verziu na ' + m.mesiace + ' mesiace zadarmo.', '',
+      'ďakujeme, že nám pomôžete GridServis zlepšovať. Tu je licencia na plnú verziu na ' + mesiaceText(m.mesiace) + ' zadarmo.', '',
       'Licenčný kód: ' + m.kod,
       'Platí do: ' + datum(m.platnaDo), '',
       'Ako začať:',
@@ -573,5 +579,6 @@ module.exports = {
   posliDemoPlnaVerzia: posliDemoPlnaVerzia,
   posliDotaznik: posliDotaznik,
   posliNovaVerzia: posliNovaVerzia,
+  mesiaceText: mesiaceText,
   nastavene: function () { return Boolean(KLUC && ODOSIELATEL); }
 };

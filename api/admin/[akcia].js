@@ -193,10 +193,10 @@ async function skusobna(req, res) {
     `INSERT INTO licencie (kod, dielna, kontakt, email, max_zariadeni, platna_do, stav, poznamka, typ_licencie)
      VALUES ($1, $2, $3, $3, 1, (current_date + make_interval(months => $4::int))::date, 'aktivna', $5, 'trial_admin')
      RETURNING platna_do::text AS platna_do`,
-    [kod, meno || adresa, adresa, mesiace, 'GridServis web · ' + mesiace + ' mesiace zadarmo za spätnú väzbu']);
+    [kod, meno || adresa, adresa, mesiace, 'GridServis web · ' + email.mesiaceText(mesiace) + ' zadarmo za spätnú väzbu']);
   await zapisPlatbu({
     stripe_id: 'skusobna-' + kod, druh: 'skusobna', plan: 'skusobna', email: adresa,
-    suma: 0, mena: 'eur', kod: kod, poznamka: mesiace + ' mesiace zadarmo za spätnú väzbu'
+    suma: 0, mena: 'eur', kod: kod, poznamka: email.mesiaceText(mesiace) + ' zadarmo za spätnú väzbu'
   });
   var poslany = await email.posliSkusobnu(adresa, {
     meno: meno, kod: kod, platnaDo: l.platna_do, mesiace: mesiace, kluc: 'skusobna-' + kod
