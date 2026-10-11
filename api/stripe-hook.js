@@ -12,6 +12,7 @@
 var crypto = require('crypto');
 var { stripe, adresaWebu } = require('./_stripe');
 var { predlz, poznamka, zapisPlatbu } = require('./_licencia');
+var { sql } = require('./_db');
 var { spracuj, koniecObdobia } = require('./_objednavka');
 
 var TAJOMSTVO = process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -95,8 +96,6 @@ module.exports = async function (req, res) {
 
       /* presun licencie na iný počítač — nevydáva sa licencia, len sa uvoľní PC */
       if (meta.typ === 'presun') {
-        var { sql } = require('./_db');
-        var { zapisPlatbu } = require('./_licencia');
         await sql('DELETE FROM zariadenia WHERE kod = $1 AND odtlacok = $2', [meta.kod, meta.pc]);
         await zapisPlatbu({
           stripe_id: relacia.id,
@@ -157,7 +156,6 @@ module.exports = async function (req, res) {
       var kod = await poznamka(objekt.id,
         'predplatné skončilo ' + new Date().toISOString().slice(0, 10));
       if (kod) {
-        var { sql } = require('./_db');
         await sql("UPDATE licencie SET platna_do = current_date WHERE kod = $1", [kod]);
       }
       console.log('stripe-hook: koniec predplatného', objekt.id, kod || '');
