@@ -87,13 +87,29 @@ module.exports = async function (req, res) {
     return;
   }
 
+  /* udalosti, ktoré nespracúvame (napr. billing_portal.* pri otvorení portálu),
+     potvrdíme hneď — inak by ich Stripe opakoval a hlásil webhook ako zlyhávajúci */
+  var SPRACUVANE = ['checkout.session.completed', 'invoice.paid', 'invoice.payment_succeeded',
+    'invoice.payment_failed', 'customer.subscription.deleted'];
+  var typTela = String((udalost && udalost.type) || '');
+  if (typTela && SPRACUVANE.indexOf(typTela) === -1) {
+    console.log('stripe-hook: ignorujem', typTela);
+    res.status(200).json({ ok: true, ignorovane: true });
+    return;
+  }
+
   var overena = Boolean(TAJOMSTVO && surovyText !== null &&
     podpisSedi(surovyText, req.headers['stripe-signature']));
 
   if (!overena) {
     var idUdalosti = String((udalost && udalost.id) || '');
-    if (!/^evt_[A-Za-z0-9]{8,100}$/.test(idUdalosti)) {
-      console.error('stripe-hook: nesedí podpis a chýba id udalosti');
+    if (!/^evt_[A-Za-z0-9_]{8,120}$/.test(idUdalosti)) {
+      console.error('stripe-hook: nesedí podpis a chýba id udalosti', JSON.stringify({
+        telo: surovyText === null ? typeof req.body : 'text ' + surovyText.length + ' B',
+        kluce: udalost && typeof udalost === 'object' ? Object.keys(udalost).slice(0, 12) : [],
+        typ: typTela, id: idUdalosti.slice(0, 12), objekt: udalost && udalost.object,
+        agent: String(req.headers['user-agent'] || '').slice(0, 60)
+      }));
       res.status(400).json({ chyba: 'Neplatný podpis.' });
       return;
     }
