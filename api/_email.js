@@ -61,11 +61,11 @@ function licenciaHtml(meno, kod, plan, platnaDo, web) {
     V.odsek('Odložte si ho — budete ho potrebovať pri prvom spustení aj pri presune na iný počítač.', true) +
     V.podnadpis('Ako začať') +
     V.kroky([
-      ['Stiahnite program', 'Inštalačka je na stránke <a href="' + web + '/stiahnut.html" style="color:#2563eb;">gridservis.app/stiahnut</a>.'],
+      ['Stiahnite program', 'Inštalačka sa stiahne hneď po kliknutí na <a href="' + web + '/api/stiahnut-plna" style="color:#2563eb;">tento odkaz</a> — bez platby, licenciu už máte.'],
       ['Spustite inštaláciu', SMARTSCREEN],
       ['Zadajte licenčný kód', 'Pri prvom spustení vložte kód vyššie. Licencia platí na jeden počítač.']
     ]) +
-    V.tlacidlo('Stiahnuť program &rarr;', web + '/stiahnut.html') +
+    V.tlacidlo('Stiahnuť program &rarr;', web + '/api/stiahnut-plna') +
     V.odsek('Predplatné platí do <b>' + platnaDo + '</b>, potom sa samo obnoví. Zrušiť ho, obnoviť alebo presunúť licenciu na iný počítač viete v <a href="' + web + '/ucet.html" style="color:#2563eb;">Mojom účte</a>.', true) +
     V.tmavyPruh('Menej chaosu, viac času na autá.', 'Ak niečo nesedí, stačí odpovedať na tento e-mail.') +
     V.kontaktKarta() +
@@ -85,7 +85,7 @@ function licenciaText(meno, kod, plan, platnaDo, web) {
     'Predplatné platí do: ' + platnaDo,
     '',
     'Ako začať:',
-    '1. Stiahnite program na ' + web + '/stiahnut.html',
+    '1. Stiahnite program (bez platby, licenciu už máte): ' + web + '/api/stiahnut-plna',
     '2. Spustite inštaláciu. Windows ukáže upozornenie SmartScreen, lebo súbor',
     '   nemá podpisový certifikát — kliknite na Ďalšie informácie a Spustiť tak či tak.',
     '3. Pri prvom spustení zadajte kód vyššie. Licencia platí na jeden počítač.',
@@ -119,7 +119,7 @@ function presunHtml(kod, web) {
     V.odsek('presun licencie na iný počítač je zaplatený. Predošlý počítač je odhlásený.') +
     V.kodBlok(kod, 'VÁŠ LICENČNÝ KÓD') +
     V.kroky([
-      ['Nainštalujte program na nový počítač', 'Inštalačka je na stránke <a href="' + web + '/stiahnut.html" style="color:#2563eb;">gridservis.app/stiahnut</a>.'],
+      ['Nainštalujte program na nový počítač', 'Inštalačka sa stiahne hneď po kliknutí na <a href="' + web + '/api/stiahnut-plna" style="color:#2563eb;">tento odkaz</a> — bez platby, licenciu už máte.'],
       ['Zadajte ten istý kód', 'Pri spustení vložte kód vyššie. Licencia ani jej platnosť sa nemenili.']
     ]) +
     V.kontaktKarta('Niečo nesedí? Ozvite sa nám') +
@@ -366,11 +366,11 @@ function skusobnaHtml(m, web) {
     V.odsek('Licencia platí do <b>' + datum(m.platnaDo) + '</b>. Nič sa automaticky neplatí, pred koncom vám pripomenieme, ako pokračovať.', true) +
     V.podnadpis('Ako začať') +
     V.kroky([
-      ['Stiahnite plnú verziu', 'Inštalačka je na stránke <a href="' + web + '/stiahnut.html" style="color:#2563eb;">gridservis.app/stiahnut</a>.'],
+      ['Stiahnite plnú verziu', 'Inštalačka sa stiahne hneď po kliknutí na <a href="' + web + '/api/stiahnut-plna" style="color:#2563eb;">tento odkaz</a> — bez platby, licenciu už máte.'],
       ['Spustite inštaláciu', SMARTSCREEN],
       ['Zadajte licenčný kód', 'Pri prvom spustení vložte kód vyššie.']
     ]) +
-    V.tlacidlo('Stiahnuť plnú verziu &rarr;', web + '/stiahnut.html') +
+    V.tlacidlo('Stiahnuť plnú verziu &rarr;', web + '/api/stiahnut-plna') +
     V.modraKarta({
       stitok: 'VAŠA SPÄTNÁ VÄZBA',
       titulok: 'Píšte nám, čo funguje a čo nie',
@@ -393,7 +393,7 @@ async function posliSkusobnu(email, m, adresaWebu) {
       'Licenčný kód: ' + m.kod,
       'Platí do: ' + datum(m.platnaDo), '',
       'Ako začať:',
-      '1. Stiahnite plnú verziu na ' + adresaWebu + '/stiahnut.html',
+      '1. Stiahnite plnú verziu (bez platby): ' + adresaWebu + '/api/stiahnut-plna',
       '2. Spustite inštaláciu (pri upozornení SmartScreen: Ďalšie informácie → Spustiť tak či tak).',
       '3. Pri prvom spustení zadajte kód vyššie.', '',
       'Kedykoľvek nám odpíšte, čo funguje a čo nie. Nič sa automaticky neplatí.', '',
@@ -537,7 +537,7 @@ function verziaHtml(m, web) {
     V.nadpis('Nová verzia', esc(m.verzia)) +
     V.odsek('vyšla nová verzia programu GridServis <b>' + esc(m.verzia) + '</b>.') +
     (m.poznamky ? V.podnadpis('Čo je nové') + poznamkyHtml(m.poznamky) : '') +
-    V.tlacidlo('Stiahnuť novú verziu &rarr;', web + '/stiahnut.html') +
+    V.tlacidlo('Stiahnuť novú verziu &rarr;', web + '/api/stiahnut-plna') +
     V.odsek('Nainštalujte ju cez pôvodný program — licencia aj dáta zostanú.', true) +
     V.podpis();
   return V.obalka('Nová verzia GridServis ' + esc(m.verzia), obsah, web, ODPOVED,
@@ -553,7 +553,7 @@ async function posliNovaVerzia(email, m, adresaWebu) {
       'Dobrý deň' + (m.meno ? ', ' + m.meno : '') + ',', '',
       'vyšla nová verzia programu GridServis ' + m.verzia + '.', '',
       String(m.poznamky || '').slice(0, 1500), '',
-      'Stiahnuť: ' + adresaWebu + '/stiahnut.html',
+      'Stiahnuť: ' + adresaWebu + '/api/stiahnut-plna',
       'Nainštalujte ju cez pôvodný program — licencia aj dáta zostanú.', '',
       'Tím GridServis'
     ].join('\n')
