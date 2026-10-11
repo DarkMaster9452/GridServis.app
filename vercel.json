@@ -5,7 +5,9 @@
     { "path": "/api/admin/cron", "schedule": "0 6 * * *" }
   ],
   "functions": {
-    "api/admin/*.js": { "maxDuration": 60 }
+    "api/*.js": { "includeFiles": "api/_*.png" },
+    "api/ucet/*.js": { "includeFiles": "api/_*.png" },
+    "api/admin/*.js": { "maxDuration": 60, "includeFiles": "api/_*.png" }
   },
   "headers": [
     {
