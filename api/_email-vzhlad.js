@@ -53,10 +53,14 @@ var FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI Variable Text','Segoe UI'
 var MONO = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace";
 
 function tlacidlo(text, href) {
+  /* modré pozadie je nastavené trikrát (bgcolor, td aj odkaz), lebo niektoré
+     klienty štýl `background` zahodia a biely text by zostal na bielom;
+     pod tlačidlom je preto aj obyčajný odkaz */
   return '\n  <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 8px;">' +
-    '\n    <tr><td style="border-radius:10px;background:' + FARBY.acc + ';">' +
-    '\n      <a href="' + href + '" style="display:inline-block;padding:13px 26px;font-family:' + FONT + ';font-size:15px;line-height:1;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">' + text + '</a>' +
-    '\n    </td></tr>\n  </table>';
+    '\n    <tr><td bgcolor="' + FARBY.acc + '" style="border-radius:10px;background-color:' + FARBY.acc + ';">' +
+    '\n      <a href="' + href + '" style="display:inline-block;padding:13px 26px;font-family:' + FONT + ';font-size:15px;line-height:1;font-weight:600;color:#ffffff;background-color:' + FARBY.acc + ';text-decoration:none;border-radius:10px;border:1px solid ' + FARBY.acc + ';">' + text + '</a>' +
+    '\n    </td></tr>\n  </table>' +
+    '\n  <p style="margin:0 0 4px;color:' + FARBY.mut + ';font-size:13px;">Alebo otvor: <a href="' + href + '" style="color:' + FARBY.acc + ';">' + href.replace(/^https?:\/\//, '') + '</a></p>';
 }
 
 /* Licenčný kód — zvýraznený monospace blok, ako .kod na webe. */
@@ -72,11 +76,10 @@ function kodBlok(hodnota, popis) {
    (ten je tiež svetlý s tmavým logom, nie tmavý pruh). */
 function znacka(hero) {
   if (hero) {
-    /* modrá hlavička s mriežkou a bielym logom — jeden obrázok, preto vyzerá
-       rovnako vo všetkých e-mailových klientoch; bgcolor je záloha, keby sa
-       obrázok neurobil */
-    return '\n  <tr><td bgcolor="' + FARBY.acc + '" style="background:' + FARBY.acc + ';line-height:0;font-size:0;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;">' +
-      '\n    <img src="cid:' + HERO_CID + '" width="560" height="150" alt="GridServis" style="display:block;width:100%;max-width:560px;height:auto;border:0;">' +
+    /* modrá hlavička s mriežkou a bielym logom — jeden obrázok. Keď ho klient
+       zablokuje, ostane modrý pruh s bielym nápisom (alt), nie prázdne miesto. */
+    return '\n  <tr><td bgcolor="' + FARBY.acc + '" height="150" align="center" style="height:150px;background-color:' + FARBY.acc + ';border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;">' +
+      '\n    <img src="cid:' + HERO_CID + '" width="560" height="150" alt="GridServis" style="display:block;width:100%;max-width:560px;height:auto;min-height:150px;border:0;color:#ffffff;font-family:' + FONT + ';font-size:30px;font-weight:700;line-height:150px;text-align:center;">' +
       '\n  </td></tr>';
   }
   return '\n  <tr><td style="background:' + FARBY.bg + ';padding:22px 32px;border-radius:' + RADIUS + ' ' + RADIUS + ' 0 0;border-bottom:1px solid ' + FARBY.linka + ';">' +
@@ -103,8 +106,8 @@ function obalka(predmet, obsahHtml, webUrl, odpoved, hero) {   // webUrl sa už 
     '\n<meta name="color-scheme" content="light">' +
     '\n<title>' + predmet + '</title>' +
     '\n</head>' +
-    '\n<body style="margin:0;padding:32px 16px;background:' + FARBY.bg2 + ';font-family:' + FONT + ';font-size:15px;line-height:1.65;color:' + FARBY.ink + ';">' +
-    '\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:' + FARBY.bg + ';border-radius:' + RADIUS + ';overflow:hidden;box-shadow:0 2px 6px rgba(13,17,23,.05),0 18px 40px -28px rgba(13,17,23,.28);">' +
+    '\n<body bgcolor="' + FARBY.bg2 + '" style="margin:0;padding:32px 16px;background-color:' + FARBY.bg2 + ';font-family:' + FONT + ';font-size:15px;line-height:1.65;color:' + FARBY.ink + ';">' +
+    '\n  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="' + FARBY.bg + '" style="max-width:560px;margin:0 auto;background-color:' + FARBY.bg + ';border-radius:' + RADIUS + ';overflow:hidden;box-shadow:0 2px 6px rgba(13,17,23,.05),0 18px 40px -28px rgba(13,17,23,.28);">' +
     znacka(hero) +
     '\n    <tr><td style="padding:34px 32px 12px;">' +
     obsahHtml +
