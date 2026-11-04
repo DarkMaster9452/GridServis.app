@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/assets/img/og-gridservis.png" alt="GridServis — celý servis v jednom programe" width="720">
+<img src="docs/web-banner.png" alt="GridServis — celý servis v jednom programe" width="720">
 
 # GridServis
 
