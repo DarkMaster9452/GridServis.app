@@ -1,4 +1,5 @@
-# Hotové stránky vyrába tools/gen.py (duplicita), GitHub ich v rozdieloch zbalí.
-public/*.html linguist-generated=true
+# JavaScript (api/ a public/assets/js/) je pisany s AI, GitHub ho v grafe jazykov nepocita.
+*.js linguist-generated=true
+# Hotove stranky vyrába tools/gen.py (duplicita), ale HTML sa v grafe jazykov pocita ako rucne pisane.
 public/sitemap.xml linguist-generated=true
 public/robots.txt linguist-generated=true
