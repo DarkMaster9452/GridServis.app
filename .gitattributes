@@ -1,0 +1,4 @@
+# Hotové stránky vyrába tools/gen.py (duplicita), GitHub ich v rozdieloch zbalí.
+public/*.html linguist-generated=true
+public/sitemap.xml linguist-generated=true
+public/robots.txt linguist-generated=true
