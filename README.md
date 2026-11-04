@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/assets/img/og-gridservis.png" alt="GridServis — celý servis v jednom programe" width="720">
+<img src="docs/web-banner.png" alt="GridServis — celý servis v jednom programe" width="720">
 
 # GridServis
 
@@ -93,6 +93,14 @@ Web je postavený tak, aby **nesťahoval nič z cudzích domén** — žiadne ex
 písma, reklamné skripty ani vložený obsah. Návštevnosť sa meria vlastným
 riešením, ktoré ukladá len typ udalosti a stránku: žiadne cookies, žiadne
 sledovanie, žiadna IP adresa.
+
+**Poznámka: `public/*.html` je duplicita.** Stránky generuje `tools/gen.py`
+(`python3 tools/gen.py`), ale hotové HTML je v repe zámerne uložené, lebo
+nasadenie na Vercel nemá build krok. Upravuj preto `tools/gen.py` a potom
+stránky vygeneruj znova — priame úpravy `public/*.html` sa pri ďalšom
+generovaní prepíšu. Pozor: generátor zatiaľ píše všetkým snímkom pevné rozmery
+1600×1000, kým v repe sú skutočné rozmery obrázkov, takže po vygenerovaní sa
+`index.html` a `funkcie.html` zmenia.
 
 ---
 
